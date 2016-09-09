@@ -86,7 +86,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
       this.data = dataSetOservable;
 
       this.bounds = {
-         margin: {top: 20, right: 20, bottom: 30, left: 30},
+         margin: {top: 20, right: 20, bottom: 30, left: 40},
          getInnerWidth: function () {
             return +svg.attr("width") - self.bounds.margin.left - self.bounds.margin.right;
          },
@@ -118,20 +118,22 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
       data = self.data();
 
       data.sort(function (a, b) {
-         return self.totalChanges(b) - self.totalChanges(a)
+         return self.countChanges(b) - self.countChanges(a)
+      });
+
+      var allChangesCount = d3.sum(data, function (d) {
+         return self.countChanges(d);
       });
 
       self.usersScale.domain(data.map(function (d) {
          return d.user.name;
       }));
-      self.contributionScale.domain([0, d3.max(data, function (d) {
-         return self.totalChanges(d);
-      })]).nice();
+      self.contributionScale.domain([0, 1]);
       self.colorScale.domain(workTypes);
 
       workTypeStacker = d3.stack().keys(workTypes)
          .value(function (datum, key) {
-            return datum.changes[key];
+            return datum.changes[key] / allChangesCount;
          });
 
       // create one group for each work type
@@ -175,9 +177,13 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
    CWRC.CreditVisualization.StackedColumnGraph.prototype.constructLeftScale = function () {
       var self = this;
 
+      var ticks = d3.axisLeft(self.contributionScale)
+         .ticks(10, "s")
+         .tickFormat(d3.format(".0%"));
+
       self.contentGroup.append("g")
          .attr("class", "axis axis--y")
-         .call(d3.axisLeft(self.contributionScale).ticks(10, "s"))
+         .call(ticks)
          .append("text")
          .attr("x", 2)
          .attr("y", self.contributionScale(self.contributionScale.ticks(10).pop()))
@@ -215,7 +221,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
          });
    };
 
-   CWRC.CreditVisualization.StackedColumnGraph.prototype.totalChanges = function (datum) {
+   CWRC.CreditVisualization.StackedColumnGraph.prototype.countChanges = function (datum) {
       var total = 0;
 
       for (var type in datum.changes)
