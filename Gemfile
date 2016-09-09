@@ -10,7 +10,9 @@ gem 'sinatra'
 gem 'sinatra-contrib'
 # gem 'padrino-helpers'
 gem 'sinatra-partial'
+gem 'sprockets', '~>2.12.4' # restricted to 2.xx b/c 3.xx breaks asset prefixes
 gem 'sinatra-asset-pipeline'
+
 gem 'sinatra-bouncer'
 gem 'rack-protection' # to prevent cross-site scripting and other attacks
 gem 'warden'
