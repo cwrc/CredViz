@@ -7,61 +7,58 @@ ko.components.register('credit_visualization', {
       var self = this;
 
       // STATE
-      self.data = ko.observableArray();
-
-      self.grapher = new CWRC.CreditVisualization.StackedColumnGraph(self.data);
+      self.grapher = new CWRC.CreditVisualization.StackedColumnGraph();
 
       self.getWorkData = function (id) {
-         //var projects = [{
-         //   objects_meta: [{
-         //      id: 'cba-321',
-         //      name: 'Kelly Oxford',
-         //      editors: [
-         //         {
-         //            id: 1,
-         //            name: 'Bob'
-         //         },
-         //         {
-         //            id: 2,
-         //            name: 'Dot'
-         //         }
-         //      ]
-         //   }]
-         //}];
+         var multiUserMultiDoc = {
+            documents: [
+               {
+                  id: 10,
+                  name: 'Nellie McClung',
+                  modrecords: [
+                     {
+                        user: {id: 1, name: 'Bob'},
+                        changes: {
+                           write: 1000,
+                           edit: 200
+                        }
+                     },
+                     {
+                        user: {id: 2, name: 'Dot'},
+                        changes: {
+                           write: 5000,
+                           edit: 100
+                        }
+                     }
+                  ]
+               },
+               {
+                  id: 11, name: 'Emily Murphy',
+                  modrecords: [
+                     {
+                        user: {id: 3, name: 'Phong'},
+                        changes: {
+                           write: 100,
+                           edit: 2000
+                        }
+                     },
+                     {
+                        user: {id: 4, name: 'Enzo'},
+                        changes: {
+                           write: 100,
+                           edit: 0
+                        }
+                     }
+                  ]
+               }
+            ]
+         };
 
-         //self.data(projects[0].objects_meta[0].editors);
+         var multiUserSingleDoc = multiUserMultiDoc.documents[0];
 
-         // all users' changes to a single object
-         self.data([
-            {
-               user: {id: 1, name: 'Bob'},
-               changes: {
-                  write: 1000,
-                  edit: 200
-               }
-            },
-            {
-               user: {id: 2, name: 'Dot'},
-               changes: {
-                  write: 5000,
-                  edit: 100
-               }
-            },
-            {
-               user: {id: 3, name: 'Phong'},
-               changes: {
-                  write: 100,
-                  edit: 2000
-               }
-            },
-            {
-               user: {id: 4, name: 'Enzo'},
-               changes: {
-                  write: 100,
-                  edit: 0
-               }
-            }
-         ]);
+         var singleUserSingleDoc = multiUserSingleDoc.modrecords[0];
+
+         self.grapher.data(multiUserSingleDoc.modrecords);
 
          // TODO: actually call the server
          //ajax('post', '/users/' + id, '', function (response) {
@@ -78,12 +75,12 @@ var CWRC = CWRC || {};
 CWRC.CreditVisualization = CWRC.CreditVisualization || {};
 
 (function () {
-   CWRC.CreditVisualization.StackedColumnGraph = function (dataSetOservable) {
+   CWRC.CreditVisualization.StackedColumnGraph = function () {
       var self = this;
 
       var svg = d3.select("svg");
 
-      this.data = dataSetOservable;
+      this.data = ko.observable();
 
       this.bounds = {
          margin: {top: 20, right: 20, bottom: 30, left: 40},
