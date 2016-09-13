@@ -114,7 +114,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
    CWRC.CreditVisualization.StackedColumnGraph.prototype.render = function () {
       var self = this;
 
-      var data, contentGroupVM, workTypeStacker, workTypes;
+      var data, contentGroupVM, workTypeStacker, workTypes, allChangesCount;
 
       workTypes = ['write', 'edit']; // TODO: dynamically determine this based on the workflow keys
 
@@ -124,15 +124,15 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
          return self.countChanges(b) - self.countChanges(a)
       });
 
-      var allChangesCount = d3.sum(data, function (d) {
-         return self.countChanges(d);
-      });
-
       self.usersScale.domain(data.map(function (d) {
          return d.user.name;
       }));
       self.contributionScale.domain([0, 1]);
       self.colorScale.domain(workTypes);
+
+      allChangesCount = d3.sum(data, function (d) {
+         return self.countChanges(d);
+      });
 
       workTypeStacker = d3.stack().keys(workTypes)
          .value(function (datum, key) {
@@ -187,10 +187,12 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
    CWRC.CreditVisualization.StackedColumnGraph.prototype.constructBottomScale = function (workTypes) {
       var self = this;
 
+      console.log()
+
       self.contentGroup.append("g")
          .attr("class", "axis axis--x")
-         .attr("transform", "translate(0," + this.bounds.getInnerHeight() + ")")
-         .call(d3.axisBottom(this.usersScale));
+         .attr("transform", "translate(0," + self.bounds.getInnerHeight() + ")")
+         .call(d3.axisBottom(self.usersScale));
    };
 
    CWRC.CreditVisualization.StackedColumnGraph.prototype.constructLeftScale = function () {
