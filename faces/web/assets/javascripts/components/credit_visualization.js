@@ -17,14 +17,14 @@ ko.components.register('credit_visualization', {
                   name: 'Nellie McClung',
                   modrecords: [
                      {
-                        user: {id: 1, name: 'Bob'},
+                        user: {id: 1, name: 'Bob Mainframe'},
                         changes: {
                            write: 1000,
                            edit: 200
                         }
                      },
                      {
-                        user: {id: 2, name: 'Dot'},
+                        user: {id: 2, name: 'Dot Matrix'},
                         changes: {
                            write: 5000,
                            edit: 100
@@ -36,14 +36,14 @@ ko.components.register('credit_visualization', {
                   id: 11, name: 'Emily Murphy',
                   modrecords: [
                      {
-                        user: {id: 3, name: 'Phong'},
+                        user: {id: 3, name: 'Phong Mainframe'},
                         changes: {
                            write: 100,
                            edit: 2000
                         }
                      },
                      {
-                        user: {id: 4, name: 'Enzo'},
+                        user: {id: 4, name: 'Enzo Matrix'},
                         changes: {
                            write: 100,
                            edit: 0
@@ -125,7 +125,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
       });
 
       self.usersScale.domain(data.map(function (d) {
-         return d.user.name;
+         return JSON.stringify(d.user);
       }));
       self.contributionScale.domain([0, 1]);
       self.colorScale.domain(workTypes);
@@ -153,7 +153,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
          })
          .enter().append("rect")
          .attr("x", function (d) {
-            return self.usersScale(d.data.user.name);
+            return self.usersScale(JSON.stringify(d.data.user));
          })
          .attr("y", function (d) {
             return self.contributionScale(d[1]);
@@ -187,12 +187,47 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
    CWRC.CreditVisualization.StackedColumnGraph.prototype.constructBottomScale = function (workTypes) {
       var self = this;
 
-      console.log()
+      var axis, tickGroup, existingTickLabels, tickFill, tickX, tickX, tickY, tickDY;
 
-      self.contentGroup.append("g")
+      axis = d3.axisBottom(self.usersScale)
+         .tickFormat(function (datum) {
+            return JSON.parse(datum).name;
+         });
+
+      tickGroup = self.contentGroup.append("g")
          .attr("class", "axis axis--x")
          .attr("transform", "translate(0," + self.bounds.getInnerHeight() + ")")
-         .call(d3.axisBottom(self.usersScale));
+         .call(axis);
+
+      /*
+       * replacing each label text with an anchor because we can't change
+       * the tick construction process to use anchors instead
+       */
+      existingTickLabels = tickGroup.selectAll('.tick > text');
+      tickFill = existingTickLabels.attr('fill');
+      tickX = existingTickLabels.attr('x');
+      tickY = existingTickLabels.attr('y');
+      tickDY = existingTickLabels.attr('dy');
+      existingTickLabels.remove();
+
+
+      tickGroup.selectAll('.tick')
+         .append('a')
+         .attr('xlink:href', function (datum) {
+            var user = JSON.parse(datum);
+
+            return "/" + user.id
+         })
+         .append('text')
+         .attr('x', tickX)
+         .attr('y', tickY)
+         .attr('dy', tickDY)
+         .attr('fill', tickFill)
+         .text(function (datum) {
+            var user = JSON.parse(datum);
+
+            return user.name
+         });
    };
 
    CWRC.CreditVisualization.StackedColumnGraph.prototype.constructLeftScale = function () {
