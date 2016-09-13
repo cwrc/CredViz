@@ -83,7 +83,13 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
       this.data = ko.observable();
 
       this.bounds = {
-         margin: {top: 20, right: 20, bottom: 30, left: 40},
+         margin: {top: 20, right: 20, bottom: 60, left: 40},
+         getOuterWidth: function () {
+            return +svg.attr("width");
+         },
+         getOuterHeight: function () {
+            return +svg.attr("height");
+         },
          getInnerWidth: function () {
             return +svg.attr("width") - self.bounds.margin.left - self.bounds.margin.right;
          },
@@ -170,6 +176,12 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
       this.constructBottomScale(workTypes);
       this.constructLeftScale(workTypes);
       this.constructLegend(workTypes);
+
+      self.contentGroup.append('text')
+         .text('User Contributions by Type')
+         .attr('text-anchor', 'middle')
+         .attr('x', (self.bounds.getInnerWidth() / 2))
+         .attr('y', self.bounds.getOuterHeight() - (self.bounds.margin.bottom / 2))
    };
 
    CWRC.CreditVisualization.StackedColumnGraph.prototype.constructBottomScale = function (workTypes) {
