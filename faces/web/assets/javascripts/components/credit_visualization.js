@@ -155,7 +155,17 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
          .attr("height", function (d) {
             return self.contributionScale(d[0]) - self.contributionScale(d[1]);
          })
-         .attr("width", self.usersScale.bandwidth());
+         .attr("width", self.usersScale.bandwidth())
+         .on("mouseover", function (d, rowNumber, group) {
+            d3.select('.legend-' + d3.select(this.parentNode).datum().key).classed('highlight', true)
+
+            d3.select(d3.event.target).classed("highlight", true);
+         })
+         .on("mouseout", function () {
+            d3.select('.legend-' + d3.select(this.parentNode).datum().key).classed('highlight', false)
+
+            d3.select(d3.event.target).classed("highlight", false);
+         });
 
       this.constructBottomScale(workTypes);
       this.constructLeftScale(workTypes);
@@ -191,24 +201,30 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
    };
 
    CWRC.CreditVisualization.StackedColumnGraph.prototype.constructLegend = function (workTypes) {
-      var self = this, legend;
+      var self = this, legendItem, legendGroup;
 
-      legend = self.contentGroup.selectAll(".legend")
+      legendGroup = self.contentGroup.append('g')
+         .attr('class', 'legend');
+
+      legendItem = legendGroup.selectAll(".legendItem")
          .data(workTypes.reverse())
          .enter().append("g")
-         .attr("class", "legend")
+         .attr("class", "legendItem")
+         .attr("class", function (columnName, i) {
+            return 'legend-' + columnName;
+         })
          .attr("transform", function (d, i) {
             return "translate(0," + i * 20 + ")";
          })
          .style("font", "10px sans-serif");
 
-      legend.append("rect")
+      legendItem.append("rect")
          .attr("x", self.bounds.getInnerWidth() - 18)
          .attr("width", 18)
          .attr("height", 18)
          .attr("fill", this.colorScale);
 
-      legend.append("text")
+      legendItem.append("text")
          .attr("x", self.bounds.getInnerWidth() - 24)
          .attr("y", 9)
          .attr("dy", ".35em")
