@@ -1,5 +1,5 @@
 ko.components.register('credit_visualization', {
-   template: ' <svg width="960" height="500"></svg>',
+   template: ' <svg class="creditvis" width="960" height="500"></svg>',
 
    /**
     */
@@ -17,17 +17,25 @@ ko.components.register('credit_visualization', {
                   name: 'Nellie McClung',
                   modrecords: [
                      {
-                        user: {id: 1, name: 'Bob Mainframe'},
+                        user: {
+                           id: 1,
+                           name: 'Susan Brown',
+                           uri: '/islandora/object/cwrc%3Aba99b4e0-d9f1-4f00-9dc9-fa6dc2dea8bb'
+                        },
                         changes: {
-                           write: 1000,
+                           write: 5000,
                            edit: 200
                         }
                      },
                      {
-                        user: {id: 2, name: 'Dot Matrix'},
+                        user: {
+                           id: 2,
+                           name: 'Mihaela Illovan',
+                           uri: 'http://beta.cwrc.ca/islandora/object/cwrc%3Aa7de2169-ec07-4455-87d8-732852a2eb16'
+                        },
                         changes: {
-                           write: 5000,
-                           edit: 100
+                           write: 800,
+                           edit: 1200
                         }
                      }
                   ]
@@ -36,7 +44,7 @@ ko.components.register('credit_visualization', {
                   id: 11, name: 'Emily Murphy',
                   modrecords: [
                      {
-                        user: {id: 3, name: 'Phong Mainframe'},
+                        user: {id: 3, name: 'Dot Matrix'},
                         changes: {
                            write: 100,
                            edit: 2000
@@ -78,7 +86,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
    CWRC.CreditVisualization.StackedColumnGraph = function () {
       var self = this;
 
-      var svg = d3.select("svg");
+      var svg = d3.select("svg.creditvis");
 
       this.data = ko.observable();
 
@@ -214,9 +222,9 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
       tickGroup.selectAll('.tick')
          .append('a')
          .attr('xlink:href', function (datum) {
-            var user = JSON.parse(datum);
+            var user_uri = JSON.parse(datum).uri || '';
 
-            return "/" + user.id
+            return user_uri.charAt(0) == '/' ? user_uri : "/" + user_uri;
          })
          .append('text')
          .attr('x', tickX)
