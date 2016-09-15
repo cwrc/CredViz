@@ -1,10 +1,17 @@
 ko.components.register('credit_visualization', {
-   template: ' <svg class="creditvis" width="960" height="500"></svg>',
+   template: ' <svg class="creditvis" width="1024" height="500"></svg>',
 
    /**
     */
    viewModel: function (params) {
       var self = this;
+
+// TODO: pull merge type map and ignore list to KO params.
+      var mergedWorkTypes = {
+         evaluated: 'peer_evaluated',
+         peer_reviewed: 'peer_evaluated'
+      };
+      var ignoreWorkTypes = ['machine_processed'];
 
       // STATE
       self.grapher = new CWRC.CreditVisualization.StackedColumnGraph('svg.creditvis');
@@ -12,17 +19,31 @@ ko.components.register('credit_visualization', {
       self.getWorkData = function (id) {
          // TODO: actually call the appropriate endpoint
          ajax('get', '/contribution_data.json', '', function (response) {
-            var multiUserMultiDoc, multiUserSingleDoc, singleUserSingleDoc
+            var data, title, multiUser, multiDoc;
 
-            multiUserMultiDoc = response;
+            // multiUserMultiDoc = response;
+            // multiUserSingleDoc = multiUserMultiDoc.documents[0];
+            // singleUserSingleDoc = multiUserSingleDoc.documents[0].modrecords[0];
 
-            multiUserSingleDoc = multiUserMultiDoc.documents[0];
+            multiUser = true;
+            multiDoc = true;
+            multiDoc = false;
 
-            singleUserSingleDoc = multiUserSingleDoc.modrecords[0];
+            if (multiUser && multiDoc) {
+               data = response.documents.reduce(function (aggregate, document) {
+                  return aggregate.concat(document.modrecords);
+               }, []);
 
-            self.grapher.data(multiUserSingleDoc.modrecords);
+               title = 'User Contributions to "' + response.name + '", by Type';
+            } else if (multiUser && !multiDoc) {
+               var doc = response.documents[0];
 
-            self.grapher.render();
+               data = doc.modrecords;
+
+               title = 'User Contributions to "' + doc.name + '", by Type';
+            }
+
+            self.grapher.render(data, title, mergedWorkTypes, ignoreWorkTypes);
          });
       };
 
@@ -38,44 +59,6 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
       var self = this;
 
       var svg = d3.select(svgSelector);
-
-      this.data = ko.observable();
-
-      this.bounds = {
-         margin: {top: 20, right: 20, bottom: 60, left: 40},
-         getOuterWidth: function () {
-            return +svg.attr("width");
-         },
-         getOuterHeight: function () {
-            return +svg.attr("height");
-         },
-         getInnerWidth: function () {
-            return +svg.attr("width") - self.bounds.margin.left - self.bounds.margin.right;
-         },
-         getInnerHeight: function () {
-            return +svg.attr("height") - self.bounds.margin.top - self.bounds.margin.bottom;
-         }
-      };
-      this.contentGroup = svg.append("g");
-
-      this.contentGroup.attr("transform", "translate(" + this.bounds.margin.left + "," + this.bounds.margin.top + ")");
-
-      this.usersScale = d3.scaleBand()
-         .rangeRound([0, this.bounds.getInnerWidth()])
-         .padding(0.1)
-         .align(0.1);
-
-      this.contributionScale = d3.scaleLinear()
-         .rangeRound([this.bounds.getInnerHeight(), 0]);
-
-      this.colorScale = d3.scaleOrdinal(d3.schemeCategory20c)
-      //.range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
-   };
-
-   CWRC.CreditVisualization.StackedColumnGraph.prototype.render = function () {
-      var self = this;
-
-      var data, contentGroupVM, workTypeStacker, workTypes, allChangesCount;
 
       var workflowCategoriesToStamps = {
          created: 'cre',
@@ -94,9 +77,66 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
          deleted: 'del'
       };
 
-      workTypes = Object.keys(workflowCategoriesToStamps); // TODO: dynamically determine this based on the workflow keys
+      this.workTypes = Object.keys(workflowCategoriesToStamps);
 
-      data = self.data();
+      this.bounds = {
+         padding: {top: 20, right: 20, bottom: 60, left: 40},
+         getOuterWidth: function () {
+            return +svg.attr("width");
+         },
+         getOuterHeight: function () {
+            return +svg.attr("height");
+         },
+         getInnerWidth: function () {
+            return +svg.attr("width") - self.bounds.padding.left - self.bounds.padding.right;
+         },
+         getInnerHeight: function () {
+            return +svg.attr("height") - self.bounds.padding.top - self.bounds.padding.bottom;
+         },
+         legendWidth: 80
+      };
+      this.contentGroup = svg.append("g");
+
+      this.contentGroup.attr("transform", "translate(" + this.bounds.padding.left + "," + this.bounds.padding.top + ")");
+
+      this.usersScale = d3.scaleBand()
+         .rangeRound([0, this.bounds.getInnerWidth() - this.bounds.legendWidth])
+         .padding(0.1)
+         .align(0.1);
+
+      this.contributionScale = d3.scaleLinear()
+         .rangeRound([this.bounds.getInnerHeight(), 0]);
+
+      this.colorScale = d3.scaleOrdinal(d3.schemeCategory20);
+      //.range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
+   };
+
+   CWRC.CreditVisualization.StackedColumnGraph.prototype.merge = function (data, mergedTagMap) {
+      var self = this, changeset;
+
+      data.forEach(function (modrecord) {
+         changeset = modrecord.changes;
+
+         for (var mergedTag in mergedTagMap) {
+            var primaryTag = mergedTagMap[mergedTag];
+
+            changeset[primaryTag] = (changeset[primaryTag] || 0) + changeset[mergedTag];
+            changeset[mergedTag] = 0;
+         }
+      });
+   };
+
+   CWRC.CreditVisualization.StackedColumnGraph.prototype.render = function (data, title, mergedTagMap, ignoredTags) {
+      var self = this;
+
+      var contentGroupVM, workTypeStacker, allChangesCount;
+
+      // removing the types from the list will mean that the Ordinal Scale will ignore those values.
+      (Object.keys(mergedTagMap).concat(ignoredTags)).forEach(function (tag) {
+         self.workTypes.splice(self.workTypes.indexOf(tag), 1)
+      });
+
+      self.merge(data, mergedTagMap);
 
       data.sort(function (a, b) {
          return self.countChanges(b) - self.countChanges(a)
@@ -106,22 +146,22 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
          return JSON.stringify(d.user);
       }));
       self.contributionScale.domain([0, 1]);
-      self.colorScale.domain(workTypes);
+      self.colorScale.domain(self.workTypes);
 
       allChangesCount = d3.sum(data, function (d) {
          return self.countChanges(d);
       });
 
-      workTypeStacker = d3.stack().keys(workTypes)
+      workTypeStacker = d3.stack().keys(self.workTypes)
          .value(function (datum, key) {
-            return (datum.changes[key] || 0) / allChangesCount;
+            return (datum.changes[key] || 0) / allChangesCount
          });
 
       // create one group for each work type
       contentGroupVM = self.contentGroup.selectAll(".serie").data(workTypeStacker(data));
 
       contentGroupVM.enter().append("g")
-         .attr("class", "serie")
+         .attr("class", "series")
          .attr("fill", function (d) {
             return self.colorScale(d.key);
          })
@@ -151,21 +191,21 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
             d3.select(d3.event.target).classed("highlight", false);
          });
 
-      this.constructBottomScale(workTypes);
-      this.constructLeftScale(workTypes);
-      this.constructLegend(workTypes);
+      this.constructBottomScale();
+      this.constructLeftScale();
+      this.constructLegend();
 
       self.contentGroup.append('text')
-         .text('User Contributions by Type')
+         .text(title)
          .attr('text-anchor', 'middle')
          .attr('x', (self.bounds.getInnerWidth() / 2))
-         .attr('y', self.bounds.getOuterHeight() - (self.bounds.margin.bottom / 2))
+         .attr('y', self.bounds.getOuterHeight() - (self.bounds.padding.bottom / 2))
    };
 
-   CWRC.CreditVisualization.StackedColumnGraph.prototype.constructBottomScale = function (workTypes) {
+   CWRC.CreditVisualization.StackedColumnGraph.prototype.constructBottomScale = function () {
       var self = this;
 
-      var axis, tickGroup, existingTickLabels, tickFill, tickX, tickY, tickDY;
+      var axis, tickGroup, existingTickLabels, tickFill, tickX, tickY, tickDY, columnWidth;
 
       axis = d3.axisBottom(self.usersScale)
          .tickFormat(function (datum) {
@@ -188,7 +228,6 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
       tickDY = existingTickLabels.attr('dy');
       existingTickLabels.remove();
 
-
       tickGroup.selectAll('.tick')
          .append('a')
          .attr('xlink:href', function (datum) {
@@ -206,6 +245,11 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
 
             return user.name
          });
+
+      columnWidth = self.usersScale.bandwidth(); // labelling for clarity
+
+      tickGroup.selectAll(".tick text")
+         .call(self.wrap, columnWidth);
    };
 
    CWRC.CreditVisualization.StackedColumnGraph.prototype.constructLeftScale = function () {
@@ -234,7 +278,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
          .attr('class', 'legend');
 
       legendItem = legendGroup.selectAll(".legendItem")
-         .data(workTypes.reverse())
+         .data(self.workTypes.reverse())
          .enter().append("g")
          .attr("class", "legendItem")
          .attr("class", function (columnName, i) {
@@ -271,4 +315,40 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
 
       return total;
    };
+
+   CWRC.CreditVisualization.StackedColumnGraph.prototype.wrap = function (text, width) {
+      text.each(function () {
+         var text, words, word, line, lineNumber, lineHeight, y, dy, tspan;
+
+         text = d3.select(this);
+         words = text.text().split(/\s+/);
+
+         line = [];
+         lineNumber = 0;
+         lineHeight = 1.1; // ems
+         y = text.attr("y");
+         dy = parseFloat(text.attr("dy"));
+         tspan = text.text(null)
+            .append("tspan")
+            .attr("x", 0)
+            .attr("y", y)
+            .attr("dy", dy + "em");
+
+         while (word = words.shift()) {
+            line.push(word);
+            tspan.text(line.join(" "));
+
+            if (tspan.node().getComputedTextLength() > width) {
+               line.pop();
+               tspan.text(line.join(" "));
+               line = [word];
+               tspan = text.append("tspan")
+                  .attr("x", 0)
+                  .attr("y", y)
+                  .attr("dy", ++lineNumber * lineHeight + dy + "em")
+                  .text(word);
+            }
+         }
+      });
+   }
 })();
