@@ -10,92 +10,23 @@ ko.components.register('credit_visualization', {
       self.grapher = new CWRC.CreditVisualization.StackedColumnGraph('svg.creditvis');
 
       self.getWorkData = function (id) {
-         var multiUserMultiDoc = {
-            documents: [
-               {
-                  id: 10,
-                  name: 'Nellie McClung',
-                  modrecords: [
-                     {
-                        user: {
-                           id: 1,
-                           name: 'Susan Brown',
-                           uri: '/islandora/object/cwrc%3Aba99b4e0-d9f1-4f00-9dc9-fa6dc2dea8bb'
-                        },
-                        changes: {
-                           created: 100,
-                           deposited: 100,
-                           metadata_contribution: 0,
-                           content_contribution: 500,
-                           checked: 100,
-                           machine_processed: 0,
-                           user_tagged: 100,
-                           rights_assigned: 100,
-                           published: 100,
-                           peer_reviewed: 100,
-                           withdrawn: 0,
-                           deleted: 0
-                        }
-                     },
-                     {
-                        user: {
-                           id: 2,
-                           name: 'Mihaela Illovan',
-                           uri: 'http://beta.cwrc.ca/islandora/object/cwrc%3Aa7de2169-ec07-4455-87d8-732852a2eb16'
-                        },
-                        changes: {
-                           created: 200,
-                           deposited: 100,
-                           metadata_contribution: 100,
-                           content_contribution: 100,
-                           checked: 100,
-                           machine_processed: 0,
-                           user_tagged: 100,
-                           rights_assigned: 100,
-                           published: 100,
-                           peer_reviewed: 100,
-                           withdrawn: 0,
-                           deleted: 0
-                        }
-                     }
-                  ]
-               },
-               {
-                  id: 11, name: 'Emily Murphy',
-                  modrecords: [
-                     {
-                        user: {id: 3, name: 'Dot Matrix'},
-                        changes: {
-                           write: 100,
-                           edit: 2000
-                        }
-                     },
-                     {
-                        user: {id: 4, name: 'Enzo Matrix'},
-                        changes: {
-                           write: 100,
-                           edit: 0
-                        }
-                     }
-                  ]
-               }
-            ]
-         };
+         // TODO: actually call the appropriate endpoint
+         ajax('get', '/contribution_data.json', '', function (response) {
+            var multiUserMultiDoc, multiUserSingleDoc, singleUserSingleDoc
 
-         var multiUserSingleDoc = multiUserMultiDoc.documents[0];
+            multiUserMultiDoc = response;
 
-         var singleUserSingleDoc = multiUserSingleDoc.modrecords[0];
+            multiUserSingleDoc = multiUserMultiDoc.documents[0];
 
-         self.grapher.data(multiUserSingleDoc.modrecords);
+            singleUserSingleDoc = multiUserSingleDoc.modrecords[0];
 
-         // TODO: actually call the server
-         //ajax('post', '/users/' + id, '', function (response) {
-         //   self.data(response);
-         //});
+            self.grapher.data(multiUserSingleDoc.modrecords);
+
+            self.grapher.render();
+         });
       };
 
       self.getWorkData();
-      self.grapher.render();
    }
 });
 
@@ -183,7 +114,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
 
       workTypeStacker = d3.stack().keys(workTypes)
          .value(function (datum, key) {
-            return datum.changes[key] / allChangesCount;
+            return (datum.changes[key] || 0) / allChangesCount;
          });
 
       // create one group for each work type
