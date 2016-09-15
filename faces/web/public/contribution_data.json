@@ -45,6 +45,342 @@
                   "withdrawn": 0,
                   "deleted": 0
                }
+            },
+            {
+               "user": {
+                  "id": 3,
+                  "name": "Mihaela Illovan",
+                  "uri": "/islandora/object/cwrc%3Aa7de2169-ec07-4455-87d8-732852a2eb16"
+               },
+               "changes": {
+                  "created": 0,
+                  "deposited": 0,
+                  "metadata_contribution": 1,
+                  "content_contribution": 1,
+                  "checked": 2,
+                  "machine_processed": 0,
+                  "user_tagged": 1,
+                  "rights_assigned": 1,
+                  "published": 1,
+                  "peer_reviewed": 1,
+                  "withdrawn": 0,
+                  "deleted": 0
+               }
+            },
+            {
+               "user": {
+                  "id": 4,
+                  "name": "Mihaela Illovan",
+                  "uri": "/islandora/object/cwrc%3Aa7de2169-ec07-4455-87d8-732852a2eb16"
+               },
+               "changes": {
+                  "created": 0,
+                  "deposited": 0,
+                  "metadata_contribution": 1,
+                  "content_contribution": 1,
+                  "checked": 2,
+                  "machine_processed": 0,
+                  "user_tagged": 1,
+                  "rights_assigned": 1,
+                  "published": 1,
+                  "peer_reviewed": 1,
+                  "withdrawn": 0,
+                  "deleted": 0
+               }
+            },
+            {
+               "user": {
+                  "id": 5,
+                  "name": "Mihaela Illovan",
+                  "uri": "/islandora/object/cwrc%3Aa7de2169-ec07-4455-87d8-732852a2eb16"
+               },
+               "changes": {
+                  "created": 0,
+                  "deposited": 0,
+                  "metadata_contribution": 1,
+                  "content_contribution": 1,
+                  "checked": 2,
+                  "machine_processed": 0,
+                  "user_tagged": 1,
+                  "rights_assigned": 1,
+                  "published": 1,
+                  "peer_reviewed": 1,
+                  "withdrawn": 0,
+                  "deleted": 0
+               }
+            },
+            {
+               "user": {
+                  "id": 6,
+                  "name": "Mihaela Illovan",
+                  "uri": "/islandora/object/cwrc%3Aa7de2169-ec07-4455-87d8-732852a2eb16"
+               },
+               "changes": {
+                  "created": 0,
+                  "deposited": 0,
+                  "metadata_contribution": 1,
+                  "content_contribution": 1,
+                  "checked": 2,
+                  "machine_processed": 0,
+                  "user_tagged": 1,
+                  "rights_assigned": 1,
+                  "published": 1,
+                  "peer_reviewed": 1,
+                  "withdrawn": 0,
+                  "deleted": 0
+               }
+            },
+            {
+               "user": {
+                  "id": 7,
+                  "name": "Mihaela Illovan",
+                  "uri": "/islandora/object/cwrc%3Aa7de2169-ec07-4455-87d8-732852a2eb16"
+               },
+               "changes": {
+                  "created": 0,
+                  "deposited": 0,
+                  "metadata_contribution": 1,
+                  "content_contribution": 1,
+                  "checked": 2,
+                  "machine_processed": 0,
+                  "user_tagged": 1,
+                  "rights_assigned": 1,
+                  "published": 1,
+                  "peer_reviewed": 1,
+                  "withdrawn": 0,
+                  "deleted": 0
+               }
+            },
+            {
+               "user": {
+                  "id": 8,
+                  "name": "Mihaela Illovan",
+                  "uri": "/islandora/object/cwrc%3Aa7de2169-ec07-4455-87d8-732852a2eb16"
+               },
+               "changes": {
+                  "created": 0,
+                  "deposited": 0,
+                  "metadata_contribution": 1,
+                  "content_contribution": 1,
+                  "checked": 2,
+                  "machine_processed": 0,
+                  "user_tagged": 1,
+                  "rights_assigned": 1,
+                  "published": 1,
+                  "peer_reviewed": 1,
+                  "withdrawn": 0,
+                  "deleted": 0
+               }
+            },
+            {
+               "user": {
+                  "id": 9,
+                  "name": "Mihaela Illovan",
+                  "uri": "/islandora/object/cwrc%3Aa7de2169-ec07-4455-87d8-732852a2eb16"
+               },
+               "changes": {
+                  "created": 0,
+                  "deposited": 0,
+                  "metadata_contribution": 1,
+                  "content_contribution": 1,
+                  "checked": 2,
+                  "machine_processed": 0,
+                  "user_tagged": 1,
+                  "rights_assigned": 1,
+                  "published": 1,
+                  "peer_reviewed": 1,
+                  "withdrawn": 0,
+                  "deleted": 0
+               }
+            },
+            {
+               "user": {
+                  "id": 10,
+                  "name": "Mihaela Illovan",
+                  "uri": "/islandora/object/cwrc%3Aa7de2169-ec07-4455-87d8-732852a2eb16"
+               },
+               "changes": {
+                  "created": 0,
+                  "deposited": 0,
+                  "metadata_contribution": 1,
+                  "content_contribution": 1,
+                  "checked": 2,
+                  "machine_processed": 0,
+                  "user_tagged": 1,
+                  "rights_assigned": 1,
+                  "published": 1,
+                  "peer_reviewed": 1,
+                  "withdrawn": 0,
+                  "deleted": 0
+               }
+            },
+            {
+               "user": {
+                  "id": 11,
+                  "name": "Mihaela Illovan",
+                  "uri": "/islandora/object/cwrc%3Aa7de2169-ec07-4455-87d8-732852a2eb16"
+               },
+               "changes": {
+                  "created": 0,
+                  "deposited": 0,
+                  "metadata_contribution": 1,
+                  "content_contribution": 1,
+                  "checked": 2,
+                  "machine_processed": 0,
+                  "user_tagged": 1,
+                  "rights_assigned": 1,
+                  "published": 1,
+                  "peer_reviewed": 1,
+                  "withdrawn": 0,
+                  "deleted": 0
+               }
+            },
+            {
+               "user": {
+                  "id": 12,
+                  "name": "Mihaela Illovan",
+                  "uri": "/islandora/object/cwrc%3Aa7de2169-ec07-4455-87d8-732852a2eb16"
+               },
+               "changes": {
+                  "created": 0,
+                  "deposited": 0,
+                  "metadata_contribution": 1,
+                  "content_contribution": 1,
+                  "checked": 2,
+                  "machine_processed": 0,
+                  "user_tagged": 1,
+                  "rights_assigned": 1,
+                  "published": 1,
+                  "peer_reviewed": 1,
+                  "withdrawn": 0,
+                  "deleted": 0
+               }
+            },
+            {
+               "user": {
+                  "id": 13,
+                  "name": "Mihaela Illovan",
+                  "uri": "/islandora/object/cwrc%3Aa7de2169-ec07-4455-87d8-732852a2eb16"
+               },
+               "changes": {
+                  "created": 0,
+                  "deposited": 0,
+                  "metadata_contribution": 1,
+                  "content_contribution": 1,
+                  "checked": 2,
+                  "machine_processed": 0,
+                  "user_tagged": 1,
+                  "rights_assigned": 1,
+                  "published": 1,
+                  "peer_reviewed": 1,
+                  "withdrawn": 0,
+                  "deleted": 0
+               }
+            },
+            {
+               "user": {
+                  "id": 14,
+                  "name": "Mihaela Illovan",
+                  "uri": "/islandora/object/cwrc%3Aa7de2169-ec07-4455-87d8-732852a2eb16"
+               },
+               "changes": {
+                  "created": 0,
+                  "deposited": 0,
+                  "metadata_contribution": 1,
+                  "content_contribution": 1,
+                  "checked": 2,
+                  "machine_processed": 0,
+                  "user_tagged": 1,
+                  "rights_assigned": 1,
+                  "published": 1,
+                  "peer_reviewed": 1,
+                  "withdrawn": 0,
+                  "deleted": 0
+               }
+            },
+            {
+               "user": {
+                  "id": 15,
+                  "name": "Mihaela Illovan",
+                  "uri": "/islandora/object/cwrc%3Aa7de2169-ec07-4455-87d8-732852a2eb16"
+               },
+               "changes": {
+                  "created": 0,
+                  "deposited": 0,
+                  "metadata_contribution": 1,
+                  "content_contribution": 1,
+                  "checked": 2,
+                  "machine_processed": 0,
+                  "user_tagged": 1,
+                  "rights_assigned": 1,
+                  "published": 1,
+                  "peer_reviewed": 1,
+                  "withdrawn": 0,
+                  "deleted": 0
+               }
+            },
+            {
+               "user": {
+                  "id": 16,
+                  "name": "Mihaela Illovan",
+                  "uri": "/islandora/object/cwrc%3Aa7de2169-ec07-4455-87d8-732852a2eb16"
+               },
+               "changes": {
+                  "created": 0,
+                  "deposited": 0,
+                  "metadata_contribution": 1,
+                  "content_contribution": 1,
+                  "checked": 2,
+                  "machine_processed": 0,
+                  "user_tagged": 1,
+                  "rights_assigned": 1,
+                  "published": 1,
+                  "peer_reviewed": 1,
+                  "withdrawn": 0,
+                  "deleted": 0
+               }
+            },
+            {
+               "user": {
+                  "id": 17,
+                  "name": "Mihaela Illovan",
+                  "uri": "/islandora/object/cwrc%3Aa7de2169-ec07-4455-87d8-732852a2eb16"
+               },
+               "changes": {
+                  "created": 0,
+                  "deposited": 0,
+                  "metadata_contribution": 1,
+                  "content_contribution": 1,
+                  "checked": 2,
+                  "machine_processed": 0,
+                  "user_tagged": 1,
+                  "rights_assigned": 1,
+                  "published": 1,
+                  "peer_reviewed": 1,
+                  "withdrawn": 0,
+                  "deleted": 0
+               }
+            },
+            {
+               "user": {
+                  "id": 18,
+                  "name": "Mihaela Illovan",
+                  "uri": "/islandora/object/cwrc%3Aa7de2169-ec07-4455-87d8-732852a2eb16"
+               },
+               "changes": {
+                  "created": 0,
+                  "deposited": 0,
+                  "metadata_contribution": 1,
+                  "content_contribution": 1,
+                  "checked": 2,
+                  "machine_processed": 0,
+                  "user_tagged": 1,
+                  "rights_assigned": 1,
+                  "published": 1,
+                  "peer_reviewed": 1,
+                  "withdrawn": 0,
+                  "deleted": 0
+               }
             }
          ]
       },
