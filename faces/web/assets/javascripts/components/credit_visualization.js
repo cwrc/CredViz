@@ -7,7 +7,7 @@ ko.components.register('credit_visualization', {
       var self = this;
 
       // STATE
-      self.grapher = new CWRC.CreditVisualization.StackedColumnGraph();
+      self.grapher = new CWRC.CreditVisualization.StackedColumnGraph('svg.creditvis');
 
       self.getWorkData = function (id) {
          var multiUserMultiDoc = {
@@ -23,8 +23,18 @@ ko.components.register('credit_visualization', {
                            uri: '/islandora/object/cwrc%3Aba99b4e0-d9f1-4f00-9dc9-fa6dc2dea8bb'
                         },
                         changes: {
-                           write: 5000,
-                           edit: 200
+                           created: 100,
+                           deposited: 100,
+                           metadata_contribution: 0,
+                           content_contribution: 500,
+                           checked: 100,
+                           machine_processed: 0,
+                           user_tagged: 100,
+                           rights_assigned: 100,
+                           published: 100,
+                           peer_reviewed: 100,
+                           withdrawn: 0,
+                           deleted: 0
                         }
                      },
                      {
@@ -34,8 +44,18 @@ ko.components.register('credit_visualization', {
                            uri: 'http://beta.cwrc.ca/islandora/object/cwrc%3Aa7de2169-ec07-4455-87d8-732852a2eb16'
                         },
                         changes: {
-                           write: 800,
-                           edit: 1200
+                           created: 200,
+                           deposited: 100,
+                           metadata_contribution: 100,
+                           content_contribution: 100,
+                           checked: 100,
+                           machine_processed: 0,
+                           user_tagged: 100,
+                           rights_assigned: 100,
+                           published: 100,
+                           peer_reviewed: 100,
+                           withdrawn: 0,
+                           deleted: 0
                         }
                      }
                   ]
@@ -82,11 +102,11 @@ ko.components.register('credit_visualization', {
 var CWRC = CWRC || {};
 CWRC.CreditVisualization = CWRC.CreditVisualization || {};
 
-(function () {
-   CWRC.CreditVisualization.StackedColumnGraph = function () {
+(function StackedColumnGraph() {
+   CWRC.CreditVisualization.StackedColumnGraph = function (svgSelector) {
       var self = this;
 
-      var svg = d3.select("svg.creditvis");
+      var svg = d3.select(svgSelector);
 
       this.data = ko.observable();
 
@@ -105,7 +125,9 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
             return +svg.attr("height") - self.bounds.margin.top - self.bounds.margin.bottom;
          }
       };
-      this.contentGroup = svg.append("g").attr("transform", "translate(" + this.bounds.margin.left + "," + this.bounds.margin.top + ")");
+      this.contentGroup = svg.append("g");
+
+      this.contentGroup.attr("transform", "translate(" + this.bounds.margin.left + "," + this.bounds.margin.top + ")");
 
       this.usersScale = d3.scaleBand()
          .rangeRound([0, this.bounds.getInnerWidth()])
@@ -115,8 +137,8 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
       this.contributionScale = d3.scaleLinear()
          .rangeRound([this.bounds.getInnerHeight(), 0]);
 
-      this.colorScale = d3.scaleOrdinal()
-         .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
+      this.colorScale = d3.scaleOrdinal(d3.schemeCategory20c)
+      //.range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
    };
 
    CWRC.CreditVisualization.StackedColumnGraph.prototype.render = function () {
@@ -124,7 +146,24 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
 
       var data, contentGroupVM, workTypeStacker, workTypes, allChangesCount;
 
-      workTypes = ['write', 'edit']; // TODO: dynamically determine this based on the workflow keys
+      var workflowCategoriesToStamps = {
+         created: 'cre',
+         deposited: 'dep',
+         metadata_contribution: 'evr',
+         content_contribution: ['evr', 'cvr'],
+         checked: 'ckd',
+         machine_processed: ['evr', 'cvr'],
+         user_tagged: 'tag',
+         rights_assigned: 'rights_asg',
+         published: 'pub',
+         peer_evaluated: 'rev',
+         evaluated: 'rev',
+         peer_reviewed: 'rev',
+         withdrawn: 'wdr',
+         deleted: 'del'
+      };
+
+      workTypes = Object.keys(workflowCategoriesToStamps); // TODO: dynamically determine this based on the workflow keys
 
       data = self.data();
 
@@ -195,7 +234,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
    CWRC.CreditVisualization.StackedColumnGraph.prototype.constructBottomScale = function (workTypes) {
       var self = this;
 
-      var axis, tickGroup, existingTickLabels, tickFill, tickX, tickX, tickY, tickDY;
+      var axis, tickGroup, existingTickLabels, tickFill, tickX, tickY, tickDY;
 
       axis = d3.axisBottom(self.usersScale)
          .tickFormat(function (datum) {
@@ -287,7 +326,9 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
          .attr("dy", ".35em")
          .attr("text-anchor", "end")
          .text(function (columnName) {
-            return columnName.toUpperCase()[0] + columnName.slice(1);
+            return columnName.split(/_/g).map(function (word) {
+               return word[0].toUpperCase() + word.slice(1);
+            }).join(' ');
          });
    };
 
