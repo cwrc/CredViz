@@ -12,17 +12,31 @@ ko.components.register('credit_visualization', {
       self.getWorkData = function (id) {
          // TODO: actually call the appropriate endpoint
          ajax('get', '/contribution_data.json', '', function (response) {
-            var multiUserMultiDoc, multiUserSingleDoc, singleUserSingleDoc
+            var data, title, multiUser, multiDoc;
 
-            multiUserMultiDoc = response;
+            // multiUserMultiDoc = response;
+            // multiUserSingleDoc = multiUserMultiDoc.documents[0];
+            // singleUserSingleDoc = multiUserSingleDoc.documents[0].modrecords[0];
 
-            multiUserSingleDoc = multiUserMultiDoc.documents[0];
+            multiUser = true;
+            multiDoc = true;
+            multiDoc = false;
 
-            singleUserSingleDoc = multiUserSingleDoc.modrecords[0];
+            if (multiUser && multiDoc) {
+               data = response.documents.reduce(function (aggregate, document) {
+                  return aggregate.concat(document.modrecords);
+               }, []);
 
-            self.grapher.data(multiUserSingleDoc.modrecords);
+               title = 'User Contributions to "' + response.name + '", by Type';
+            } else if (multiUser && !multiDoc) {
+               var doc = response.documents[0];
 
-            self.grapher.render();
+               data = doc.modrecords;
+
+               title = 'User Contributions to "' + doc.name + '", by Type';
+            }
+
+            self.grapher.render(data, title);
          });
       };
 
@@ -58,8 +72,6 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
 
       this.workTypes = Object.keys(workflowCategoriesToStamps); // TODO: dynamically determine this based on the workflow keys
 
-      this.data = ko.observable();
-
       this.bounds = {
          padding: {top: 20, right: 20, bottom: 60, left: 40},
          getOuterWidth: function () {
@@ -88,16 +100,14 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
       this.contributionScale = d3.scaleLinear()
          .rangeRound([this.bounds.getInnerHeight(), 0]);
 
-      this.colorScale = d3.scaleOrdinal(d3.schemeCategory20c)
+      this.colorScale = d3.scaleOrdinal(d3.schemeCategory20c);
       //.range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
    };
 
-   CWRC.CreditVisualization.StackedColumnGraph.prototype.render = function () {
+   CWRC.CreditVisualization.StackedColumnGraph.prototype.render = function (data, title) {
       var self = this;
 
-      var data, contentGroupVM, workTypeStacker, allChangesCount;
-
-      data = self.data();
+      var contentGroupVM, workTypeStacker, allChangesCount;
 
       data.sort(function (a, b) {
          return self.countChanges(b) - self.countChanges(a)
@@ -157,7 +167,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
       this.constructLegend();
 
       self.contentGroup.append('text')
-         .text('User Contributions by Type')
+         .text(title)
          .attr('text-anchor', 'middle')
          .attr('x', (self.bounds.getInnerWidth() / 2))
          .attr('y', self.bounds.getOuterHeight() - (self.bounds.padding.bottom / 2))
