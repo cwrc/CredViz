@@ -102,6 +102,11 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
 
       this.colorScale = d3.scaleOrdinal(d3.schemeCategory20);
       //.range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
+
+      svg.append('text')
+         .attr('class', 'notice-label')
+         .attr('x', self.bounds.getInnerWidth() / 2)
+         .attr('y', self.bounds.getInnerHeight() / 2);
    };
 
    CWRC.CreditVisualization.StackedColumnGraph.prototype.merge = function (data, mergedTagMap) {
@@ -151,12 +156,21 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
          });
 
       // create one group for each work type
-      contentGroupVM = self.contentGroup.selectAll(".serie").data(workTypeStacker(data));
+      contentGroupVM = self.contentGroup.selectAll('.series')
+         .data(workTypeStacker(data));
 
       contentGroupVM.enter().append("g")
-         .attr("class", "series")
+         .attr("class", function (datum) {
+            return "series tag-" + datum.key;
+         })
          .attr("fill", function (d) {
             return self.colorScale(d.key);
+         })
+         .filter(function (stackGroup) {
+            // removing the empties cleans up the graph DOM for other conditionals
+            return stackGroup.some(function (positionsRow) {
+               return positionsRow[0] != positionsRow[1];
+            })
          })
          .selectAll("rect")
          .data(function (d) {
@@ -166,20 +180,20 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
          .attr("x", function (d) {
             return self.usersScale(JSON.stringify(d.data.user));
          })
-         .attr("y", function (d) {
-            return self.contributionScale(d[1]);
+         .attr("y", function (dataRow) {
+            return self.contributionScale(dataRow[1]);
          })
-         .attr("height", function (d) {
-            return self.contributionScale(d[0]) - self.contributionScale(d[1]);
+         .attr("height", function (dataRow) {
+            return self.contributionScale(dataRow[0]) - self.contributionScale(dataRow[1]);
          })
          .attr("width", self.usersScale.bandwidth())
          .on("mouseover", function (d, rowNumber, group) {
-            d3.select('.legend-' + d3.select(this.parentNode).datum().key).classed('highlight', true)
+            d3.select('.legend-' + d3.select(this.parentNode).datum().key).classed('highlight', true);
 
             d3.select(d3.event.target).classed("highlight", true);
          })
          .on("mouseout", function () {
-            d3.select('.legend-' + d3.select(this.parentNode).datum().key).classed('highlight', false)
+            d3.select('.legend-' + d3.select(this.parentNode).datum().key).classed('highlight', false);
 
             d3.select(d3.event.target).classed("highlight", false);
          });
@@ -286,7 +300,36 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
          .attr("x", self.bounds.getInnerWidth() - 18)
          .attr("width", 18)
          .attr("height", 18)
-         .attr("fill", this.colorScale);
+         .attr("fill", this.colorScale)
+         .on('mouseover', function (datum, group, c) {
+            var blocks;
+
+            d3.select(d3.event.target.parentNode)
+               .classed("highlight", true);
+
+            blocks = d3.selectAll('.tag-' + datum + ' rect');
+
+            if (blocks.size() > 0)
+               blocks.classed("highlight", true);
+            else
+               d3.select('.notice-label')
+                  .text('- no "' + self.toUpperCase(datum) + '" contributions -')
+         })
+         .on('mouseout', function (datum, group, c) {
+            var blocks;
+
+            d3.select(d3.event.target.parentNode)
+               .classed("highlight", false);
+
+            blocks = d3.selectAll('.tag-' + datum + ' rect');
+
+            if (blocks.size() > 0)
+               blocks.classed("highlight", false);
+            else
+               d3.select('.notice-label')
+                  .text('')
+         });
+
 
       legendItem.append("text")
          .attr("x", self.bounds.getInnerWidth() - 24)
@@ -294,10 +337,14 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
          .attr("dy", ".35em")
          .attr("text-anchor", "end")
          .text(function (columnName) {
-            return columnName.split(/_/g).map(function (word) {
-               return word[0].toUpperCase() + word.slice(1);
-            }).join(' ');
+            return self.toUpperCase(columnName.replace('_', ' '));
          });
+   };
+
+   CWRC.CreditVisualization.StackedColumnGraph.prototype.toUpperCase = function (string) {
+      return string.split(/\s/g).map(function (word) {
+         return word[0].toUpperCase() + word.slice(1);
+      }).join(' ')
    };
 
    CWRC.CreditVisualization.StackedColumnGraph.prototype.countChanges = function (datum) {
