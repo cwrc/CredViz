@@ -6,13 +6,6 @@ ko.components.register('credit_visualization', {
    viewModel: function (params) {
       var self = this;
 
-// TODO: pull merge type map and ignore list to KO params.
-      var mergedWorkTypes = {
-         evaluated: 'peer_evaluated',
-         peer_reviewed: 'peer_evaluated'
-      };
-      var ignoreWorkTypes = ['machine_processed'];
-
       // STATE
       self.grapher = new CWRC.CreditVisualization.StackedColumnGraph('svg.creditvis');
 
@@ -43,7 +36,7 @@ ko.components.register('credit_visualization', {
                title = 'User Contributions to "' + doc.name + '", by Type';
             }
 
-            self.grapher.render(data, title, mergedWorkTypes, ignoreWorkTypes);
+            self.grapher.render(data, title, params.mergeTags || {}, params.ignoreTags);
          });
       };
 
