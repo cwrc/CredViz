@@ -50,7 +50,7 @@
             {
                "user": {
                   "id": 3,
-                  "name": "Mihaela Illovan",
+                  "name": "Robin Miller",
                   "uri": "/islandora/object/cwrc%3Aa7de2169-ec07-4455-87d8-732852a2eb16"
                },
                "changes": {
@@ -63,11 +63,19 @@
                   "user_tagged": 1,
                   "rights_assigned": 1,
                   "published": 1,
+                  "peer_evaluated": 1,
+                  "evaluated": 1,
                   "peer_reviewed": 1,
                   "withdrawn": 0,
                   "deleted": 0
                }
-            },
+            }
+         ]
+      },
+      {
+         "id": 11,
+         "name": "Emily Murphy",
+         "modrecords": [
             {
                "user": {
                   "id": 4,
@@ -381,32 +389,6 @@
                   "peer_reviewed": 1,
                   "withdrawn": 0,
                   "deleted": 0
-               }
-            }
-         ]
-      },
-      {
-         "id": 11,
-         "name": "Emily Murphy",
-         "modrecords": [
-            {
-               "user": {
-                  "id": 3,
-                  "name": "Dot Matrix"
-               },
-               "changes": {
-                  "write": 1,
-                  "edit": 20
-               }
-            },
-            {
-               "user": {
-                  "id": 4,
-                  "name": "Enzo Matrix"
-               },
-               "changes": {
-                  "write": 1,
-                  "edit": 0
                }
             }
          ]

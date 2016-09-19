@@ -6,6 +6,13 @@ ko.components.register('credit_visualization', {
    viewModel: function (params) {
       var self = this;
 
+// TODO: pull merge type map and ignore list to KO params.
+      var mergedWorkTypes = {
+         evaluated: 'peer_evaluated',
+         peer_reviewed: 'peer_evaluated'
+      };
+      var ignoreWorkTypes = ['machine_processed'];
+
       // STATE
       self.grapher = new CWRC.CreditVisualization.StackedColumnGraph('svg.creditvis');
 
@@ -36,7 +43,7 @@ ko.components.register('credit_visualization', {
                title = 'User Contributions to "' + doc.name + '", by Type';
             }
 
-            self.grapher.render(data, title);
+            self.grapher.render(data, title, mergedWorkTypes, ignoreWorkTypes);
          });
       };
 
@@ -70,7 +77,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
          deleted: 'del'
       };
 
-      this.workTypes = Object.keys(workflowCategoriesToStamps); // TODO: dynamically determine this based on the workflow keys
+      this.workTypes = Object.keys(workflowCategoriesToStamps);
 
       this.bounds = {
          padding: {top: 20, right: 20, bottom: 60, left: 40},
@@ -100,14 +107,36 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
       this.contributionScale = d3.scaleLinear()
          .rangeRound([this.bounds.getInnerHeight(), 0]);
 
-      this.colorScale = d3.scaleOrdinal(d3.schemeCategory20c);
+      this.colorScale = d3.scaleOrdinal(d3.schemeCategory20);
       //.range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
    };
 
-   CWRC.CreditVisualization.StackedColumnGraph.prototype.render = function (data, title) {
+   CWRC.CreditVisualization.StackedColumnGraph.prototype.merge = function (data, mergedTagMap) {
+      var self = this, changeset;
+
+      data.forEach(function (modrecord) {
+         changeset = modrecord.changes;
+
+         for (var mergedTag in mergedTagMap) {
+            var primaryTag = mergedTagMap[mergedTag];
+
+            changeset[primaryTag] = (changeset[primaryTag] || 0) + changeset[mergedTag];
+            changeset[mergedTag] = 0;
+         }
+      });
+   };
+
+   CWRC.CreditVisualization.StackedColumnGraph.prototype.render = function (data, title, mergedTagMap, ignoredTags) {
       var self = this;
 
       var contentGroupVM, workTypeStacker, allChangesCount;
+
+      // removing the types from the list will mean that the Ordinal Scale will ignore those values.
+      (Object.keys(mergedTagMap).concat(ignoredTags)).forEach(function (tag) {
+         self.workTypes.splice(self.workTypes.indexOf(tag), 1)
+      });
+
+      self.merge(data, mergedTagMap);
 
       data.sort(function (a, b) {
          return self.countChanges(b) - self.countChanges(a)
@@ -125,7 +154,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
 
       workTypeStacker = d3.stack().keys(self.workTypes)
          .value(function (datum, key) {
-            return (datum.changes[key] || 0) / allChangesCount;
+            return (datum.changes[key] || 0) / allChangesCount
          });
 
       // create one group for each work type
