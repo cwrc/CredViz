@@ -100,7 +100,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
       this.contributionScale = d3.scaleLinear()
          .rangeRound([this.bounds.getInnerHeight(), 0]);
 
-      this.colorScale = d3.scaleOrdinal(d3.schemeCategory20);
+      this.colorScale = d3.scaleOrdinal(d3.schemeCategory20c);
       //.range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
 
       svg.append('text')
@@ -214,6 +214,8 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
          })
          .on("mouseout", function (d, rowNumber, group) {
             var keyName = d3.select(this.parentNode).datum().key;
+
+            console.log(d3.event.type)
 
             d3.select(d3.event.target).classed("highlight", false);
 
@@ -340,6 +342,26 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
       legendGroup = self.contentGroup.append('g')
          .attr('class', 'legend');
 
+      var hoverHandler = function (datum, group, c) {
+         var segments, isEnter;
+
+         isEnter = d3.event.type == 'mouseover';
+
+         d3.select(d3.event.target.parentNode)
+            .classed("highlight", isEnter);
+
+         segments = d3.selectAll('.tag-' + datum)
+            .selectAll('rect, text');
+
+         if (segments.size() > 0) {
+            segments.classed("highlight", isEnter);
+            //d3.selectAll('.tag-' + datum + ' text').classed('highlight', true);
+         } else {
+            d3.select('.notice-label')
+               .text(isEnter ? '- no "' + self.toUpperCase(datum) + '" contributions -' : '')
+         }
+      };
+
       legendItem = legendGroup.selectAll(".legendItem")
          .data(self.workTypes.reverse())
          .enter().append("g")
@@ -350,46 +372,15 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
          .attr("transform", function (d, i) {
             return "translate(0," + i * 20 + ")";
          })
-         .style("font", "10px sans-serif");
+         .style("font", "10px sans-serif")
+         .on('mouseover', hoverHandler)
+         .on('mouseout', hoverHandler);
 
       legendItem.append("rect")
          .attr("x", self.bounds.getInnerWidth() - 18)
          .attr("width", 18)
          .attr("height", 18)
          .attr("fill", this.colorScale)
-         .on('mouseover', function (datum, group, c) {
-            var blocks;
-
-            d3.select(d3.event.target.parentNode)
-               .classed("highlight", true);
-
-            blocks = d3.selectAll('.tag-' + datum)
-               .selectAll('rect, text');
-
-            if (blocks.size() > 0) {
-               blocks.classed("highlight", true);
-               //d3.selectAll('.tag-' + datum + ' text').classed('highlight', true);
-            } else {
-               d3.select('.notice-label')
-                  .text('- no "' + self.toUpperCase(datum) + '" contributions -')
-            }
-         })
-         .on('mouseout', function (datum, group, c) {
-            var blocks;
-
-            d3.select(d3.event.target.parentNode)
-               .classed("highlight", false);
-
-            blocks = d3.selectAll('.tag-' + datum)
-               .selectAll('rect, text');
-
-            if (blocks.size() > 0)
-               blocks.classed("highlight", false);
-            else
-               d3.select('.notice-label')
-                  .text('')
-         });
-
 
       legendItem.append("text")
          .attr("x", self.bounds.getInnerWidth() - 24)

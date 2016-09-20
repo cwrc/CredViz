@@ -60,6 +60,11 @@ credit_visualization {
       .legend .highlight {
          text {
             font-size: 110%;
+
+            cursor: default;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            user-select: none;
          }
 
          rect {
