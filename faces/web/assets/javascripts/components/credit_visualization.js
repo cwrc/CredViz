@@ -102,11 +102,6 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
 
       this.colorScale = d3.scaleOrdinal(d3.schemeCategory20c);
       //.range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
-
-      svg.append('text')
-         .attr('class', 'notice-label')
-         .attr('x', self.bounds.getInnerWidth() / 2)
-         .attr('y', self.bounds.getInnerHeight() / 2);
    };
 
    CWRC.CreditVisualization.StackedColumnGraph.prototype.merge = function (data, mergedTagMap) {
@@ -251,12 +246,8 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
       this.constructBottomScale();
       this.constructLeftScale();
       this.constructLegend();
-
-      self.contentGroup.append('text')
-         .text(title)
-         .attr('text-anchor', 'middle')
-         .attr('x', (self.bounds.getInnerWidth() / 2))
-         .attr('y', self.bounds.getOuterHeight() - (self.bounds.padding.bottom / 2))
+      this.constructTitle(title);
+      this.constructNoticeOverlay()
    };
 
    CWRC.CreditVisualization.StackedColumnGraph.prototype.constructBottomScale = function () {
@@ -328,7 +319,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
          .text("Contribution");
    };
 
-   CWRC.CreditVisualization.StackedColumnGraph.prototype.constructLegend = function (workTypes) {
+   CWRC.CreditVisualization.StackedColumnGraph.prototype.constructLegend = function () {
       var self = this, legendItem, legendGroup, hoverHandler;
 
       legendGroup = self.contentGroup.append('g')
@@ -349,8 +340,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
             segments.classed("highlight", isEnter);
             //d3.selectAll('.tag-' + datum + ' text').classed('highlight', true);
          } else {
-            d3.select('.notice-label')
-               .text(isEnter ? '- no "' + self.toUpperCase(datum) + '" contributions -' : '')
+            self.setNotice(isEnter ? 'No "' + self.toUpperCase(datum) + '" contributions' : '');
          }
       };
 
@@ -382,6 +372,48 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
          .text(function (columnName) {
             return self.toUpperCase(columnName.replace('_', ' '));
          });
+   };
+
+   CWRC.CreditVisualization.StackedColumnGraph.prototype.constructNoticeOverlay = function () {
+      var self = this, noticeGroup;
+
+      noticeGroup = d3.select('.creditvis').append('g')
+         .attr('class', 'notice-label');
+
+      noticeGroup
+         .append('rect')
+         .attr('x', self.bounds.getInnerWidth() / 2)
+         .attr('y', self.bounds.getInnerHeight() / 2);
+      noticeGroup
+         .append('text')
+         .attr('x', self.bounds.getInnerWidth() / 2)
+         .attr('y', self.bounds.getInnerHeight() / 2);
+   };
+
+   CWRC.CreditVisualization.StackedColumnGraph.prototype.constructTitle = function (title) {
+      var self = this;
+
+      self.contentGroup.append('text')
+         .text(title)
+         .attr('text-anchor', 'middle')
+         .attr('x', (self.bounds.getInnerWidth() / 2))
+         .attr('y', self.bounds.getOuterHeight() - (self.bounds.padding.bottom / 2));
+   };
+
+   CWRC.CreditVisualization.StackedColumnGraph.prototype.setNotice = function (msg) {
+      var textSelection, padding;
+
+      textSelection = d3.select('.notice-label text');
+
+      textSelection.text(msg);
+
+      padding = 10;
+
+      d3.select('.notice-label rect')
+         .attr('x', textSelection.node().getBBox().x - padding)
+         .attr('y', textSelection.node().getBBox().y - padding)
+         .attr('width', textSelection.node().getBBox().width + padding * 2)
+         .attr('height', textSelection.node().getBBox().height + padding * 2)
    };
 
    CWRC.CreditVisualization.StackedColumnGraph.prototype.toUpperCase = function (string) {
