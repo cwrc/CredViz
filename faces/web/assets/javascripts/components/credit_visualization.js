@@ -401,7 +401,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
    };
 
    CWRC.CreditVisualization.StackedColumnGraph.prototype.setNotice = function (msg) {
-      var textSelection, padding;
+      var textSelection, rectSelection, padding;
 
       textSelection = d3.select('.notice-label text');
 
@@ -409,11 +409,17 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
 
       padding = 10;
 
-      d3.select('.notice-label rect')
-         .attr('x', textSelection.node().getBBox().x - padding)
-         .attr('y', textSelection.node().getBBox().y - padding)
-         .attr('width', textSelection.node().getBBox().width + padding * 2)
-         .attr('height', textSelection.node().getBBox().height + padding * 2)
+      rectSelection = d3.select('.notice-label rect');
+      rectSelection.attr('x', textSelection.node().getBBox().x - padding);
+      rectSelection.attr('y', textSelection.node().getBBox().y - padding);
+
+      if (msg.length > 0) {
+         rectSelection.attr('width', textSelection.node().getBBox().width + padding * 2);
+         rectSelection.attr('height', textSelection.node().getBBox().height + padding * 2);
+      } else {
+         rectSelection.attr('width', 0);
+         rectSelection.attr('height', 0);
+      }
    };
 
    CWRC.CreditVisualization.StackedColumnGraph.prototype.toUpperCase = function (string) {
