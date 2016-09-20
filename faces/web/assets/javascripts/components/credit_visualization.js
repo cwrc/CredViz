@@ -127,7 +127,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
    CWRC.CreditVisualization.StackedColumnGraph.prototype.render = function (data, title, mergedTagMap, ignoredTags) {
       var self = this;
 
-      var stackVM, workTypeStacker, allChangesCount, seriesGroupVM, percentFormat, hasSize;
+      var stackVM, workTagStacker, workTagStack, allChangesCount, seriesGroupVM, percentFormat, hasSize, maxValue;
 
       // removing the types from the list will mean that the Ordinal Scale will ignore those values.
       (Object.keys(mergedTagMap).concat(ignoredTags)).forEach(function (tag) {
@@ -140,20 +140,29 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
          return self.countChanges(b) - self.countChanges(a)
       });
 
-      self.usersScale.domain(data.map(function (d) {
-         return JSON.stringify(d.user);
-      }));
-      self.contributionScale.domain([0, 1]);
-      self.colorScale.domain(self.workTypes);
-
       allChangesCount = d3.sum(data, function (d) {
          return self.countChanges(d);
       });
 
-      workTypeStacker = d3.stack().keys(self.workTypes)
+      workTagStacker = d3.stack()
+         .keys(self.workTypes)
          .value(function (datum, key) {
             return (datum.workflow_changes[key] || 0) / allChangesCount
          });
+
+      workTagStack = workTagStacker(data);
+
+      maxValue = d3.max(workTagStack.reduce(function (a, b) {
+         return a.concat(b.reduce(function (c, d) {
+            return c.concat(d);
+         }, []));
+      }, []));
+
+      self.usersScale.domain(data.map(function (d) {
+         return JSON.stringify(d.user);
+      }));
+      self.contributionScale.domain([0, maxValue]).nice();
+      self.colorScale.domain(self.workTypes);
 
       hasSize = function (stackGroup) {
          // removing the empties cleans up the graph DOM for other conditionals
@@ -164,7 +173,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
 
       // create one group for each work type
       stackVM = self.contentGroup.selectAll('.series')
-         .data(workTypeStacker(data));
+         .data(workTagStack);
 
       seriesGroupVM = stackVM.enter().append("g")
          .attr("class", function (datum) {

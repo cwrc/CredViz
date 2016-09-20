@@ -49,6 +49,8 @@ credit_visualization {
             stroke: black;
             stroke-width: 0.05em;
 
+            pointer-events: none;
+
             &.highlight {
                display: inherit;
             }
