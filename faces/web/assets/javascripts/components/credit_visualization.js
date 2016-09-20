@@ -16,7 +16,7 @@ ko.components.register('credit_visualization', {
 
             // multiUserMultiDoc = response;
             // multiUserSingleDoc = multiUserMultiDoc.documents[0];
-            // singleUserSingleDoc = multiUserSingleDoc.documents[0].modrecords[0];
+            // singleUserSingleDoc = multiUserSingleDoc.documents[0].modifications[0];
 
             multiUser = true;
             multiDoc = true;
@@ -24,14 +24,14 @@ ko.components.register('credit_visualization', {
 
             if (multiUser && multiDoc) {
                data = response.documents.reduce(function (aggregate, document) {
-                  return aggregate.concat(document.modrecords);
+                  return aggregate.concat(document.modifications);
                }, []);
 
                title = 'User Contributions to "' + response.name + '", by Type';
             } else if (multiUser && !multiDoc) {
                var doc = response.documents[0];
 
-               data = doc.modrecords;
+               data = doc.modifications;
 
                title = 'User Contributions to "' + doc.name + '", by Type';
             }
@@ -112,8 +112,8 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
    CWRC.CreditVisualization.StackedColumnGraph.prototype.merge = function (data, mergedTagMap) {
       var self = this, changeset;
 
-      data.forEach(function (modrecord) {
-         changeset = modrecord.changes;
+      data.forEach(function (modification) {
+         changeset = modification.workflow_changes;
 
          for (var mergedTag in mergedTagMap) {
             var primaryTag = mergedTagMap[mergedTag];
@@ -152,7 +152,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
 
       workTypeStacker = d3.stack().keys(self.workTypes)
          .value(function (datum, key) {
-            return (datum.changes[key] || 0) / allChangesCount
+            return (datum.workflow_changes[key] || 0) / allChangesCount
          });
 
       hasSize = function (stackGroup) {
@@ -191,16 +191,30 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
          })
          .attr("width", self.usersScale.bandwidth())
          .on("mouseover", function (d, rowNumber, group) {
-            var keyName = d3.select(this.parentNode).datum().key
+            var keyName = d3.select(this.parentNode).datum().key;
 
             d3.select(d3.event.target).classed("highlight", true);
 
             d3.select('.legend-' + keyName).classed('highlight', true);
+
+            d3.selectAll('.tag-' + keyName + ' text')
+               .filter(function (d, labelRowNumber, f) {
+                  return rowNumber == labelRowNumber;
+               })
+               .classed('highlight', true);
          })
-         .on("mouseout", function () {
+         .on("mouseout", function (d, rowNumber, group) {
+            var keyName = d3.select(this.parentNode).datum().key;
+
             d3.select(d3.event.target).classed("highlight", false);
 
-            d3.select('.legend-' + d3.select(this.parentNode).datum().key).classed('highlight', false);
+            d3.select('.legend-' + keyName).classed('highlight', false);
+
+            d3.selectAll('.tag-' + keyName + ' text')
+               .filter(function (d, labelRowNumber, f) {
+                  return rowNumber == labelRowNumber;
+               })
+               .classed('highlight', false);
          });
 
       percentFormat = d3.format(".00%");
@@ -387,8 +401,8 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
    CWRC.CreditVisualization.StackedColumnGraph.prototype.countChanges = function (datum) {
       var total = 0;
 
-      for (var type in datum.changes)
-         total += datum.changes[type];
+      for (var type in datum.workflow_changes)
+         total += datum.workflow_changes[type];
 
       return total;
    };
