@@ -215,8 +215,6 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
          .on("mouseout", function (d, rowNumber, group) {
             var keyName = d3.select(this.parentNode).datum().key;
 
-            console.log(d3.event.type)
-
             d3.select(d3.event.target).classed("highlight", false);
 
             d3.select('.legend-' + keyName).classed('highlight', false);
@@ -337,12 +335,12 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
    };
 
    CWRC.CreditVisualization.StackedColumnGraph.prototype.constructLegend = function (workTypes) {
-      var self = this, legendItem, legendGroup;
+      var self = this, legendItem, legendGroup, hoverHandler;
 
       legendGroup = self.contentGroup.append('g')
          .attr('class', 'legend');
 
-      var hoverHandler = function (datum, group, c) {
+      hoverHandler = function (datum, group, c) {
          var segments, isEnter;
 
          isEnter = d3.event.type == 'mouseover';
