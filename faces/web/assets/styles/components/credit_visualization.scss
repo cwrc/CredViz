@@ -76,7 +76,20 @@ credit_visualization {
       }
 
       .notice-label {
-         text-anchor: middle;
+         text {
+            fill: white;
+
+            text-anchor: middle;
+         }
+
+         rect {
+            padding: 1em;
+
+            -webkit-filter: drop-shadow(-5px -5px 5px #000);
+            filter: drop-shadow(-5px -5px 5px #000);
+
+            fill: rgba(51, 51, 51, 0.61);
+         }
       }
    }
 }
