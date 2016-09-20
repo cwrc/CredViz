@@ -191,16 +191,30 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
          })
          .attr("width", self.usersScale.bandwidth())
          .on("mouseover", function (d, rowNumber, group) {
-            var keyName = d3.select(this.parentNode).datum().key
+            var keyName = d3.select(this.parentNode).datum().key;
 
             d3.select(d3.event.target).classed("highlight", true);
 
             d3.select('.legend-' + keyName).classed('highlight', true);
+
+            d3.selectAll('.tag-' + keyName + ' text')
+               .filter(function (d, labelRowNumber, f) {
+                  return rowNumber == labelRowNumber;
+               })
+               .classed('highlight', true);
          })
-         .on("mouseout", function () {
+         .on("mouseout", function (d, rowNumber, group) {
+            var keyName = d3.select(this.parentNode).datum().key;
+
             d3.select(d3.event.target).classed("highlight", false);
 
-            d3.select('.legend-' + d3.select(this.parentNode).datum().key).classed('highlight', false);
+            d3.select('.legend-' + keyName).classed('highlight', false);
+
+            d3.selectAll('.tag-' + keyName + ' text')
+               .filter(function (d, labelRowNumber, f) {
+                  return rowNumber == labelRowNumber;
+               })
+               .classed('highlight', false);
          });
 
       percentFormat = d3.format(".00%");
