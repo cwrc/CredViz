@@ -4,14 +4,14 @@
       {
          "id": 10,
          "name": "Nellie McClung",
-         "modrecords": [
+         "modifications": [
             {
                "user": {
                   "id": 1,
                   "name": "Susan Brown",
                   "uri": "/islandora/object/cwrc%3Aba99b4e0-d9f1-4f00-9dc9-fa6dc2dea8bb"
                },
-               "changes": {
+               "workflow_changes": {
                   "created": 1,
                   "deposited": 0,
                   "metadata_contribution": 0,
@@ -19,7 +19,7 @@
                   "checked": 1,
                   "machine_processed": 0,
                   "user_tagged": 1,
-                  "rights_assigned": 1,
+                  "rights_assigned": 0,
                   "published": 1,
                   "peer_reviewed": 1,
                   "withdrawn": 0,
@@ -32,28 +32,7 @@
                   "name": "Mihaela Illovan",
                   "uri": "/islandora/object/cwrc%3Aa7de2169-ec07-4455-87d8-732852a2eb16"
                },
-               "changes": {
-                  "created": 0,
-                  "deposited": 0,
-                  "metadata_contribution": 1,
-                  "content_contribution": 1,
-                  "checked": 2,
-                  "machine_processed": 0,
-                  "user_tagged": 1,
-                  "rights_assigned": 1,
-                  "published": 1,
-                  "peer_reviewed": 1,
-                  "withdrawn": 0,
-                  "deleted": 0
-               }
-            },
-            {
-               "user": {
-                  "id": 3,
-                  "name": "Robin Miller",
-                  "uri": "/islandora/object/cwrc%3Aa7de2169-ec07-4455-87d8-732852a2eb16"
-               },
-               "changes": {
+               "workflow_changes": {
                   "created": 0,
                   "deposited": 0,
                   "metadata_contribution": 1,
@@ -69,20 +48,41 @@
                   "withdrawn": 0,
                   "deleted": 0
                }
+            },
+            {
+               "user": {
+                  "id": 3,
+                  "name": "Robin Miller",
+                  "uri": "/islandora/object/cwrc%3Aa7de2169-ec07-4455-87d8-732852a2eb16"
+               },
+               "workflow_changes": {
+                  "created": 0,
+                  "deposited": 0,
+                  "metadata_contribution": 1,
+                  "content_contribution": 0,
+                  "checked": 2,
+                  "machine_processed": 0,
+                  "user_tagged": 0,
+                  "rights_assigned": 0,
+                  "published": 0,
+                  "peer_reviewed": 1,
+                  "withdrawn": 0,
+                  "deleted": 0
+               }
             }
          ]
       },
       {
          "id": 11,
          "name": "Emily Murphy",
-         "modrecords": [
+         "modifications": [
             {
                "user": {
                   "id": 4,
                   "name": "Mihaela Illovan",
                   "uri": "/islandora/object/cwrc%3Aa7de2169-ec07-4455-87d8-732852a2eb16"
                },
-               "changes": {
+               "workflow_changes": {
                   "created": 0,
                   "deposited": 0,
                   "metadata_contribution": 1,
@@ -100,10 +100,10 @@
             {
                "user": {
                   "id": 5,
-                  "name": "Mihaela Illovan",
+                  "name": "Paul Dyck",
                   "uri": "/islandora/object/cwrc%3Aa7de2169-ec07-4455-87d8-732852a2eb16"
                },
-               "changes": {
+               "workflow_changes": {
                   "created": 0,
                   "deposited": 0,
                   "metadata_contribution": 1,
@@ -111,7 +111,7 @@
                   "checked": 2,
                   "machine_processed": 0,
                   "user_tagged": 1,
-                  "rights_assigned": 1,
+                  "rights_assigned": 0,
                   "published": 1,
                   "peer_reviewed": 1,
                   "withdrawn": 0,
@@ -121,10 +121,10 @@
             {
                "user": {
                   "id": 6,
-                  "name": "Mihaela Illovan",
+                  "name": "Robyn Read",
                   "uri": "/islandora/object/cwrc%3Aa7de2169-ec07-4455-87d8-732852a2eb16"
                },
-               "changes": {
+               "workflow_changes": {
                   "created": 0,
                   "deposited": 0,
                   "metadata_contribution": 1,
@@ -132,7 +132,7 @@
                   "checked": 2,
                   "machine_processed": 0,
                   "user_tagged": 1,
-                  "rights_assigned": 1,
+                  "rights_assigned": 0,
                   "published": 1,
                   "peer_reviewed": 1,
                   "withdrawn": 0,
@@ -142,10 +142,10 @@
             {
                "user": {
                   "id": 7,
-                  "name": "Mihaela Illovan",
+                  "name": "Jane Haslett",
                   "uri": "/islandora/object/cwrc%3Aa7de2169-ec07-4455-87d8-732852a2eb16"
                },
-               "changes": {
+               "workflow_changes": {
                   "created": 0,
                   "deposited": 0,
                   "metadata_contribution": 1,
@@ -153,7 +153,7 @@
                   "checked": 2,
                   "machine_processed": 0,
                   "user_tagged": 1,
-                  "rights_assigned": 1,
+                  "rights_assigned": 0,
                   "published": 1,
                   "peer_reviewed": 1,
                   "withdrawn": 0,
@@ -163,10 +163,10 @@
             {
                "user": {
                   "id": 8,
-                  "name": "Mihaela Illovan",
+                  "name": "Jennifer Chambers",
                   "uri": "/islandora/object/cwrc%3Aa7de2169-ec07-4455-87d8-732852a2eb16"
                },
-               "changes": {
+               "workflow_changes": {
                   "created": 0,
                   "deposited": 0,
                   "metadata_contribution": 1,
@@ -174,7 +174,7 @@
                   "checked": 2,
                   "machine_processed": 0,
                   "user_tagged": 1,
-                  "rights_assigned": 1,
+                  "rights_assigned": 0,
                   "published": 1,
                   "peer_reviewed": 1,
                   "withdrawn": 0,
@@ -184,10 +184,10 @@
             {
                "user": {
                   "id": 9,
-                  "name": "Mihaela Illovan",
+                  "name": "Michelle Gregory",
                   "uri": "/islandora/object/cwrc%3Aa7de2169-ec07-4455-87d8-732852a2eb16"
                },
-               "changes": {
+               "workflow_changes": {
                   "created": 0,
                   "deposited": 0,
                   "metadata_contribution": 1,
@@ -195,7 +195,7 @@
                   "checked": 2,
                   "machine_processed": 0,
                   "user_tagged": 1,
-                  "rights_assigned": 1,
+                  "rights_assigned": 0,
                   "published": 1,
                   "peer_reviewed": 1,
                   "withdrawn": 0,
@@ -205,10 +205,10 @@
             {
                "user": {
                   "id": 10,
-                  "name": "Mihaela Illovan",
+                  "name": "Jeanne Wood",
                   "uri": "/islandora/object/cwrc%3Aa7de2169-ec07-4455-87d8-732852a2eb16"
                },
-               "changes": {
+               "workflow_changes": {
                   "created": 0,
                   "deposited": 0,
                   "metadata_contribution": 1,
@@ -216,7 +216,7 @@
                   "checked": 2,
                   "machine_processed": 0,
                   "user_tagged": 1,
-                  "rights_assigned": 1,
+                  "rights_assigned": 0,
                   "published": 1,
                   "peer_reviewed": 1,
                   "withdrawn": 0,
@@ -226,10 +226,10 @@
             {
                "user": {
                   "id": 11,
-                  "name": "Mihaela Illovan",
+                  "name": "Sue Fisher",
                   "uri": "/islandora/object/cwrc%3Aa7de2169-ec07-4455-87d8-732852a2eb16"
                },
-               "changes": {
+               "workflow_changes": {
                   "created": 0,
                   "deposited": 0,
                   "metadata_contribution": 1,
@@ -237,7 +237,7 @@
                   "checked": 2,
                   "machine_processed": 0,
                   "user_tagged": 1,
-                  "rights_assigned": 1,
+                  "rights_assigned": 0,
                   "published": 1,
                   "peer_reviewed": 1,
                   "withdrawn": 0,
@@ -247,10 +247,10 @@
             {
                "user": {
                   "id": 12,
-                  "name": "Mihaela Illovan",
+                  "name": "Rebecca Cameron",
                   "uri": "/islandora/object/cwrc%3Aa7de2169-ec07-4455-87d8-732852a2eb16"
                },
-               "changes": {
+               "workflow_changes": {
                   "created": 0,
                   "deposited": 0,
                   "metadata_contribution": 1,
@@ -258,7 +258,7 @@
                   "checked": 2,
                   "machine_processed": 0,
                   "user_tagged": 1,
-                  "rights_assigned": 1,
+                  "rights_assigned": 0,
                   "published": 1,
                   "peer_reviewed": 1,
                   "withdrawn": 0,
@@ -268,10 +268,10 @@
             {
                "user": {
                   "id": 13,
-                  "name": "Mihaela Illovan",
+                  "name": "Sharon Balazs",
                   "uri": "/islandora/object/cwrc%3Aa7de2169-ec07-4455-87d8-732852a2eb16"
                },
-               "changes": {
+               "workflow_changes": {
                   "created": 0,
                   "deposited": 0,
                   "metadata_contribution": 1,
@@ -279,7 +279,7 @@
                   "checked": 2,
                   "machine_processed": 0,
                   "user_tagged": 1,
-                  "rights_assigned": 1,
+                  "rights_assigned": 0,
                   "published": 1,
                   "peer_reviewed": 1,
                   "withdrawn": 0,
@@ -289,10 +289,10 @@
             {
                "user": {
                   "id": 14,
-                  "name": "Mihaela Illovan",
+                  "name": "Deanna Kruger",
                   "uri": "/islandora/object/cwrc%3Aa7de2169-ec07-4455-87d8-732852a2eb16"
                },
-               "changes": {
+               "workflow_changes": {
                   "created": 0,
                   "deposited": 0,
                   "metadata_contribution": 1,
@@ -300,7 +300,7 @@
                   "checked": 2,
                   "machine_processed": 0,
                   "user_tagged": 1,
-                  "rights_assigned": 1,
+                  "rights_assigned": 0,
                   "published": 1,
                   "peer_reviewed": 1,
                   "withdrawn": 0,
@@ -310,10 +310,10 @@
             {
                "user": {
                   "id": 15,
-                  "name": "Mihaela Illovan",
+                  "name": "Melisa Brittain",
                   "uri": "/islandora/object/cwrc%3Aa7de2169-ec07-4455-87d8-732852a2eb16"
                },
-               "changes": {
+               "workflow_changes": {
                   "created": 0,
                   "deposited": 0,
                   "metadata_contribution": 1,
@@ -321,7 +321,7 @@
                   "checked": 2,
                   "machine_processed": 0,
                   "user_tagged": 1,
-                  "rights_assigned": 1,
+                  "rights_assigned": 0,
                   "published": 1,
                   "peer_reviewed": 1,
                   "withdrawn": 0,
@@ -331,10 +331,10 @@
             {
                "user": {
                   "id": 16,
-                  "name": "Mihaela Illovan",
+                  "name": "Susan Brown",
                   "uri": "/islandora/object/cwrc%3Aa7de2169-ec07-4455-87d8-732852a2eb16"
                },
-               "changes": {
+               "workflow_changes": {
                   "created": 0,
                   "deposited": 0,
                   "metadata_contribution": 1,
@@ -342,7 +342,7 @@
                   "checked": 2,
                   "machine_processed": 0,
                   "user_tagged": 1,
-                  "rights_assigned": 1,
+                  "rights_assigned": 0,
                   "published": 1,
                   "peer_reviewed": 1,
                   "withdrawn": 0,
@@ -352,18 +352,18 @@
             {
                "user": {
                   "id": 17,
-                  "name": "Mihaela Illovan",
+                  "name": "Kathryn Harvey",
                   "uri": "/islandora/object/cwrc%3Aa7de2169-ec07-4455-87d8-732852a2eb16"
                },
-               "changes": {
+               "workflow_changes": {
                   "created": 0,
                   "deposited": 0,
                   "metadata_contribution": 1,
                   "content_contribution": 1,
                   "checked": 2,
                   "machine_processed": 0,
-                  "user_tagged": 1,
-                  "rights_assigned": 1,
+                  "user_tagged": 0,
+                  "rights_assigned": 0,
                   "published": 1,
                   "peer_reviewed": 1,
                   "withdrawn": 0,
@@ -373,10 +373,10 @@
             {
                "user": {
                   "id": 18,
-                  "name": "Mihaela Illovan",
+                  "name": "Tamara de Dominicis",
                   "uri": "/islandora/object/cwrc%3Aa7de2169-ec07-4455-87d8-732852a2eb16"
                },
-               "changes": {
+               "workflow_changes": {
                   "created": 0,
                   "deposited": 0,
                   "metadata_contribution": 1,
@@ -384,7 +384,7 @@
                   "checked": 2,
                   "machine_processed": 0,
                   "user_tagged": 1,
-                  "rights_assigned": 1,
+                  "rights_assigned": 0,
                   "published": 1,
                   "peer_reviewed": 1,
                   "withdrawn": 0,
