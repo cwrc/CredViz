@@ -127,7 +127,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
    CWRC.CreditVisualization.StackedColumnGraph.prototype.render = function (data, title, mergedTagMap, ignoredTags) {
       var self = this;
 
-      var contentGroupVM, workTypeStacker, allChangesCount;
+      var stackVM, workTypeStacker, allChangesCount, seriesGroupVM, percentFormat, hasSize;
 
       // removing the types from the list will mean that the Ordinal Scale will ignore those values.
       (Object.keys(mergedTagMap).concat(ignoredTags)).forEach(function (tag) {
@@ -155,24 +155,27 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
             return (datum.changes[key] || 0) / allChangesCount
          });
 
+      hasSize = function (stackGroup) {
+         // removing the empties cleans up the graph DOM for other conditionals
+         return stackGroup.some(function (positionsRow) {
+            return positionsRow[0] != positionsRow[1];
+         })
+      };
+
       // create one group for each work type
-      contentGroupVM = self.contentGroup.selectAll('.series')
+      stackVM = self.contentGroup.selectAll('.series')
          .data(workTypeStacker(data));
 
-      contentGroupVM.enter().append("g")
+      seriesGroupVM = stackVM.enter().append("g")
          .attr("class", function (datum) {
             return "series tag-" + datum.key;
          })
          .attr("fill", function (d) {
             return self.colorScale(d.key);
          })
-         .filter(function (stackGroup) {
-            // removing the empties cleans up the graph DOM for other conditionals
-            return stackGroup.some(function (positionsRow) {
-               return positionsRow[0] != positionsRow[1];
-            })
-         })
-         .selectAll("rect")
+         .filter(hasSize);
+
+      seriesGroupVM.selectAll("rect")
          .data(function (d) {
             return d;
          })
@@ -188,15 +191,45 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
          })
          .attr("width", self.usersScale.bandwidth())
          .on("mouseover", function (d, rowNumber, group) {
-            d3.select('.legend-' + d3.select(this.parentNode).datum().key).classed('highlight', true);
+            var keyName = d3.select(this.parentNode).datum().key
 
             d3.select(d3.event.target).classed("highlight", true);
+
+            d3.select('.legend-' + keyName).classed('highlight', true);
          })
          .on("mouseout", function () {
-            d3.select('.legend-' + d3.select(this.parentNode).datum().key).classed('highlight', false);
-
             d3.select(d3.event.target).classed("highlight", false);
+
+            d3.select('.legend-' + d3.select(this.parentNode).datum().key).classed('highlight', false);
          });
+
+      percentFormat = d3.format(".00%");
+
+      stackVM.enter().append("g")
+         .attr("class", function (datum) {
+            return "labels tag-" + datum.key;
+         })
+         .filter(hasSize)
+         .selectAll("text")
+         .data(function (d) {
+            return d;
+         })
+         .enter().append("text")
+         .text(function (d) {
+            var value = d[1] - d[0];
+
+            return value > 0 ? percentFormat(value) : '';
+         })
+         .attr("x", function (d) {
+            return self.usersScale(JSON.stringify(d.data.user)) + self.usersScale.bandwidth() / 2;
+         })
+         .attr("y", function (dataRow) {
+            var baseline = self.contributionScale(dataRow[0]);
+            var top = self.contributionScale(dataRow[1]);
+
+            return baseline + (top - self.contributionScale(dataRow[0])) / 2;
+         });
+
 
       this.constructBottomScale();
       this.constructLeftScale();
@@ -307,13 +340,16 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
             d3.select(d3.event.target.parentNode)
                .classed("highlight", true);
 
-            blocks = d3.selectAll('.tag-' + datum + ' rect');
+            blocks = d3.selectAll('.tag-' + datum)
+               .selectAll('rect, text');
 
-            if (blocks.size() > 0)
+            if (blocks.size() > 0) {
                blocks.classed("highlight", true);
-            else
+               //d3.selectAll('.tag-' + datum + ' text').classed('highlight', true);
+            } else {
                d3.select('.notice-label')
                   .text('- no "' + self.toUpperCase(datum) + '" contributions -')
+            }
          })
          .on('mouseout', function (datum, group, c) {
             var blocks;
@@ -321,7 +357,8 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
             d3.select(d3.event.target.parentNode)
                .classed("highlight", false);
 
-            blocks = d3.selectAll('.tag-' + datum + ' rect');
+            blocks = d3.selectAll('.tag-' + datum)
+               .selectAll('rect, text');
 
             if (blocks.size() > 0)
                blocks.classed("highlight", false);

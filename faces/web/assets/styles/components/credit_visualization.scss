@@ -35,6 +35,26 @@ credit_visualization {
          }
       }
 
+      g.labels {
+         text {
+            display: none;
+
+            text-anchor: middle;
+            alignment-baseline: middle;
+            z-index: 1000;
+
+            fill: white;
+            font-size: 25px;
+            font-weight: bold;
+            stroke: black;
+            stroke-width: 0.05em;
+
+            &.highlight {
+               display: inherit;
+            }
+         }
+      }
+
       .legend .highlight {
          text {
             font-size: 110%;
@@ -48,7 +68,7 @@ credit_visualization {
          }
       }
 
-      .no-blocks-label {
+      .notice-label {
          text-anchor: middle;
       }
    }
