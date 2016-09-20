@@ -127,7 +127,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
    CWRC.CreditVisualization.StackedColumnGraph.prototype.render = function (data, title, mergedTagMap, ignoredTags) {
       var self = this;
 
-      var stackVM, workTagStacker, workTagStack, allChangesCount, seriesGroupVM, percentFormat, hasSize, maxValue;
+      var stackVM, workTagStacker, workTagStack, allChangesCount, seriesGroupVM, percentFormat, hasSize, maxValue, hoverHandler;
 
       // removing the types from the list will mean that the Ordinal Scale will ignore those values.
       (Object.keys(mergedTagMap).concat(ignoredTags)).forEach(function (tag) {
@@ -184,6 +184,24 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
          })
          .filter(hasSize);
 
+      hoverHandler = function (d, rowNumber, group) {
+         var keyName, isEnter;
+
+         isEnter = d3.event.type == 'mouseover';
+
+         keyName = d3.select(this.parentNode).datum().key;
+
+         d3.select(d3.event.target).classed("highlight", isEnter);
+
+         d3.select('.legend-' + keyName).classed('highlight', isEnter);
+
+         d3.selectAll('.tag-' + keyName + ' text')
+            .filter(function (d, labelRowNumber, f) {
+               return rowNumber == labelRowNumber;
+            })
+            .classed('highlight', isEnter);
+      };
+
       seriesGroupVM.selectAll("rect")
          .data(function (d) {
             return d;
@@ -199,32 +217,8 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
             return self.contributionScale(dataRow[0]) - self.contributionScale(dataRow[1]);
          })
          .attr("width", self.usersScale.bandwidth())
-         .on("mouseover", function (d, rowNumber, group) {
-            var keyName = d3.select(this.parentNode).datum().key;
-
-            d3.select(d3.event.target).classed("highlight", true);
-
-            d3.select('.legend-' + keyName).classed('highlight', true);
-
-            d3.selectAll('.tag-' + keyName + ' text')
-               .filter(function (d, labelRowNumber, f) {
-                  return rowNumber == labelRowNumber;
-               })
-               .classed('highlight', true);
-         })
-         .on("mouseout", function (d, rowNumber, group) {
-            var keyName = d3.select(this.parentNode).datum().key;
-
-            d3.select(d3.event.target).classed("highlight", false);
-
-            d3.select('.legend-' + keyName).classed('highlight', false);
-
-            d3.selectAll('.tag-' + keyName + ' text')
-               .filter(function (d, labelRowNumber, f) {
-                  return rowNumber == labelRowNumber;
-               })
-               .classed('highlight', false);
-         });
+         .on("mouseover", hoverHandler)
+         .on("mouseout", hoverHandler);
 
       percentFormat = d3.format(".00%");
 
