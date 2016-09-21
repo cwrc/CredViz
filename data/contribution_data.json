@@ -9,7 +9,7 @@
                "user": {
                   "id": 1,
                   "name": "Susan Brown",
-                  "uri": "/islandora/object/cwrc%3Aba99b4e0-d9f1-4f00-9dc9-fa6dc2dea8bb"
+                  "uri": "//beta.cwrc.ca/islandora/object/cwrc%3Aba99b4e0-d9f1-4f00-9dc9-fa6dc2dea8bb"
                },
                "workflow_changes": {
                   "created": 1,
@@ -32,7 +32,7 @@
                "user": {
                   "id": 2,
                   "name": "Mihaela Illovan",
-                  "uri": "/islandora/object/cwrc%3Aa7de2169-ec07-4455-87d8-732852a2eb16"
+                  "uri": "//beta.cwrc.ca/islandora/object/cwrc%3Aa7de2169-ec07-4455-87d8-732852a2eb16"
                },
                "workflow_changes": {
                   "created": 1,
@@ -59,7 +59,7 @@
                "user": {
                   "id": 2,
                   "name": "Mihaela Illovan",
-                  "uri": "/islandora/object/cwrc%3Aa7de2169-ec07-4455-87d8-732852a2eb16"
+                  "uri": "//beta.cwrc.ca/islandora/object/cwrc%3Aa7de2169-ec07-4455-87d8-732852a2eb16"
                },
                "workflow_changes": {
                   "created": 1,
@@ -80,7 +80,7 @@
                "user": {
                   "id": 5,
                   "name": "Paul Dyck",
-                  "uri": "/islandora/object/cwrc%3Aa7de2169-ec07-4455-87d8-732852a2eb16"
+                  "uri": "//beta.cwrc.ca/islandora/object/cwrc%3Aa7de2169-ec07-4455-87d8-732852a2eb16"
                },
                "workflow_changes": {
                   "created": 0,
@@ -101,7 +101,7 @@
                "user": {
                   "id": 6,
                   "name": "Robyn Read",
-                  "uri": "/islandora/object/cwrc%3Aa7de2169-ec07-4455-87d8-732852a2eb16"
+                  "uri": "//beta.cwrc.ca/islandora/object/cwrc%3Aa7de2169-ec07-4455-87d8-732852a2eb16"
                },
                "workflow_changes": {
                   "created": 0,
@@ -122,7 +122,7 @@
                "user": {
                   "id": 7,
                   "name": "Jane Haslett",
-                  "uri": "/islandora/object/cwrc%3Aa7de2169-ec07-4455-87d8-732852a2eb16"
+                  "uri": "//beta.cwrc.ca/islandora/object/cwrc%3Aa7de2169-ec07-4455-87d8-732852a2eb16"
                },
                "workflow_changes": {
                   "created": 0,
@@ -143,7 +143,7 @@
                "user": {
                   "id": 8,
                   "name": "Jennifer Chambers",
-                  "uri": "/islandora/object/cwrc%3Aa7de2169-ec07-4455-87d8-732852a2eb16"
+                  "uri": "//beta.cwrc.ca/islandora/object/cwrc%3Aa7de2169-ec07-4455-87d8-732852a2eb16"
                },
                "workflow_changes": {
                   "created": 0,
@@ -164,7 +164,7 @@
                "user": {
                   "id": 9,
                   "name": "Michelle Gregory",
-                  "uri": "/islandora/object/cwrc%3Aa7de2169-ec07-4455-87d8-732852a2eb16"
+                  "uri": "//beta.cwrc.ca/islandora/object/cwrc%3Aa7de2169-ec07-4455-87d8-732852a2eb16"
                },
                "workflow_changes": {
                   "created": 0,
@@ -185,7 +185,7 @@
                "user": {
                   "id": 10,
                   "name": "Jeanne Wood",
-                  "uri": "/islandora/object/cwrc%3Aa7de2169-ec07-4455-87d8-732852a2eb16"
+                  "uri": "//beta.cwrc.ca/islandora/object/cwrc%3Aa7de2169-ec07-4455-87d8-732852a2eb16"
                },
                "workflow_changes": {
                   "created": 0,
@@ -206,7 +206,7 @@
                "user": {
                   "id": 11,
                   "name": "Sue Fisher",
-                  "uri": "/islandora/object/cwrc%3Aa7de2169-ec07-4455-87d8-732852a2eb16"
+                  "uri": "//beta.cwrc.ca/islandora/object/cwrc%3Aa7de2169-ec07-4455-87d8-732852a2eb16"
                },
                "workflow_changes": {
                   "created": 0,
@@ -227,7 +227,7 @@
                "user": {
                   "id": 12,
                   "name": "Rebecca Cameron",
-                  "uri": "/islandora/object/cwrc%3Aa7de2169-ec07-4455-87d8-732852a2eb16"
+                  "uri": "//beta.cwrc.ca/islandora/object/cwrc%3Aa7de2169-ec07-4455-87d8-732852a2eb16"
                },
                "workflow_changes": {
                   "created": 0,
@@ -248,7 +248,7 @@
                "user": {
                   "id": 13,
                   "name": "Sharon Balazs",
-                  "uri": "/islandora/object/cwrc%3Aa7de2169-ec07-4455-87d8-732852a2eb16"
+                  "uri": "//beta.cwrc.ca/islandora/object/cwrc%3Aa7de2169-ec07-4455-87d8-732852a2eb16"
                },
                "workflow_changes": {
                   "created": 0,
@@ -269,7 +269,7 @@
                "user": {
                   "id": 14,
                   "name": "Deanna Kruger",
-                  "uri": "/islandora/object/cwrc%3Aa7de2169-ec07-4455-87d8-732852a2eb16"
+                  "uri": "//beta.cwrc.ca/islandora/object/cwrc%3Aa7de2169-ec07-4455-87d8-732852a2eb16"
                },
                "workflow_changes": {
                   "created": 0,
@@ -290,7 +290,7 @@
                "user": {
                   "id": 15,
                   "name": "Melisa Brittain",
-                  "uri": "/islandora/object/cwrc%3Aa7de2169-ec07-4455-87d8-732852a2eb16"
+                  "uri": "//beta.cwrc.ca/islandora/object/cwrc%3Aa7de2169-ec07-4455-87d8-732852a2eb16"
                },
                "workflow_changes": {
                   "created": 0,
@@ -311,7 +311,7 @@
                "user": {
                   "id": 1,
                   "name": "Susan Brown",
-                  "uri": "/islandora/object/cwrc%3Aba99b4e0-d9f1-4f00-9dc9-fa6dc2dea8bb"
+                  "uri": "//beta.cwrc.ca/islandora/object/cwrc%3Aba99b4e0-d9f1-4f00-9dc9-fa6dc2dea8bb"
                },
                "workflow_changes": {
                   "created": 0,
@@ -332,7 +332,7 @@
                "user": {
                   "id": 17,
                   "name": "Kathryn Harvey",
-                  "uri": "/islandora/object/cwrc%3Aa7de2169-ec07-4455-87d8-732852a2eb16"
+                  "uri": "//beta.cwrc.ca/islandora/object/cwrc%3Aa7de2169-ec07-4455-87d8-732852a2eb16"
                },
                "workflow_changes": {
                   "created": 0,
@@ -353,7 +353,7 @@
                "user": {
                   "id": 18,
                   "name": "Tamara de Dominicis",
-                  "uri": "/islandora/object/cwrc%3Aa7de2169-ec07-4455-87d8-732852a2eb16"
+                  "uri": "//beta.cwrc.ca/islandora/object/cwrc%3Aa7de2169-ec07-4455-87d8-732852a2eb16"
                },
                "workflow_changes": {
                   "created": 0,
