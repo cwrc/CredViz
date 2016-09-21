@@ -11,7 +11,7 @@ ko.components.register('credit_visualization', {
 
       self.getWorkData = function (id) {
          // TODO: actually call the appropriate endpoint
-         ajax('get', '/contribution_data.json', '', function (response) {
+         ajax('get', '/data/contribution_data.json', '', function (response) {
             var data, title, multiUser, multiDoc;
 
             // multiUserMultiDoc = response;
@@ -261,8 +261,6 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
             changeset[mergedTag] = 0;
          }
       });
-
-      console.log(data)
    };
 
    CWRC.CreditVisualization.StackedColumnGraph.prototype.hasSize = function (stackGroup) {
