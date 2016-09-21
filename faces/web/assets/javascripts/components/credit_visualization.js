@@ -20,7 +20,7 @@ ko.components.register('credit_visualization', {
 
             multiUser = true;
             multiDoc = true;
-            multiDoc = false;
+            //multiDoc = false;
 
             if (multiUser && multiDoc) {
                data = response.documents.reduce(function (aggregate, document) {
@@ -104,32 +104,17 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
       //.range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
    };
 
-   CWRC.CreditVisualization.StackedColumnGraph.prototype.merge = function (data, mergedTagMap) {
-      var self = this, changeset;
-
-      data.forEach(function (modification) {
-         changeset = modification.workflow_changes;
-
-         for (var mergedTag in mergedTagMap) {
-            var primaryTag = mergedTagMap[mergedTag];
-
-            changeset[primaryTag] = (changeset[primaryTag] || 0) + changeset[mergedTag];
-            changeset[mergedTag] = 0;
-         }
-      });
-   };
-
    CWRC.CreditVisualization.StackedColumnGraph.prototype.render = function (data, title, mergedTagMap, ignoredTags) {
       var self = this;
 
-      var stackVM, workTagStacker, workTagStack, allChangesCount, seriesGroupVM, percentFormat, hasSize, maxValue, hoverHandler;
+      var stackVM, workTagStacker, workTagStack, allChangesCount, seriesGroupVM, percentFormat, maxValue, hoverHandler;
 
       // removing the types from the list will mean that the Ordinal Scale will ignore those values.
       (Object.keys(mergedTagMap).concat(ignoredTags)).forEach(function (tag) {
          self.workTypes.splice(self.workTypes.indexOf(tag), 1)
       });
 
-      self.merge(data, mergedTagMap);
+      self.sanitize(data, mergedTagMap);
 
       data.sort(function (a, b) {
          return self.countChanges(b) - self.countChanges(a)
@@ -159,13 +144,6 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
       self.contributionScale.domain([0, maxValue]).nice();
       self.colorScale.domain(self.workTypes);
 
-      hasSize = function (stackGroup) {
-         // removing the empties cleans up the graph DOM for other conditionals
-         return stackGroup.some(function (positionsRow) {
-            return positionsRow[0] != positionsRow[1];
-         })
-      };
-
       // create one group for each work type
       stackVM = self.contentGroup.selectAll('.series')
          .data(workTagStack);
@@ -177,11 +155,10 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
          .attr("fill", function (d) {
             return self.colorScale(d.key);
          })
-         .filter(hasSize);
+         .filter(self.hasSize); // removing the empties cleans up the graph DOM for other conditionals
 
       hoverHandler = function (d, rowNumber, group) {
          var keyName, isEnter;
-
          isEnter = d3.event.type == 'mouseover';
 
          keyName = d3.select(this.parentNode).datum().key;
@@ -221,7 +198,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
          .attr("class", function (datum) {
             return "labels tag-" + datum.key;
          })
-         .filter(hasSize)
+         .filter(self.hasSize)
          .selectAll("text")
          .data(function (d) {
             return d;
@@ -248,6 +225,50 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
       this.constructLegend();
       this.constructTitle(title);
       this.constructNoticeOverlay()
+   };
+
+   CWRC.CreditVisualization.StackedColumnGraph.prototype.sanitize = function (data, mergedTagMap) {
+      var self = this, changeset;
+
+      // merge all mods from the same user
+      var removable = [];
+
+      data.forEach(function (modification, i) {
+         var firstRecord = data.find(function (other) {
+            return other.user.id == modification.user.id;
+         });
+
+         if (!(firstRecord === modification)) {
+            for (var key in modification.workflow_changes) {
+               firstRecord.workflow_changes[key] = (firstRecord.workflow_changes[key] || 0) + modification.workflow_changes[key];
+            }
+
+            removable.push(modification);
+         }
+      });
+
+      removable.forEach(function (modification) {
+         data.splice(data.indexOf(modification), 1)
+      });
+
+      data.forEach(function (modification) {
+         changeset = modification.workflow_changes;
+
+         for (var mergedTag in mergedTagMap) {
+            var primaryTag = mergedTagMap[mergedTag];
+
+            changeset[primaryTag] = (changeset[primaryTag] || 0) + (changeset[mergedTag] || 0);
+            changeset[mergedTag] = 0;
+         }
+      });
+
+      console.log(data)
+   };
+
+   CWRC.CreditVisualization.StackedColumnGraph.prototype.hasSize = function (stackGroup) {
+      return stackGroup.some(function (positionsRow) {
+         return positionsRow[0] != positionsRow[1];
+      })
    };
 
    CWRC.CreditVisualization.StackedColumnGraph.prototype.constructBottomScale = function () {

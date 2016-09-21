@@ -22,6 +22,8 @@
                   "rights_assigned": 0,
                   "published": 1,
                   "peer_reviewed": 1,
+                  "evaluated": 1,
+                  "peer_evaluated": 1,
                   "withdrawn": 0,
                   "deleted": 0
                }
@@ -33,18 +35,16 @@
                   "uri": "/islandora/object/cwrc%3Aa7de2169-ec07-4455-87d8-732852a2eb16"
                },
                "workflow_changes": {
-                  "created": 0,
+                  "created": 1,
                   "deposited": 0,
                   "metadata_contribution": 1,
                   "content_contribution": 1,
-                  "checked": 2,
+                  "checked": 1,
                   "machine_processed": 0,
                   "user_tagged": 1,
                   "rights_assigned": 1,
                   "published": 1,
                   "peer_evaluated": 1,
-                  "evaluated": 1,
-                  "peer_reviewed": 1,
                   "withdrawn": 0,
                   "deleted": 0
                }
@@ -78,21 +78,21 @@
          "modifications": [
             {
                "user": {
-                  "id": 4,
+                  "id": 2,
                   "name": "Mihaela Illovan",
                   "uri": "/islandora/object/cwrc%3Aa7de2169-ec07-4455-87d8-732852a2eb16"
                },
                "workflow_changes": {
-                  "created": 0,
+                  "created": 2,
                   "deposited": 0,
-                  "metadata_contribution": 1,
-                  "content_contribution": 1,
+                  "metadata_contribution": 2,
+                  "content_contribution": 2,
                   "checked": 2,
                   "machine_processed": 0,
-                  "user_tagged": 1,
-                  "rights_assigned": 1,
-                  "published": 1,
-                  "peer_reviewed": 1,
+                  "user_tagged": 2,
+                  "rights_assigned": 2,
+                  "published": 2,
+                  "peer_evaluated": 2,
                   "withdrawn": 0,
                   "deleted": 0
                }
@@ -330,9 +330,9 @@
             },
             {
                "user": {
-                  "id": 16,
+                  "id": 1,
                   "name": "Susan Brown",
-                  "uri": "/islandora/object/cwrc%3Aa7de2169-ec07-4455-87d8-732852a2eb16"
+                  "uri": "/islandora/object/cwrc%3Aba99b4e0-d9f1-4f00-9dc9-fa6dc2dea8bb"
                },
                "workflow_changes": {
                   "created": 0,
