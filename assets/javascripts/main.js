@@ -13,6 +13,8 @@ function creditVisualization() {
       }
    };
 
+   console.log('binding')
+
    ko.applyBindings();
 }
 
