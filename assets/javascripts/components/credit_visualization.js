@@ -1,15 +1,21 @@
 ko.components.register('credit_visualization', {
-   template: ' <svg class="creditvis" width="1024" height="500"></svg>',
+   template: ' <div data-bind="attr: {id: id()}">\
+                  <svg width="1024" height="500" ></svg>\
+               </div>',
 
    /**
     */
    viewModel: function (params) {
       var self = this;
 
-      // STATE
-      self.grapher = new CWRC.CreditVisualization.StackedColumnGraph('svg.creditvis');
+      self.id = ko.observable(params.id || 'creditvis');
 
+      // STATE
+
+      // BEHAVIOUR
       self.getWorkData = function (id) {
+         self.grapher = new CWRC.CreditVisualization.StackedColumnGraph('#' + self.id() + ' svg');
+
          // TODO: actually call the appropriate endpoint
          ajax('get', '/data/contribution_data.json', '', function (response) {
             var data, title, multiUser, multiDoc;
@@ -20,7 +26,7 @@ ko.components.register('credit_visualization', {
 
             multiUser = true;
             multiDoc = true;
-            //multiDoc = false;
+            multiDoc = !params.isDoc;//false;
 
             if (multiUser && multiDoc) {
                data = response.documents.reduce(function (aggregate, document) {
@@ -40,7 +46,9 @@ ko.components.register('credit_visualization', {
          });
       };
 
-      self.getWorkData();
+      window.setTimeout(function () {
+         self.getWorkData();
+      });
    }
 });
 
@@ -51,7 +59,9 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
    CWRC.CreditVisualization.StackedColumnGraph = function (svgSelector) {
       var self = this;
 
-      var svg = d3.select(svgSelector);
+      console.log(svgSelector)
+
+      self.svg = d3.select(svgSelector);
 
       var workflowCategoriesToStamps = {
          created: 'cre',
@@ -75,20 +85,20 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
       this.bounds = {
          padding: {top: 20, right: 20, bottom: 60, left: 40},
          getOuterWidth: function () {
-            return +svg.attr("width");
+            return +self.svg.attr("width");
          },
          getOuterHeight: function () {
-            return +svg.attr("height");
+            return +self.svg.attr("height");
          },
          getInnerWidth: function () {
-            return +svg.attr("width") - self.bounds.padding.left - self.bounds.padding.right;
+            return +self.svg.attr("width") - self.bounds.padding.left - self.bounds.padding.right;
          },
          getInnerHeight: function () {
-            return +svg.attr("height") - self.bounds.padding.top - self.bounds.padding.bottom;
+            return +self.svg.attr("height") - self.bounds.padding.top - self.bounds.padding.bottom;
          },
          legendWidth: 80
       };
-      this.contentGroup = svg.append("g");
+      this.contentGroup = self.svg.append("g");
 
       this.contentGroup.attr("transform", "translate(" + this.bounds.padding.left + "," + this.bounds.padding.top + ")");
 
@@ -107,7 +117,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
    CWRC.CreditVisualization.StackedColumnGraph.prototype.render = function (data, title, mergedTagMap, ignoredTags) {
       var self = this;
 
-      var stackVM, workTagStacker, workTagStack, allChangesCount, seriesGroupVM, percentFormat, maxValue, hoverHandler;
+      var stackVM, workTagStacker, workTagStack, allChangesCount, seriesGroupVM, percentFormat, maxValue, segmentHoverHandler;
 
       // removing the types from the list will mean that the Ordinal Scale will ignore those values.
       (Object.keys(mergedTagMap).concat(ignoredTags)).forEach(function (tag) {
@@ -157,7 +167,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
          })
          .filter(self.hasSize); // removing the empties cleans up the graph DOM for other conditionals
 
-      hoverHandler = function (d, rowNumber, group) {
+      segmentHoverHandler = function (d, rowNumber, group) {
          var keyName, isEnter;
          isEnter = d3.event.type == 'mouseover';
 
@@ -165,9 +175,10 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
 
          d3.select(d3.event.target).classed("highlight", isEnter);
 
-         d3.select('.legend-' + keyName).classed('highlight', isEnter);
+         self.svg.select('.legend-' + keyName)
+            .classed('highlight', isEnter);
 
-         d3.selectAll('.tag-' + keyName + ' text')
+         self.svg.selectAll('.tag-' + keyName + ' text')
             .filter(function (d, labelRowNumber, f) {
                return rowNumber == labelRowNumber;
             })
@@ -189,8 +200,8 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
             return self.contributionScale(dataRow[0]) - self.contributionScale(dataRow[1]);
          })
          .attr("width", self.usersScale.bandwidth())
-         .on("mouseover", hoverHandler)
-         .on("mouseout", hoverHandler);
+         .on("mouseover", segmentHoverHandler)
+         .on("mouseout", segmentHoverHandler);
 
       percentFormat = d3.format(".00%");
 
@@ -339,12 +350,12 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
    };
 
    CWRC.CreditVisualization.StackedColumnGraph.prototype.constructLegend = function () {
-      var self = this, legendItem, legendGroup, hoverHandler;
+      var self = this, legendItem, legendGroup, legendHoverHandler;
 
       legendGroup = self.contentGroup.append('g')
          .attr('class', 'legend');
 
-      hoverHandler = function (datum, group, c) {
+      legendHoverHandler = function (datum, group, c) {
          var segments, isEnter;
 
          isEnter = d3.event.type == 'mouseover';
@@ -352,12 +363,11 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
          d3.select(d3.event.target.parentNode)
             .classed("highlight", isEnter);
 
-         segments = d3.selectAll('.tag-' + datum)
+         segments = self.svg.selectAll('.tag-' + datum)
             .selectAll('rect, text');
 
          if (segments.size() > 0) {
             segments.classed("highlight", isEnter);
-            //d3.selectAll('.tag-' + datum + ' text').classed('highlight', true);
          } else {
             self.setNotice(isEnter ? 'No "' + self.toUpperCase(datum) + '" contributions' : '');
          }
@@ -374,8 +384,8 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
             return "translate(0," + i * 20 + ")";
          })
          .style("font", "10px sans-serif")
-         .on('mouseover', hoverHandler)
-         .on('mouseout', hoverHandler);
+         .on('mouseover', legendHoverHandler)
+         .on('mouseout', legendHoverHandler);
 
       legendItem.append("rect")
          .attr("x", self.bounds.getInnerWidth() - 18)
@@ -396,7 +406,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
    CWRC.CreditVisualization.StackedColumnGraph.prototype.constructNoticeOverlay = function () {
       var self = this, noticeGroup;
 
-      noticeGroup = d3.select('.creditvis').append('g')
+      noticeGroup = self.svg.append('g')
          .attr('class', 'notice-label');
 
       noticeGroup
@@ -420,15 +430,15 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
    };
 
    CWRC.CreditVisualization.StackedColumnGraph.prototype.setNotice = function (msg) {
-      var textSelection, rectSelection, padding;
+      var self = this, textSelection, rectSelection, padding;
 
-      textSelection = d3.select('.notice-label text');
+      textSelection = self.svg.select('.notice-label text');
 
       textSelection.text(msg);
 
       padding = 10;
 
-      rectSelection = d3.select('.notice-label rect');
+      rectSelection = self.svg.select('.notice-label rect');
       rectSelection.attr('x', textSelection.node().getBBox().x - padding);
       rectSelection.attr('y', textSelection.node().getBBox().y - padding);
 
