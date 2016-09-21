@@ -48,27 +48,6 @@
                   "withdrawn": 0,
                   "deleted": 0
                }
-            },
-            {
-               "user": {
-                  "id": 3,
-                  "name": "Robin Miller",
-                  "uri": "/islandora/object/cwrc%3Aa7de2169-ec07-4455-87d8-732852a2eb16"
-               },
-               "workflow_changes": {
-                  "created": 0,
-                  "deposited": 0,
-                  "metadata_contribution": 1,
-                  "content_contribution": 0,
-                  "checked": 2,
-                  "machine_processed": 0,
-                  "user_tagged": 0,
-                  "rights_assigned": 0,
-                  "published": 0,
-                  "peer_reviewed": 1,
-                  "withdrawn": 0,
-                  "deleted": 0
-               }
             }
          ]
       },
@@ -83,16 +62,16 @@
                   "uri": "/islandora/object/cwrc%3Aa7de2169-ec07-4455-87d8-732852a2eb16"
                },
                "workflow_changes": {
-                  "created": 2,
+                  "created": 1,
                   "deposited": 0,
                   "metadata_contribution": 2,
                   "content_contribution": 2,
                   "checked": 2,
                   "machine_processed": 0,
                   "user_tagged": 2,
-                  "rights_assigned": 2,
-                  "published": 2,
-                  "peer_evaluated": 2,
+                  "rights_assigned": 1,
+                  "published": 1,
+                  "peer_evaluated": 1,
                   "withdrawn": 0,
                   "deleted": 0
                }
@@ -338,10 +317,10 @@
                   "created": 0,
                   "deposited": 0,
                   "metadata_contribution": 1,
-                  "content_contribution": 1,
+                  "content_contribution": 3,
                   "checked": 2,
                   "machine_processed": 0,
-                  "user_tagged": 1,
+                  "user_tagged": 5,
                   "rights_assigned": 0,
                   "published": 1,
                   "peer_reviewed": 1,
