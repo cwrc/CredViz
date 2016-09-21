@@ -59,8 +59,6 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
    CWRC.CreditVisualization.StackedColumnGraph = function (svgSelector) {
       var self = this;
 
-      console.log(svgSelector)
-
       self.svg = d3.select(svgSelector);
 
       var workflowCategoriesToStamps = {
