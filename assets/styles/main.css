@@ -29,6 +29,14 @@ body > header .description {
    margin-left: 15em;
 }
 
+body > header .description img {
+   margin-right: 1em;
+}
+
+body > header .description p {
+   display: inline-block;
+}
+
 body > header .description a {
    color: white;
 }
