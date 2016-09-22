@@ -34,6 +34,10 @@ credit_visualization svg g.labels text.highlight {
    display: inherit;
 }
 
+credit_visualization svg a text tspan:hover {
+   text-decoration: underline;
+}
+
 credit_visualization svg .legend .highlight text {
    font-size: 110%;
 
