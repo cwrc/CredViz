@@ -9,7 +9,7 @@
                "user": {
                   "id": 1,
                   "name": "Susan Brown",
-                  "uri": "//beta.cwrc.ca/islandora/object/cwrc%3Aba99b4e0-d9f1-4f00-9dc9-fa6dc2dea8bb"
+                  "uri": "//beta.cwrc.ca/users/susan-brown"
                },
                "workflow_changes": {
                   "created": 1,
@@ -32,7 +32,7 @@
                "user": {
                   "id": 2,
                   "name": "Mihaela Illovan",
-                  "uri": "//beta.cwrc.ca/islandora/object/cwrc%3Aa7de2169-ec07-4455-87d8-732852a2eb16"
+                  "uri": "//beta.cwrc.ca/users/mihaela-ilovan"
                },
                "workflow_changes": {
                   "created": 1,
@@ -59,7 +59,7 @@
                "user": {
                   "id": 2,
                   "name": "Mihaela Illovan",
-                  "uri": "//beta.cwrc.ca/islandora/object/cwrc%3Aa7de2169-ec07-4455-87d8-732852a2eb16"
+                  "uri": "//beta.cwrc.ca/users/mihaela-ilovan"
                },
                "workflow_changes": {
                   "created": 1,
@@ -311,7 +311,7 @@
                "user": {
                   "id": 1,
                   "name": "Susan Brown",
-                  "uri": "//beta.cwrc.ca/islandora/object/cwrc%3Aba99b4e0-d9f1-4f00-9dc9-fa6dc2dea8bb"
+                  "uri": "//beta.cwrc.ca/users/susan-brown"
                },
                "workflow_changes": {
                   "created": 0,
