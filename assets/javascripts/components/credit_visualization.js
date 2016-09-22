@@ -81,7 +81,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
       this.workTypes = Object.keys(workflowCategoriesToStamps);
 
       this.bounds = {
-         padding: {top: 20, right: 20, bottom: 60, left: 40},
+         padding: {top: 20, right: 20, bottom: 60, left: 60},
          getOuterWidth: function () {
             return +self.svg.attr("width");
          },
@@ -329,20 +329,21 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
    };
 
    CWRC.CreditVisualization.StackedColumnGraph.prototype.constructLeftScale = function () {
-      var self = this;
+      var self = this, ticks, tickLine;
 
-      var ticks = d3.axisLeft(self.contributionScale)
+      ticks = d3.axisLeft(self.contributionScale)
          .ticks(10, "s")
          .tickFormat(d3.format(".0%"));
 
-      self.contentGroup.append("g")
+      tickLine = self.contentGroup.append("g")
          .attr("class", "axis axis--y")
-         .call(ticks)
+         .call(ticks);
+
+      tickLine
          .append("text")
-         .attr("x", 2)
-         .attr("y", self.contributionScale(self.contributionScale.ticks(10).pop()))
-         .attr("dy", "0.35em")
-         .attr("text-anchor", "start")
+         .attr("x", 0)
+         .attr("y", self.contributionScale(self.contributionScale.ticks(10).pop()) - 10)
+         .attr("text-anchor", "right")
          .attr("fill", "#000")
          .text("Contribution");
    };
