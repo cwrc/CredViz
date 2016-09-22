@@ -17,7 +17,7 @@ ko.components.register('credit_visualization', {
          self.grapher = new CWRC.CreditVisualization.StackedColumnGraph('#' + self.id() + ' svg');
 
          // TODO: actually call the appropriate endpoint
-         ajax('get', '/data/contribution_data.json', '', function (response) {
+         ajax('get', '/services/credit_viz?getparams=1', '', function (response) {
             var data, title, multiUser, multiDoc;
 
             // multiUserMultiDoc = response;
@@ -34,6 +34,8 @@ ko.components.register('credit_visualization', {
                }, []);
 
                title = 'User Contributions to "' + response.name + '", by Type';
+
+               console.log(data)
             } else if (multiUser && !multiDoc) {
                var doc = response.documents[0];
 
@@ -228,6 +230,38 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
             return baseline + (top - self.contributionScale(dataRow[0])) / 2;
          });
 
+      maxValue = d3.max(workTagStack.reduce(function (a, b) {
+         return a.concat(b.reduce(function (c, d) {
+            return c.concat(d);
+         }, []));
+      }, []));
+
+
+      // per-user maxiumums
+      self.contentGroup.selectAll('.total-labels')
+         .data(data)
+         .enter()
+         .append('g')
+         .attr("class", function (datum) {
+            return "total-labels total-label-user-" + datum.user.id;
+         })
+         .append("text")
+         .text(function (d) {
+            return percentFormat(self.countChanges(d) / allChangesCount);
+         })
+         .attr('x', function (d) {
+            return self.usersScale(JSON.stringify(d.user)) + self.usersScale.bandwidth() / 2;
+         })
+         .attr('y', function (datum, index) {
+            var finalStackRow, userSegment, segmentTop;
+
+            // each stack row is all segments within a category, so last one is top
+            finalStackRow = workTagStack[workTagStack.length - 1];
+            userSegment = finalStackRow[index]; // the value pair for this column
+            segmentTop = userSegment[1];
+
+            return self.contributionScale(segmentTop) - 4;
+         });
 
       this.constructBottomScale();
       this.constructLeftScale();
@@ -281,7 +315,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
    CWRC.CreditVisualization.StackedColumnGraph.prototype.constructBottomScale = function () {
       var self = this;
 
-      var axis, tickGroup, existingTickLabels, tickFill, tickX, tickY, tickDY, columnWidth;
+      var axis, tickGroup, existingTickLabels, tickFill, tickX, tickY, tickDY, columnWidth, userLabelHoverHandler;
 
       axis = d3.axisBottom(self.usersScale)
          .tickFormat(function (datum) {
@@ -304,6 +338,18 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
       tickDY = existingTickLabels.attr('dy');
       existingTickLabels.remove();
 
+      userLabelHoverHandler = function () {
+         var user, isEnter;
+
+         user = JSON.parse(d3.select(this.parentNode).datum());
+
+         isEnter = d3.event.type == 'mouseover';
+
+         self.svg.select('.total-label-user-' + user.id)
+            .classed('highlight', isEnter);
+      };
+
+
       tickGroup.selectAll('.tick')
          .append('a')
          .attr('xlink:href', function (datum) {
@@ -320,7 +366,10 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
             var user = JSON.parse(datum);
 
             return user.name
-         });
+         })
+         .on('mouseover', userLabelHoverHandler)
+         .on('mouseout', userLabelHoverHandler);
+
 
       columnWidth = self.usersScale.bandwidth(); // labelling for clarity
 
