@@ -17,7 +17,7 @@ ko.components.register('credit_visualization', {
          self.grapher = new CWRC.CreditVisualization.StackedColumnGraph('#' + self.id() + ' svg');
 
          // TODO: actually call the appropriate endpoint
-         ajax('get', '/data/contribution_data.json', '', function (response) {
+         ajax('get', '/services/credit_viz?getparams=1', '', function (response) {
             var data, title, multiUser, multiDoc;
 
             // multiUserMultiDoc = response;
@@ -34,6 +34,8 @@ ko.components.register('credit_visualization', {
                }, []);
 
                title = 'User Contributions to "' + response.name + '", by Type';
+
+               console.log(data)
             } else if (multiUser && !multiDoc) {
                var doc = response.documents[0];
 
