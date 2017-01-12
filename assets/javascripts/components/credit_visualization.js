@@ -34,8 +34,6 @@ ko.components.register('credit_visualization', {
                }, []);
 
                title = 'User Contributions to "' + response.name + '", by Type';
-
-               console.log(data)
             } else if (multiUser && !multiDoc) {
                var doc = response.documents[0];
 
@@ -63,24 +61,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
 
       self.svg = d3.select(svgSelector);
 
-      var workflowCategoriesToStamps = {
-         created: 'cre',
-         deposited: 'dep',
-         metadata_contribution: 'evr',
-         content_contribution: ['evr', 'cvr'],
-         checked: 'ckd',
-         machine_processed: ['evr', 'cvr'],
-         user_tagged: 'tag',
-         rights_assigned: 'rights_asg',
-         published: 'pub',
-         peer_evaluated: 'rev',
-         evaluated: 'rev',
-         peer_reviewed: 'rev',
-         withdrawn: 'wdr',
-         deleted: 'del'
-      };
-
-      this.workTypes = Object.keys(workflowCategoriesToStamps);
+      this.workTypes = CWRC.CreditVisualization.WorkflowChangeTally.CATEGORIES.slice(0);
 
       this.bounds = {
          padding: {top: 20, right: 20, bottom: 60, left: 60},
@@ -124,7 +105,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
          self.workTypes.splice(self.workTypes.indexOf(tag), 1)
       });
 
-      self.sanitize(data, mergedTagMap);
+      data = self.sanitize(data, mergedTagMap);
 
       data.sort(function (a, b) {
          return self.countChanges(b) - self.countChanges(a)
@@ -271,30 +252,52 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
    };
 
    CWRC.CreditVisualization.StackedColumnGraph.prototype.sanitize = function (data, mergedTagMap) {
-      var self = this, changeset;
+      var self = this, changeset, removable;
+
+      var cleanData = [];
 
       // merge all mods from the same user
-      var removable = [];
+      //removable = [];
 
+      // the endpoint returns each workflow change as a separate entry, so we're mering it here.
       data.forEach(function (modification, i) {
-         var firstRecord = data.find(function (other) {
+         var existingRecord = cleanData.find(function (other) {
             return other.user.id == modification.user.id;
          });
 
-         if (!(firstRecord === modification)) {
-            for (var key in modification.workflow_changes) {
-               firstRecord.workflow_changes[key] = (firstRecord.workflow_changes[key] || 0) + modification.workflow_changes[key];
-            }
-
-            removable.push(modification);
+         if (!existingRecord) {
+            existingRecord = {
+               user: modification.user,
+               workflow_changes: new CWRC.CreditVisualization.WorkflowChangeTally()
+            };
+            cleanData.push(existingRecord)
          }
+
+         //for (var key in modification.workflow_changes) {
+         //   firstRecord.workflow_changes[key] = (firstRecord.workflow_changes[key] || 0) + modification.workflow_changes[key];
+         //}
+
+         var key, scalarContributions;
+
+         key = modification.workflow_changes.category;
+
+         // these catgeories also have relevant file size diff data
+         scalarContributions = ['created', 'deposited', 'content_contribution'];
+
+         if (scalarContributions.indexOf(key) >= 0)
+            existingRecord.workflow_changes[key] += parseInt(modification.diff_changes);
+         else
+            existingRecord.workflow_changes[key] += 1;
+
+         //removable.push(modification);
       });
 
-      removable.forEach(function (modification) {
-         data.splice(data.indexOf(modification), 1)
-      });
+      //removable.forEach(function (modification) {
+      //   cleanData.splice(cleanData.indexOf(modification), 1)
+      //});
 
-      data.forEach(function (modification) {
+      // also merge together categories that have aliases
+      cleanData.forEach(function (modification) {
          changeset = modification.workflow_changes;
 
          for (var mergedTag in mergedTagMap) {
@@ -304,6 +307,10 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
             changeset[mergedTag] = 0;
          }
       });
+
+      console.log('cleanData', cleanData)
+
+      return cleanData;
    };
 
    CWRC.CreditVisualization.StackedColumnGraph.prototype.hasSize = function (stackGroup) {
@@ -548,5 +555,46 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
             }
          }
       });
-   }
+   };
 })();
+
+(function WorkflowChangeTally() {
+   CWRC.CreditVisualization.WorkflowChangeTally = function () {
+      this.created = 0;
+      this.deposited = 0;
+      this.metadata_contribution = 0;
+      this.content_contribution = 0;
+      this.checked = 0;
+      this.machine_processed = 0;
+      this.user_tagged = 0;
+      this.rights_assigned = 0;
+      this.published = 0;
+      this.peer_reviewed = 0;
+      this.evaluated = 0;
+      this.peer_evaluated = 0;
+      this.withdrawn = 0;
+      this.deleted = 0;
+   };
+
+   CWRC.CreditVisualization.WorkflowChangeTally.CATEGORIES_TO_STAMPS = {
+      created: 'cre',
+      deposited: 'dep',
+      metadata_contribution: 'evr',
+      content_contribution: ['evr', 'cvr'],
+      checked: 'ckd',
+      machine_processed: ['evr', 'cvr'],
+      user_tagged: 'tag',
+      rights_assigned: 'rights_asg',
+      published: 'pub',
+      peer_evaluated: 'rev',
+      evaluated: 'rev',
+      peer_reviewed: 'rev',
+      withdrawn: 'wdr',
+      deleted: 'del'
+   };
+
+   CWRC.CreditVisualization.WorkflowChangeTally.CATEGORIES =
+      Object.keys(CWRC.CreditVisualization.WorkflowChangeTally.CATEGORIES_TO_STAMPS);
+})();
+
+
