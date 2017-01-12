@@ -184,7 +184,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
          .on("mouseover", segmentHoverHandler)
          .on("mouseout", segmentHoverHandler);
 
-      percentFormat = d3.format(".00%");
+      percentFormat = d3.format(".0%");
 
       stackVM.enter().append("g")
          .attr("class", function (datum) {
@@ -211,11 +211,11 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
             return baseline + (top - self.contributionScale(dataRow[0])) / 2;
          });
 
-      maxValue = d3.max(workTagStack.reduce(function (a, b) {
-         return a.concat(b.reduce(function (c, d) {
-            return c.concat(d);
-         }, []));
-      }, []));
+      //maxValue = d3.max(workTagStack.reduce(function (a, b) {
+      //   return a.concat(b.reduce(function (c, d) {
+      //      return c.concat(d);
+      //   }, []));
+      //}, []));
 
 
       // per-user maxiumums
@@ -410,7 +410,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
       legendGroup = self.contentGroup.append('g')
          .attr('class', 'legend');
 
-      legendHoverHandler = function (datum, group, c) {
+      legendHoverHandler = function (columnName, group, c) {
          var segments, isEnter;
 
          isEnter = d3.event.type == 'mouseover';
@@ -418,13 +418,13 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
          d3.select(d3.event.target.parentNode)
             .classed("highlight", isEnter);
 
-         segments = self.svg.selectAll('.tag-' + datum)
+         segments = self.svg.selectAll('.tag-' + columnName)
             .selectAll('rect, text');
 
          if (segments.size() > 0) {
             segments.classed("highlight", isEnter);
          } else {
-            self.setNotice(isEnter ? 'No "' + self.toUpperCase(datum) + '" contributions' : '');
+            self.setNotice(isEnter ? 'No "' + self.toUpperCase(columnName.replace('_', ' ')) + '" contributions' : '');
          }
       };
 
