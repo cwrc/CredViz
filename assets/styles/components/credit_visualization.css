@@ -75,3 +75,11 @@ credit_visualization svg .notice-label rect {
 
    fill: rgba(51, 51, 51, 0.61);
 }
+
+credit_visualization svg .title a {
+   font-style: italic;
+}
+
+credit_visualization svg .title a:hover {
+   text-decoration: underline;
+}

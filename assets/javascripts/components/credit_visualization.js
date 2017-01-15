@@ -12,13 +12,16 @@ ko.components.register('credit_visualization', {
 
       // STATE
 
+      self.testing = params['testing'];
+
       // BEHAVIOUR
       self.getWorkData = function (id) {
          self.grapher = new CWRC.CreditVisualization.StackedColumnGraph('#' + self.id() + ' svg');
 
-         // TODO: actually call the appropriate endpoint
-         ajax('get', '/services/credit_viz?getparams=1', '', function (response) {
-            var data, title, multiUser, multiDoc;
+         var currentURI = new URI();
+
+         ajax('get', '/services/credit_viz' + currentURI.search(), false, function (response) {
+            var data, title, multiUser, multiDoc, titleTarget;
 
             // multiUserMultiDoc = response;
             // multiUserSingleDoc = multiUserMultiDoc.documents[0];
@@ -33,16 +36,49 @@ ko.components.register('credit_visualization', {
                   return aggregate.concat(document.modifications);
                }, []);
 
-               title = 'User Contributions to "' + response.name + '", by Type';
+               // TODO: re-enable when we don't need triple-nested ajax :(
+               //title = response.name;
+
+               /**
+                * TODO: When/if the credit_viz service is capable of returning a result with both 1. the project name
+                * TODO: and 2. the project's id, these next two ajax calls will become redundant, and can be collapsed
+                * TODO: with the single-document render() call below
+                */
+
+               var firstObject = response.documents[0];
+
+               ajax('get', '/islandora/rest/v1/object/' + firstObject.id + '/relationship', null, function (response) {
+                     var parentRelationship, parentId;
+
+                     parentRelationship = response.find(function (relationship) {
+                        return relationship.predicate.value == 'isMemberOfCollection'
+                     });
+
+                     // object.value is the value of the isMemberOfCollection relationship
+                     parentId = parentRelationship.object.value;
+                     titleTarget = '/islandora/object/' + parentId;
+
+                     ajax('get', '/islandora/rest/v1/object/' + parentId, null, function (response) {
+                        title = response.label;
+
+                        self.grapher.render(data, title, titleTarget, params.mergeTags || {}, params.ignoreTags);
+                     });
+                  }
+               );
+               //titleTarget = '/islandora/object/' + doc.id;
             } else if (multiUser && !multiDoc) {
                var doc = response.documents[0];
 
                data = doc.modifications;
 
-               title = 'User Contributions to "' + doc.name + '", by Type';
+               title = doc.name;
+               titleTarget = '/islandora/object/' + doc.id;
+
+               self.grapher.render(data, title, titleTarget, params.mergeTags || {}, params.ignoreTags);
             }
 
-            self.grapher.render(data, title, params.mergeTags || {}, params.ignoreTags);
+            // TODO: re-enable when we don't need triple-nested ajax :(
+            //self.grapher.render(data, title, titleTarget, params.mergeTags || {}, params.ignoreTags);
          });
       };
 
@@ -95,7 +131,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
       //.range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
    };
 
-   CWRC.CreditVisualization.StackedColumnGraph.prototype.render = function (data, title, mergedTagMap, ignoredTags) {
+   CWRC.CreditVisualization.StackedColumnGraph.prototype.render = function (data, title, titleTarget, mergedTagMap, ignoredTags) {
       var self = this;
 
       var stackVM, workTagStacker, workTagStack, allChangesCount, seriesGroupVM, percentFormat, maxValue, segmentHoverHandler;
@@ -247,7 +283,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
       this.constructBottomScale();
       this.constructLeftScale();
       this.constructLegend();
-      this.constructTitle(title);
+      this.constructTitle(title, titleTarget);
       this.constructNoticeOverlay()
    };
 
@@ -307,8 +343,6 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
             changeset[mergedTag] = 0;
          }
       });
-
-      console.log('cleanData', cleanData)
 
       return cleanData;
    };
@@ -474,14 +508,30 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
          .attr('y', self.bounds.getInnerHeight() / 2);
    };
 
-   CWRC.CreditVisualization.StackedColumnGraph.prototype.constructTitle = function (title) {
+   CWRC.CreditVisualization.StackedColumnGraph.prototype.constructTitle = function (titleLabel, titleTarget) {
       var self = this;
 
-      self.contentGroup.append('text')
-         .text(title)
-         .attr('text-anchor', 'middle')
-         .attr('x', (self.bounds.getInnerWidth() / 2))
-         .attr('y', self.bounds.getOuterHeight() - (self.bounds.padding.bottom / 2));
+      var labelGroup =
+         self.contentGroup
+            .append('text')
+            .attr('text-anchor', 'middle')
+            .attr('x', (self.bounds.getInnerWidth() / 2))
+            .attr('y', self.bounds.getOuterHeight() - (self.bounds.padding.bottom / 2))
+            .attr('class', 'title');
+
+      labelGroup
+         .append('tspan')
+         .text('User Contributions to ');
+
+      labelGroup
+         .append('tspan')
+         .append('a')
+         .attr('xlink:href', titleTarget)
+         .text(titleLabel || '(Unknown)');
+
+      labelGroup
+         .append('tspan')
+         .text(', by Type')
    };
 
    CWRC.CreditVisualization.StackedColumnGraph.prototype.setNotice = function (msg) {
