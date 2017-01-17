@@ -147,9 +147,9 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
 
       data = self.sanitize(data, mergedTagMap);
 
-      data = data.filter(function (datum) {
-         return !self.filter.user || datum.user.id == self.filter.user;
-      });
+      //data = data.filter(function (datum) {
+      //   return !self.filter.user || datum.user.id == self.filter.user;
+      //});
 
       data.sort(function (a, b) {
          return self.countChanges(b) - self.countChanges(a)
@@ -272,7 +272,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
          })
          .append("text")
          .text(function (d) {
-            return percentFormat(self.countChanges(d) / allChangesCount);
+            return percentFormat((self.countChanges(d) || 0) / (allChangesCount || 1));
          })
          .attr('x', function (d) {
             return self.usersScale(JSON.stringify(d.user)) + self.usersScale.bandwidth() / 2;
