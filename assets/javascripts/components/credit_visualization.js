@@ -61,7 +61,7 @@ ko.components.register('credit_visualization', {
                      ajax('get', '/islandora/rest/v1/object/' + parentId, null, function (response) {
                         title = response.label;
 
-                        self.grapher.render(data, title, titleTarget, params.mergeTags || {}, params.ignoreTags);
+                        self.grapher.render(data, title, titleTarget, params.mergeTags || {}, params.ignoreTags, self.filter);
                      });
                   }
                );
@@ -98,6 +98,10 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
       self.svg = d3.select(svgSelector);
 
       this.workTypes = CWRC.CreditVisualization.WorkflowChangeTally.CATEGORIES.slice(0);
+
+      self.filter = {
+         user: (new URI()).search(true).user
+      };
 
       this.bounds = {
          padding: {top: 20, right: 20, bottom: 60, left: 60},
@@ -142,6 +146,10 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
       });
 
       data = self.sanitize(data, mergedTagMap);
+
+      data = data.filter(function (datum) {
+         return !self.filter.user || datum.user.id == self.filter.user;
+      });
 
       data.sort(function (a, b) {
          return self.countChanges(b) - self.countChanges(a)
