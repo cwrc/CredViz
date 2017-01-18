@@ -532,9 +532,15 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
       tickGroup.selectAll('.tick')
          .append('a')
          .attr('xlink:href', function (datum) {
-            var user_uri = JSON.parse(datum).uri || '';
+            var user, uri;
 
-            return user_uri.charAt(0) == '/' ? user_uri : "/" + user_uri;
+            user = JSON.parse(datum);
+
+            // ideally, it would actually include their true URI (eg. what happens if there are 2x John Smiths)
+            // but this isn't guaranteed at this time, so the best we can do is an educated guess
+            uri = user.uri || '/users/' + user.name.toLowerCase().replace(/\s+/, '-');
+
+            return uri.charAt(0) == '/' ? uri : "/" + uri;
          })
          .append('text')
          .attr('x', tickX)
