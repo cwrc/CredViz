@@ -156,7 +156,6 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
       self.contentGroup.attr("transform", "translate(" + self.bounds.padding.left + "," + self.bounds.padding.top + ")");
 
       self.usersScale = d3.scaleBand()
-         .rangeRound([0, self.bounds.getInnerWidth() - self.bounds.legendWidth])
          .padding(0.1)
          .align(0.1);
 
@@ -169,8 +168,6 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
       self.data = [];
 
       self.minimumPercent = 0.01; // minimum value to display; 1.00 == 100%
-
-      console.log('set', self.minimumPercent)
    };
 
    CWRC.CreditVisualization.StackedColumnGraph.prototype.render = function (data, title, titleTarget, mergedTagMap, ignoredTags) {
@@ -217,7 +214,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
       var self = this;
 
       var stackVM, workTagStacker, workTagStack, seriesGroupVM, percentFormat, maxValue, segmentHoverHandler,
-         rectBlocksVM, labelsVM, totalLabelsVM, hasSize;
+         rectBlocksVM, labelsVM, totalLabelsVM, hasSize, columnWidth, columnWidthThreshold, drawableCanvasWidth;
 
       if (self.data.length <= 0)
          return;
@@ -240,11 +237,17 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
          return Math.abs(positionsRow[0] - positionsRow[1]) > self.minimumPercent;
       };
 
+      drawableCanvasWidth = self.bounds.getInnerWidth() - self.bounds.legendWidth;
+      columnWidthThreshold = 4;
+
+      self.usersScale.rangeRound([0, self.filteredData.length >= columnWidthThreshold ? drawableCanvasWidth : drawableCanvasWidth / columnWidthThreshold]);
       self.usersScale.domain(self.filteredData.map(function (d) {
          return JSON.stringify(d.user);
       }));
       self.contributionScale.domain([0, maxValue]).nice();
       self.colorScale.domain(self.workTypes);
+
+      columnWidth = self.usersScale.bandwidth();
 
       // create one group for each work type
       stackVM = self.contentGroup.selectAll('.series')
@@ -302,7 +305,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
          .attr("height", function (dataRow) {
             return self.contributionScale(dataRow[0]) - self.contributionScale(dataRow[1]);
          })
-         .attr("width", self.usersScale.bandwidth())
+         .attr("width", columnWidth)
          .on("mouseover", segmentHoverHandler)
          .on("mouseout", segmentHoverHandler);
 
@@ -331,7 +334,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
             return value > 0 ? percentFormat(value) : '';
          })
          .attr("x", function (d) {
-            return self.usersScale(JSON.stringify(d.data.user)) + self.usersScale.bandwidth() / 2;
+            return self.usersScale(JSON.stringify(d.data.user)) + columnWidth / 2;
          })
          .attr("y", function (dataRow) {
             var baseline = self.contributionScale(dataRow[0]);
@@ -363,7 +366,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
             return percentFormat((self.countChanges(d) || 0) / (self.allChangesCount || 1));
          })
          .attr('x', function (d) {
-            return self.usersScale(JSON.stringify(d.user)) + self.usersScale.bandwidth() / 2;
+            return self.usersScale(JSON.stringify(d.user)) + columnWidth / 2;
          })
          .attr('y', function (datum, index) {
             var finalStackRow, userSegment, segmentTop;
@@ -526,7 +529,6 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
             .classed('highlight', isEnter);
       };
 
-
       tickGroup.selectAll('.tick')
          .append('a')
          .attr('xlink:href', function (datum) {
@@ -553,7 +555,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
          .on('mouseover', userLabelHoverHandler)
          .on('mouseout', userLabelHoverHandler);
 
-      columnWidth = self.usersScale.bandwidth(); // this variable is just a label for clarity
+      columnWidth = self.usersScale.bandwidth(); // columnWidth is a better name than bandwidth
 
       tickGroup.selectAll(".tick text")
          .call(self.wrap, columnWidth);
