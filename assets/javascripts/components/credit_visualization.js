@@ -196,9 +196,9 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
          return self.countChanges(d);
       });
 
+      this.constructLeftScale();
       this.constructBars(ignoredTags);
       this.constructBottomScale();
-      this.constructLeftScale();
       this.constructLegend();
       this.constructTitle(title, titleTarget);
       this.constructNoticeOverlay();
@@ -217,7 +217,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
       var self = this;
 
       var stackVM, workTagStacker, workTagStack, seriesGroupVM, percentFormat, maxValue, segmentHoverHandler,
-         rectBlocksVM, labelsVM;
+         rectBlocksVM, labelsVM, totalLabelsVM;
 
       if (self.data.length <= 0)
          return;
@@ -341,7 +341,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
       //}, []));
 
       // === Column totals ===
-      var totalLabelsVM = self.contentGroup.selectAll('.total-labels')
+      totalLabelsVM = self.contentGroup.selectAll('.total-labels')
          .data(self.filteredData, function (d) {
             // need this to compare by item, not by list index
             return d.user.id;
@@ -377,6 +377,8 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
          .filter(function (d) {
             return true
          }).remove();
+
+      d3.select('.axis--y').call(self.verticalAxis)
    };
 
    CWRC.CreditVisualization.StackedColumnGraph.prototype.sanitize = function (data, mergedTagMap) {
@@ -510,15 +512,16 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
    };
 
    CWRC.CreditVisualization.StackedColumnGraph.prototype.constructLeftScale = function () {
-      var self = this, ticks, tickLine;
+      var self = this, verticalAxis, tickLine;
 
-      ticks = d3.axisLeft(self.contributionScale)
+      self.verticalAxis = d3.axisLeft(self.contributionScale)
          .ticks(10, "s")
          .tickFormat(d3.format(".0%"));
 
-      tickLine = self.contentGroup.append("g")
+      tickLine = self.contentGroup
+         .append("g")
          .attr("class", "axis axis--y")
-         .call(ticks);
+         .call(self.verticalAxis);
 
       tickLine
          .append("text")
