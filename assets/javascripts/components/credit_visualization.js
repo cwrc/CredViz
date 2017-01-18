@@ -197,8 +197,8 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
       });
 
       this.constructLeftScale();
-      this.constructBars(ignoredTags);
       this.constructBottomScale();
+      this.constructBars(ignoredTags);
       this.constructLegend();
       this.constructTitle(title, titleTarget);
       this.constructNoticeOverlay();
@@ -257,8 +257,8 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
             })
             .attr("fill", function (d) {
                return self.colorScale(d.key);
-            })
-            .filter(self.hasSize); // removing the empties cleans up the graph DOM for other conditionals
+            });
+
 
       segmentHoverHandler = function (d, rowNumber, group) {
          var keyName, isMouseEnter;
@@ -284,9 +284,10 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
       rectBlocksVM = seriesGroupVM.selectAll("rect")
          .data(function (d) {
             return d;
-         });
+         })
 
       rectBlocksVM.enter()
+         .filter(self.hasSize)// removing the empties cleans up the graph DOM for other conditionals
          .append("rect")
          .attr("x", function (d) {
             return self.usersScale(JSON.stringify(d.data.user));
@@ -310,7 +311,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
             .attr("class", function (datum) {
                return "labels tag-" + datum.key;
             })
-            .filter(self.hasSize)
+            //.filter(self.hasSize)
             .selectAll("text")
             .data(function (d) {
                return d;
@@ -318,6 +319,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
 
       labelsVM
          .enter()
+         .filter(self.hasSize)
          .append("text")
          .text(function (d) {
             var value = d[1] - d[0];
@@ -378,7 +380,8 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
             return true
          }).remove();
 
-      d3.select('.axis--y').call(self.verticalAxis)
+      d3.select('.axis--y').call(self.verticalAxis);
+      d3.select('.axis--x').call(self.horizontalAxis);
    };
 
    CWRC.CreditVisualization.StackedColumnGraph.prototype.sanitize = function (data, mergedTagMap) {
@@ -441,18 +444,24 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
       return cleanData;
    };
 
-   CWRC.CreditVisualization.StackedColumnGraph.prototype.hasSize = function (stackGroup) {
-      return stackGroup.some(function (positionsRow) {
-         return positionsRow[0] != positionsRow[1];
-      })
+   CWRC.CreditVisualization.StackedColumnGraph.prototype.hasSize = function (positionsRow) {
+      // TODO: this isn't actually logical to what we want. need to filter
+
+      //console.log(stackGroup)
+
+      //return stackGroup.some(function (positionsRow) {
+      console.log(positionsRow[0], positionsRow[1], positionsRow[0] != positionsRow[1], positionsRow.data)
+
+      return positionsRow[0] != positionsRow[1];
+      //})
    };
 
    CWRC.CreditVisualization.StackedColumnGraph.prototype.constructBottomScale = function () {
       var self = this;
 
-      var axis, tickGroup, existingTickLabels, tickFill, tickX, tickY, tickDY, columnWidth, userLabelHoverHandler;
+      var tickGroup, existingTickLabels, tickFill, tickX, tickY, tickDY, columnWidth, userLabelHoverHandler;
 
-      axis = d3.axisBottom(self.usersScale)
+      self.horizontalAxis = d3.axisBottom(self.usersScale)
          .tickFormat(function (datum) {
             return JSON.parse(datum).name;
          });
@@ -460,18 +469,20 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
       tickGroup = self.contentGroup.append("g")
          .attr("class", "axis axis--x")
          .attr("transform", "translate(0," + self.bounds.getInnerHeight() + ")")
-         .call(axis);
+         .call(self.horizontalAxis);
 
       /*
        * replacing each label text with an anchor because we can't change
        * the tick construction process to use anchors instead
        */
       existingTickLabels = tickGroup.selectAll('.tick > text');
-      tickFill = existingTickLabels.attr('fill');
-      tickX = existingTickLabels.attr('x');
-      tickY = existingTickLabels.attr('y');
-      tickDY = existingTickLabels.attr('dy');
-      existingTickLabels.remove();
+      if (!existingTickLabels.empty()) {
+         tickFill = existingTickLabels.attr('fill');
+         tickX = existingTickLabels.attr('x');
+         tickY = existingTickLabels.attr('y');
+         tickDY = existingTickLabels.attr('dy');
+         existingTickLabels.remove();
+      }
 
       userLabelHoverHandler = function () {
          var user, isEnter;
