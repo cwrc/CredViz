@@ -3,9 +3,10 @@ ko.components.register('credit_visualization', {
                   <svg width="1024" height="500" ></svg>\
                </div>\
                <label>\
-                  <span>Users</span>\
+                  <span>User</span>\
                   <select data-bind="options: users, \
-                                     optionsText: \'name\', \
+                                     optionsText: \'name\',\
+                                     optionsCaption:\'(any)\',\
                                      value: filter.user"></select>\
                </label>',
 
@@ -105,7 +106,7 @@ ko.components.register('credit_visualization', {
                //   return !newVal || datum.user.id == newVal.id;
                //});
 
-               self.grapher.filter(newVal.id)
+               self.grapher.filter(newVal ? newVal.id : null)
 
                self.grapher.constructBars(params.ignoreTags);
             });
