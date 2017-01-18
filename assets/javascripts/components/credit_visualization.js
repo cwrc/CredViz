@@ -116,6 +116,7 @@ ko.components.register('credit_visualization', {
          });
       };
 
+      // d3 loads after KO, so push the fetch to the event stack.
       window.setTimeout(function () {
          self.getWorkData();
       });
@@ -224,8 +225,6 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
       workTagStacker = d3.stack()
          .keys(self.workTypes)
          .value(function (datum, key) {
-            //console.log(datum, key)
-
             return (datum.workflow_changes[key] || 0) / self.allChangesCount
          });
 
@@ -341,13 +340,12 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
       //   }, []));
       //}, []));
 
+      // === Column totals ===
       var totalLabelsVM = self.contentGroup.selectAll('.total-labels')
          .data(self.filteredData, function (d) {
             // need this to compare by item, not by list index
-            return (d);
-         })
-
-      // per-user maxiumums
+            return d.user.id;
+         });
 
       totalLabelsVM.enter()
          .append('g')
@@ -375,7 +373,10 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
       stackVM.exit().remove();
       labelsVM.exit().remove();
       rectBlocksVM.exit().remove();
-      totalLabelsVM.exit().remove();
+      totalLabelsVM.exit()
+         .filter(function (d) {
+            return true
+         }).remove();
    };
 
    CWRC.CreditVisualization.StackedColumnGraph.prototype.sanitize = function (data, mergedTagMap) {
