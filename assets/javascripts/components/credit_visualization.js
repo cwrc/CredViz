@@ -1,7 +1,13 @@
 ko.components.register('credit_visualization', {
    template: ' <div data-bind="attr: {id: id()}">\
                   <svg width="1024" height="500" ></svg>\
-               </div>',
+               </div>\
+               <label>\
+                  <span>Users</span>\
+                  <select data-bind="options: users, \
+                                     optionsText: \'name\', \
+                                     value: filter.user"></select>\
+               </label>',
 
    /**
     */
@@ -14,24 +20,26 @@ ko.components.register('credit_visualization', {
 
       self.testing = params['testing'];
 
+      self.users = ko.observableArray();
+      self.filter = {
+         user: ko.observable((new URI()).search(true).user || {})
+      };
+
+      params.mergeTags = params.mergeTags || {};
+
       // BEHAVIOUR
       self.getWorkData = function (id) {
-         self.grapher = new CWRC.CreditVisualization.StackedColumnGraph('#' + self.id() + ' svg');
+         self.grapher = new CWRC.CreditVisualization.StackedColumnGraph(self.id());
 
          var currentURI = new URI();
 
          ajax('get', '/services/credit_viz' + currentURI.search(), false, function (response) {
-            var data, title, multiUser, multiDoc, titleTarget;
+            var data, title, multiDoc, titleTarget;
 
-            // multiUserMultiDoc = response;
-            // multiUserSingleDoc = multiUserMultiDoc.documents[0];
-            // singleUserSingleDoc = multiUserSingleDoc.documents[0].modifications[0];
-
-            multiUser = true;
-            multiDoc = true;
+            // TODO: infer this from URI param, eg collectionid=5b1...k8y&docId=yz10-ab...
             multiDoc = !params.isDoc;//false;
 
-            if (multiUser && multiDoc) {
+            if (multiDoc) {
                data = response.documents.reduce(function (aggregate, document) {
                   return aggregate.concat(document.modifications);
                }, []);
@@ -48,25 +56,37 @@ ko.components.register('credit_visualization', {
                var firstObject = response.documents[0];
 
                ajax('get', '/islandora/rest/v1/object/' + firstObject.id + '/relationship', null, function (response) {
-                     var parentRelationship, parentId;
+                  var parentRelationship, parentId;
 
-                     parentRelationship = response.find(function (relationship) {
-                        return relationship.predicate.value == 'isMemberOfCollection'
-                     });
+                  parentRelationship = response.find(function (relationship) {
+                     return relationship.predicate.value == 'isMemberOfCollection'
+                  });
 
-                     // object.value is the value of the isMemberOfCollection relationship
-                     parentId = parentRelationship.object.value;
-                     titleTarget = '/islandora/object/' + parentId;
+                  // object.value is the value of the isMemberOfCollection relationship
+                  parentId = parentRelationship.object.value;
+                  titleTarget = '/islandora/object/' + parentId;
 
-                     ajax('get', '/islandora/rest/v1/object/' + parentId, null, function (response) {
-                        title = response.label;
+                  ajax('get', '/islandora/rest/v1/object/' + parentId, null, function (response) {
+                     title = response.label;
 
-                        self.grapher.render(data, title, titleTarget, params.mergeTags || {}, params.ignoreTags, self.filter);
-                     });
-                  }
-               );
+                     self.users(data.map(function (datum) {
+                        return datum.user
+                     }).reduce(function (aggregate, user) {
+                        if (!aggregate.find(function (u) {
+                              return u.name == user.name;
+                           })) {
+                           aggregate.push(user);
+                        }
+
+                        return aggregate;
+                     }, []));
+
+                     //self.grapher.render(data, title, titleTarget, params.mergeTags, params.ignoreTags, self.filter.user().id);
+                  });
+               });
+
                //titleTarget = '/islandora/object/' + doc.id;
-            } else if (multiUser && !multiDoc) {
+            } else if (!multiDoc) {
                var doc = response.documents[0];
 
                data = doc.modifications;
@@ -74,11 +94,16 @@ ko.components.register('credit_visualization', {
                title = doc.name;
                titleTarget = '/islandora/object/' + doc.id;
 
-               self.grapher.render(data, title, titleTarget, params.mergeTags || {}, params.ignoreTags);
+               //self.grapher.render(data, title, titleTarget, params.mergeTags, params.ignoreTags, self.filter.user().id);
             }
 
+            self.filter.user.subscribe(function () {
+               //self.grapher.clear()
+               self.grapher.render(data, title, titleTarget, params.mergeTags, params.ignoreTags, self.filter.user().id);
+            });
+
             // TODO: re-enable when we don't need triple-nested ajax :(
-            //self.grapher.render(data, title, titleTarget, params.mergeTags || {}, params.ignoreTags);
+            //self.grapher.render(data, title, titleTarget, params.mergeTags, params.ignoreTags);
          });
       };
 
@@ -92,16 +117,17 @@ var CWRC = CWRC || {};
 CWRC.CreditVisualization = CWRC.CreditVisualization || {};
 
 (function StackedColumnGraph() {
-   CWRC.CreditVisualization.StackedColumnGraph = function (svgSelector) {
+   CWRC.CreditVisualization.StackedColumnGraph = function (containerId) {
       var self = this;
 
-      self.svg = d3.select(svgSelector);
+      self.containerId = containerId;
+      self.svg = d3.select('#' + self.containerId + ' svg');
 
       this.workTypes = CWRC.CreditVisualization.WorkflowChangeTally.CATEGORIES.slice(0);
 
-      self.filter = {
-         user: (new URI()).search(true).user
-      };
+      //self.filter = {
+      //   user: (new URI()).search(true).user
+      //};
 
       this.bounds = {
          padding: {top: 20, right: 20, bottom: 60, left: 60},
@@ -135,7 +161,25 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
       //.range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
    };
 
-   CWRC.CreditVisualization.StackedColumnGraph.prototype.render = function (data, title, titleTarget, mergedTagMap, ignoredTags) {
+   //CWRC.CreditVisualization.StackedColumnGraph.prototype.clear = function () {
+   //   var self = this;
+   //
+   //   console.log(self.containerId)
+   //
+   //   var container = document.getElementById(self.containerId);
+   //
+   //   while (container.firstChild) {
+   //      container.removeChild(container.firstChild);
+   //   }
+   //
+   //   var newSvg = document.createElement('svg');
+   //
+   //   container.appendChild(newSvg);
+   //};
+
+   CWRC.CreditVisualization.StackedColumnGraph.prototype.render = function (data, title, titleTarget, mergedTagMap, ignoredTags, filterUser) {
+      
+
       var self = this;
 
       var stackVM, workTagStacker, workTagStack, allChangesCount, seriesGroupVM, percentFormat, maxValue, segmentHoverHandler;
@@ -155,9 +199,10 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
          return self.countChanges(d);
       });
 
-      data = data.filter(function (datum) {
-         return !self.filter.user || datum.user.id == self.filter.user;
-      });
+      //data = data.filter(function (datum) {
+      //   return !filterUser || datum.user.id == filterUser;
+      //   //return !self.filter.user || datum.user.id == self.filter.user;
+      //});
 
       workTagStacker = d3.stack()
          .keys(self.workTypes)
@@ -191,6 +236,13 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
             return self.colorScale(d.key);
          })
          .filter(self.hasSize); // removing the empties cleans up the graph DOM for other conditionals
+
+      stackVM.exit().remove();
+
+      //window.setTimeout(function () {
+      //   data.pop()
+      //   console.log('popping')
+      //}, 2000);
 
       segmentHoverHandler = function (d, rowNumber, group) {
          var keyName, isEnter;
