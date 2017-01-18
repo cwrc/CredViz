@@ -2,7 +2,10 @@
    "$schema": "http://json-schema.org/draft-04/schema#",
    "type": "object",
    "properties": {
-      "name": {
+      "id": {
+         "type": "string"
+      },
+      "label": {
          "type": "string"
       },
       "documents": {
@@ -72,7 +75,8 @@
       }
    },
    "required": [
-      "name",
+      "id",
+      "label",
       "documents"
    ]
 }

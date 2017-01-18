@@ -1,0 +1,824 @@
+{
+   "pid": "cwrc:abcd1234-5678-efgh-ijkl-mnopqrstuvwx",
+   "label": "Women Persons",
+   "owner": "admin",
+   "models": [
+      "islandora:collectionCModel",
+      "fedora-system:FedoraObject-3.0"
+   ],
+   "state": "A",
+   "created": "2013-07-31T17:29:29.704Z",
+   "modified": "2016-06-24T03:24:22.610Z",
+   "datastreams": [
+      {
+         "dsid": "RELS-EXT",
+         "label": "Fedora Object to Object Relationship Metadata.",
+         "state": "A",
+         "size": 881,
+         "mimeType": "application\/rdf+xml",
+         "controlGroup": "X",
+         "created": "2016-06-24T03:24:22.610Z",
+         "versionable": true,
+         "versions": [
+            {
+               "label": "Fedora Object to Object Relationship Metadata.",
+               "state": "A",
+               "size": 935,
+               "mimeType": "application\/rdf+xml",
+               "controlGroup": "X",
+               "created": "2016-06-24T03:24:22.355Z"
+            },
+            {
+               "label": "Fedora Object to Object Relationship Metadata.",
+               "state": "A",
+               "size": 997,
+               "mimeType": "application\/rdf+xml",
+               "controlGroup": "X",
+               "created": "2016-06-24T03:24:21.973Z"
+            },
+            {
+               "label": "Fedora Object to Object Relationship Metadata.",
+               "state": "A",
+               "size": 1069,
+               "mimeType": "application\/rdf+xml",
+               "controlGroup": "X",
+               "created": "2016-06-24T03:24:21.524Z"
+            },
+            {
+               "label": "Fedora Object to Object Relationship Metadata.",
+               "state": "A",
+               "size": 1135,
+               "mimeType": "application\/rdf+xml",
+               "controlGroup": "X",
+               "created": "2016-06-24T03:23:59.558Z"
+            },
+            {
+               "label": "Fedora Object to Object Relationship Metadata.",
+               "state": "A",
+               "size": 1069,
+               "mimeType": "application\/rdf+xml",
+               "controlGroup": "X",
+               "created": "2016-06-24T03:23:59.379Z"
+            },
+            {
+               "label": "Fedora Object to Object Relationship Metadata.",
+               "state": "A",
+               "size": 1015,
+               "mimeType": "application\/rdf+xml",
+               "controlGroup": "X",
+               "created": "2016-06-24T03:23:58.780Z"
+            },
+            {
+               "label": "Fedora Object to Object Relationship Metadata.",
+               "state": "A",
+               "size": 953,
+               "mimeType": "application\/rdf+xml",
+               "controlGroup": "X",
+               "created": "2016-06-24T03:23:58.202Z"
+            },
+            {
+               "label": "Fedora Object to Object Relationship Metadata.",
+               "state": "A",
+               "size": 881,
+               "mimeType": "application\/rdf+xml",
+               "controlGroup": "X",
+               "created": "2016-06-01T15:50:22.751Z"
+            },
+            {
+               "label": "Fedora Object to Object Relationship Metadata.",
+               "state": "A",
+               "size": 935,
+               "mimeType": "application\/rdf+xml",
+               "controlGroup": "X",
+               "created": "2016-06-01T15:50:22.578Z"
+            },
+            {
+               "label": "Fedora Object to Object Relationship Metadata.",
+               "state": "A",
+               "size": 997,
+               "mimeType": "application\/rdf+xml",
+               "controlGroup": "X",
+               "created": "2016-06-01T15:50:22.090Z"
+            },
+            {
+               "label": "Fedora Object to Object Relationship Metadata.",
+               "state": "A",
+               "size": 1069,
+               "mimeType": "application\/rdf+xml",
+               "controlGroup": "X",
+               "created": "2016-06-01T15:50:21.709Z"
+            },
+            {
+               "label": "Fedora Object to Object Relationship Metadata.",
+               "state": "A",
+               "size": 1135,
+               "mimeType": "application\/rdf+xml",
+               "controlGroup": "X",
+               "created": "2016-06-01T15:39:15.229Z"
+            },
+            {
+               "label": "Fedora Object to Object Relationship Metadata.",
+               "state": "A",
+               "size": 1069,
+               "mimeType": "application\/rdf+xml",
+               "controlGroup": "X",
+               "created": "2016-06-01T15:39:14.685Z"
+            },
+            {
+               "label": "Fedora Object to Object Relationship Metadata.",
+               "state": "A",
+               "size": 1015,
+               "mimeType": "application\/rdf+xml",
+               "controlGroup": "X",
+               "created": "2016-06-01T15:39:14.500Z"
+            },
+            {
+               "label": "Fedora Object to Object Relationship Metadata.",
+               "state": "A",
+               "size": 953,
+               "mimeType": "application\/rdf+xml",
+               "controlGroup": "X",
+               "created": "2016-06-01T15:39:14.087Z"
+            },
+            {
+               "label": "Fedora Object to Object Relationship Metadata.",
+               "state": "A",
+               "size": 881,
+               "mimeType": "application\/rdf+xml",
+               "controlGroup": "X",
+               "created": "2016-05-31T04:52:27.556Z"
+            },
+            {
+               "label": "Fedora Object to Object Relationship Metadata.",
+               "state": "A",
+               "size": 936,
+               "mimeType": "application\/rdf+xml",
+               "controlGroup": "X",
+               "created": "2016-05-31T04:52:27.386Z"
+            },
+            {
+               "label": "Fedora Object to Object Relationship Metadata.",
+               "state": "A",
+               "size": 998,
+               "mimeType": "application\/rdf+xml",
+               "controlGroup": "X",
+               "created": "2016-05-31T04:52:26.982Z"
+            },
+            {
+               "label": "Fedora Object to Object Relationship Metadata.",
+               "state": "A",
+               "size": 1071,
+               "mimeType": "application\/rdf+xml",
+               "controlGroup": "X",
+               "created": "2016-05-31T04:52:26.562Z"
+            },
+            {
+               "label": "Fedora Object to Object Relationship Metadata.",
+               "state": "A",
+               "size": 1137,
+               "mimeType": "application\/rdf+xml",
+               "controlGroup": "X",
+               "created": "2016-05-31T04:51:31.526Z"
+            },
+            {
+               "label": "Fedora Object to Object Relationship Metadata.",
+               "state": "A",
+               "size": 1071,
+               "mimeType": "application\/rdf+xml",
+               "controlGroup": "X",
+               "created": "2016-05-31T04:51:31.265Z"
+            },
+            {
+               "label": "Fedora Object to Object Relationship Metadata.",
+               "state": "A",
+               "size": 1016,
+               "mimeType": "application\/rdf+xml",
+               "controlGroup": "X",
+               "created": "2016-05-31T04:51:30.812Z"
+            },
+            {
+               "label": "Fedora Object to Object Relationship Metadata.",
+               "state": "A",
+               "size": 954,
+               "mimeType": "application\/rdf+xml",
+               "controlGroup": "X",
+               "created": "2016-05-31T04:51:30.403Z"
+            },
+            {
+               "label": "Fedora Object to Object Relationship Metadata.",
+               "state": "A",
+               "size": 881,
+               "mimeType": "application\/rdf+xml",
+               "controlGroup": "X",
+               "created": "2016-05-29T08:47:10.761Z"
+            },
+            {
+               "label": "Fedora Object to Object Relationship Metadata.",
+               "state": "A",
+               "size": 936,
+               "mimeType": "application\/rdf+xml",
+               "controlGroup": "X",
+               "created": "2016-05-29T08:47:10.403Z"
+            },
+            {
+               "label": "Fedora Object to Object Relationship Metadata.",
+               "state": "A",
+               "size": 998,
+               "mimeType": "application\/rdf+xml",
+               "controlGroup": "X",
+               "created": "2016-05-29T08:47:09.918Z"
+            },
+            {
+               "label": "Fedora Object to Object Relationship Metadata.",
+               "state": "A",
+               "size": 1071,
+               "mimeType": "application\/rdf+xml",
+               "controlGroup": "X",
+               "created": "2016-05-29T08:47:09.532Z"
+            },
+            {
+               "label": "Fedora Object to Object Relationship Metadata.",
+               "state": "A",
+               "size": 1137,
+               "mimeType": "application\/rdf+xml",
+               "controlGroup": "X",
+               "created": "2016-05-29T07:43:25.960Z"
+            },
+            {
+               "label": "Fedora Object to Object Relationship Metadata.",
+               "state": "A",
+               "size": 1071,
+               "mimeType": "application\/rdf+xml",
+               "controlGroup": "X",
+               "created": "2016-05-29T07:43:25.651Z"
+            },
+            {
+               "label": "Fedora Object to Object Relationship Metadata.",
+               "state": "A",
+               "size": 1016,
+               "mimeType": "application\/rdf+xml",
+               "controlGroup": "X",
+               "created": "2016-05-29T07:43:25.487Z"
+            },
+            {
+               "label": "Fedora Object to Object Relationship Metadata.",
+               "state": "A",
+               "size": 954,
+               "mimeType": "application\/rdf+xml",
+               "controlGroup": "X",
+               "created": "2016-05-29T07:43:25.080Z"
+            },
+            {
+               "label": "Fedora Object to Object Relationship Metadata.",
+               "state": "A",
+               "size": 881,
+               "mimeType": "application\/rdf+xml",
+               "controlGroup": "X",
+               "created": "2016-05-29T05:04:02.077Z"
+            },
+            {
+               "label": "Fedora Object to Object Relationship Metadata.",
+               "state": "A",
+               "size": 936,
+               "mimeType": "application\/rdf+xml",
+               "controlGroup": "X",
+               "created": "2016-05-29T05:04:01.860Z"
+            },
+            {
+               "label": "Fedora Object to Object Relationship Metadata.",
+               "state": "A",
+               "size": 998,
+               "mimeType": "application\/rdf+xml",
+               "controlGroup": "X",
+               "created": "2016-05-29T05:04:01.558Z"
+            },
+            {
+               "label": "Fedora Object to Object Relationship Metadata.",
+               "state": "A",
+               "size": 1071,
+               "mimeType": "application\/rdf+xml",
+               "controlGroup": "X",
+               "created": "2016-05-29T05:04:01.140Z"
+            },
+            {
+               "label": "Fedora Object to Object Relationship Metadata.",
+               "state": "A",
+               "size": 1137,
+               "mimeType": "application\/rdf+xml",
+               "controlGroup": "X",
+               "created": "2016-05-29T05:03:44.223Z"
+            },
+            {
+               "label": "Fedora Object to Object Relationship Metadata.",
+               "state": "A",
+               "size": 1071,
+               "mimeType": "application\/rdf+xml",
+               "controlGroup": "X",
+               "created": "2016-05-29T05:03:43.977Z"
+            },
+            {
+               "label": "Fedora Object to Object Relationship Metadata.",
+               "state": "A",
+               "size": 1016,
+               "mimeType": "application\/rdf+xml",
+               "controlGroup": "X",
+               "created": "2016-05-29T05:03:43.825Z"
+            },
+            {
+               "label": "Fedora Object to Object Relationship Metadata.",
+               "state": "A",
+               "size": 954,
+               "mimeType": "application\/rdf+xml",
+               "controlGroup": "X",
+               "created": "2016-05-29T05:03:43.440Z"
+            },
+            {
+               "label": "Fedora Object to Object Relationship Metadata.",
+               "state": "A",
+               "size": 881,
+               "mimeType": "application\/rdf+xml",
+               "controlGroup": "X",
+               "created": "2016-05-29T04:59:37.604Z"
+            },
+            {
+               "label": "Fedora Object to Object Relationship Metadata.",
+               "state": "A",
+               "size": 936,
+               "mimeType": "application\/rdf+xml",
+               "controlGroup": "X",
+               "created": "2016-05-29T04:59:37.263Z"
+            },
+            {
+               "label": "Fedora Object to Object Relationship Metadata.",
+               "state": "A",
+               "size": 998,
+               "mimeType": "application\/rdf+xml",
+               "controlGroup": "X",
+               "created": "2016-05-29T04:59:36.875Z"
+            },
+            {
+               "label": "Fedora Object to Object Relationship Metadata.",
+               "state": "A",
+               "size": 1071,
+               "mimeType": "application\/rdf+xml",
+               "controlGroup": "X",
+               "created": "2016-05-29T04:59:36.620Z"
+            },
+            {
+               "label": "Fedora Object to Object Relationship Metadata.",
+               "state": "A",
+               "size": 1137,
+               "mimeType": "application\/rdf+xml",
+               "controlGroup": "X",
+               "created": "2016-05-29T04:58:33.557Z"
+            },
+            {
+               "label": "Fedora Object to Object Relationship Metadata.",
+               "state": "A",
+               "size": 1071,
+               "mimeType": "application\/rdf+xml",
+               "controlGroup": "X",
+               "created": "2016-05-29T04:58:33.387Z"
+            },
+            {
+               "label": "Fedora Object to Object Relationship Metadata.",
+               "state": "A",
+               "size": 1016,
+               "mimeType": "application\/rdf+xml",
+               "controlGroup": "X",
+               "created": "2016-05-29T04:58:33.179Z"
+            },
+            {
+               "label": "Fedora Object to Object Relationship Metadata.",
+               "state": "A",
+               "size": 954,
+               "mimeType": "application\/rdf+xml",
+               "controlGroup": "X",
+               "created": "2016-05-29T04:58:32.830Z"
+            },
+            {
+               "label": "Fedora Object to Object Relationship Metadata.",
+               "state": "A",
+               "size": 881,
+               "mimeType": "application\/rdf+xml",
+               "controlGroup": "X",
+               "created": "2016-05-27T06:50:18.611Z"
+            },
+            {
+               "label": "Fedora Object to Object Relationship Metadata.",
+               "state": "A",
+               "size": 1019,
+               "mimeType": "application\/rdf+xml",
+               "controlGroup": "X",
+               "created": "2016-05-27T06:50:18.350Z"
+            },
+            {
+               "label": "Fedora Object to Object Relationship Metadata.",
+               "state": "A",
+               "size": 913,
+               "mimeType": "application\/rdf+xml",
+               "controlGroup": "X",
+               "created": "2016-05-26T18:34:18.914Z"
+            },
+            {
+               "label": "Fedora Object to Object Relationship Metadata.",
+               "state": "A",
+               "size": 1019,
+               "mimeType": "application\/rdf+xml",
+               "controlGroup": "X",
+               "created": "2016-05-26T18:34:18.634Z"
+            },
+            {
+               "label": "Fedora Object to Object Relationship Metadata.",
+               "state": "A",
+               "size": 881,
+               "mimeType": "application\/rdf+xml",
+               "controlGroup": "X",
+               "created": "2015-06-02T11:15:11.949Z"
+            },
+            {
+               "label": "Fedora Object to Object Relationship Metadata.",
+               "state": "A",
+               "size": 935,
+               "mimeType": "application\/rdf+xml",
+               "controlGroup": "X",
+               "created": "2015-06-02T11:15:11.827Z"
+            },
+            {
+               "label": "Fedora Object to Object Relationship Metadata.",
+               "state": "A",
+               "size": 1064,
+               "mimeType": "application\/rdf+xml",
+               "controlGroup": "X",
+               "created": "2015-06-02T11:15:11.557Z"
+            },
+            {
+               "label": "Fedora Object to Object Relationship Metadata.",
+               "state": "A",
+               "size": 1136,
+               "mimeType": "application\/rdf+xml",
+               "controlGroup": "X",
+               "created": "2015-06-02T11:15:11.330Z"
+            },
+            {
+               "label": "Fedora Object to Object Relationship Metadata.",
+               "state": "A",
+               "size": 1202,
+               "mimeType": "application\/rdf+xml",
+               "controlGroup": "X",
+               "created": "2015-06-02T11:14:50.757Z"
+            },
+            {
+               "label": "Fedora Object to Object Relationship Metadata.",
+               "state": "A",
+               "size": 1136,
+               "mimeType": "application\/rdf+xml",
+               "controlGroup": "X",
+               "created": "2015-06-02T11:14:50.619Z"
+            },
+            {
+               "label": "Fedora Object to Object Relationship Metadata.",
+               "state": "A",
+               "size": 1082,
+               "mimeType": "application\/rdf+xml",
+               "controlGroup": "X",
+               "created": "2015-06-02T11:14:50.379Z"
+            },
+            {
+               "label": "Fedora Object to Object Relationship Metadata.",
+               "state": "A",
+               "size": 953,
+               "mimeType": "application\/rdf+xml",
+               "controlGroup": "X",
+               "created": "2015-06-02T11:14:49.841Z"
+            },
+            {
+               "label": "Fedora Object to Object Relationship Metadata.",
+               "state": "A",
+               "size": 581,
+               "mimeType": "application\/rdf+xml",
+               "controlGroup": "X",
+               "created": "2014-01-24T17:11:45.345Z"
+            },
+            {
+               "label": "Fedora Object to Object Relationship Metadata.",
+               "state": "A",
+               "size": 688,
+               "mimeType": "application\/rdf+xml",
+               "controlGroup": "X",
+               "created": "2014-01-24T17:11:45.259Z"
+            },
+            {
+               "label": "Fedora Object to Object Relationship Metadata.",
+               "state": "A",
+               "size": 582,
+               "mimeType": "application\/rdf+xml",
+               "controlGroup": "X",
+               "created": "2014-01-24T17:08:37.997Z"
+            },
+            {
+               "label": "Fedora Object to Object Relationship Metadata.",
+               "state": "A",
+               "size": 688,
+               "mimeType": "application\/rdf+xml",
+               "controlGroup": "X",
+               "created": "2014-01-24T17:08:37.866Z"
+            },
+            {
+               "label": "Fedora Object to Object Relationship Metadata.",
+               "state": "A",
+               "size": 581,
+               "mimeType": "application\/rdf+xml",
+               "controlGroup": "X",
+               "created": "2013-07-31T17:29:29.714Z"
+            }
+         ]
+      },
+      {
+         "dsid": "TN",
+         "label": "Thumbnail",
+         "state": "A",
+         "size": 687,
+         "mimeType": "image\/gif",
+         "controlGroup": "M",
+         "created": "2016-06-01T15:49:31.871Z",
+         "versionable": true,
+         "versions": [
+            {
+               "label": "Thumbnail",
+               "state": "A",
+               "size": 5137,
+               "mimeType": "image\/gif",
+               "controlGroup": "M",
+               "created": "2016-06-01T15:49:31.509Z"
+            },
+            {
+               "label": "Thumbnail",
+               "state": "A",
+               "size": 5137,
+               "mimeType": "image\/png",
+               "controlGroup": "M",
+               "created": "2013-07-31T17:29:29.714Z"
+            }
+         ]
+      },
+      {
+         "dsid": "COLLECTION_POLICY",
+         "label": "Collection policy",
+         "state": "A",
+         "size": 671,
+         "mimeType": "text\/xml",
+         "controlGroup": "X",
+         "created": "2013-07-31T17:29:29.715Z",
+         "versionable": true,
+         "versions": []
+      },
+      {
+         "dsid": "DC",
+         "label": "Dublin Core Record for this object",
+         "state": "A",
+         "size": 749,
+         "mimeType": "text\/xml",
+         "controlGroup": "X",
+         "created": "2016-06-24T03:24:21.257Z",
+         "versionable": true,
+         "versions": [
+            {
+               "label": "Dublin Core Record for this object",
+               "state": "A",
+               "size": 750,
+               "mimeType": "text\/xml",
+               "controlGroup": "X",
+               "created": "2016-05-31T04:52:26.257Z"
+            },
+            {
+               "label": "Dublin Core Record for this object",
+               "state": "A",
+               "size": 750,
+               "mimeType": "text\/xml",
+               "controlGroup": "X",
+               "created": "2016-05-29T07:47:48.754Z"
+            },
+            {
+               "label": "Dublin Core Record for this object",
+               "state": "A",
+               "size": 735,
+               "mimeType": "text\/xml",
+               "controlGroup": "X",
+               "created": "2016-05-29T07:44:55.102Z"
+            },
+            {
+               "label": "Dublin Core Record for this object",
+               "state": "A",
+               "size": 707,
+               "mimeType": "text\/xml",
+               "controlGroup": "X",
+               "created": "2016-05-29T05:04:00.832Z"
+            },
+            {
+               "label": "Dublin Core Record for this object",
+               "state": "A",
+               "size": 406,
+               "mimeType": "text\/xml",
+               "controlGroup": "X",
+               "created": "2013-07-31T17:29:29.704Z"
+            }
+         ]
+      },
+      {
+         "dsid": "POLICY",
+         "label": "XACML Policy Stream",
+         "state": "A",
+         "size": 13143,
+         "mimeType": "text\/xml",
+         "controlGroup": "X",
+         "created": "2016-06-24T03:24:22.133Z",
+         "versionable": true,
+         "versions": [
+            {
+               "label": "XACML Policy Stream",
+               "state": "A",
+               "size": 13246,
+               "mimeType": "text\/xml",
+               "controlGroup": "X",
+               "created": "2016-06-24T03:23:58.500Z"
+            },
+            {
+               "label": "XACML Policy Stream",
+               "state": "A",
+               "size": 13143,
+               "mimeType": "text\/xml",
+               "controlGroup": "X",
+               "created": "2016-06-01T15:50:22.302Z"
+            },
+            {
+               "label": "XACML Policy Stream",
+               "state": "A",
+               "size": 13246,
+               "mimeType": "text\/xml",
+               "controlGroup": "X",
+               "created": "2016-06-01T15:39:14.328Z"
+            },
+            {
+               "label": "XACML Policy Stream",
+               "state": "A",
+               "size": 13143,
+               "mimeType": "text\/xml",
+               "controlGroup": "X",
+               "created": "2016-05-31T04:52:27.161Z"
+            },
+            {
+               "label": "XACML Policy Stream",
+               "state": "A",
+               "size": 13247,
+               "mimeType": "text\/xml",
+               "controlGroup": "X",
+               "created": "2016-05-31T04:51:30.593Z"
+            },
+            {
+               "label": "XACML Policy Stream",
+               "state": "A",
+               "size": 13143,
+               "mimeType": "text\/xml",
+               "controlGroup": "X",
+               "created": "2016-05-29T08:47:10.188Z"
+            },
+            {
+               "label": "XACML Policy Stream",
+               "state": "A",
+               "size": 13247,
+               "mimeType": "text\/xml",
+               "controlGroup": "X",
+               "created": "2016-05-29T07:43:25.288Z"
+            },
+            {
+               "label": "XACML Policy Stream",
+               "state": "A",
+               "size": 13143,
+               "mimeType": "text\/xml",
+               "controlGroup": "X",
+               "created": "2016-05-29T05:04:01.706Z"
+            },
+            {
+               "label": "XACML Policy Stream",
+               "state": "A",
+               "size": 13247,
+               "mimeType": "text\/xml",
+               "controlGroup": "X",
+               "created": "2016-05-29T05:03:43.643Z"
+            },
+            {
+               "label": "XACML Policy Stream",
+               "state": "A",
+               "size": 13143,
+               "mimeType": "text\/xml",
+               "controlGroup": "X",
+               "created": "2016-05-29T04:59:37.086Z"
+            },
+            {
+               "label": "XACML Policy Stream",
+               "state": "A",
+               "size": 13247,
+               "mimeType": "text\/xml",
+               "controlGroup": "X",
+               "created": "2016-05-29T04:58:32.981Z"
+            },
+            {
+               "label": "XACML Policy Stream",
+               "state": "A",
+               "size": 13143,
+               "mimeType": "text\/xml",
+               "controlGroup": "X",
+               "created": "2015-06-02T11:15:11.706Z"
+            },
+            {
+               "label": "XACML Policy Stream",
+               "state": "A",
+               "size": 13246,
+               "mimeType": "text\/xml",
+               "controlGroup": "X",
+               "created": "2015-06-02T11:14:50.234Z"
+            },
+            {
+               "label": "XACML Policy Stream",
+               "state": "A",
+               "size": 13143,
+               "mimeType": "text\/xml",
+               "controlGroup": "X",
+               "created": "2013-08-20T20:37:34.247Z"
+            }
+         ]
+      },
+      {
+         "dsid": "MODS",
+         "label": "MODS Record",
+         "state": "A",
+         "size": 1645,
+         "mimeType": "application\/xml",
+         "controlGroup": "M",
+         "created": "2016-06-24T03:24:21.053Z",
+         "versionable": true,
+         "versions": [
+            {
+               "label": "MODS Record",
+               "state": "A",
+               "size": 1646,
+               "mimeType": "application\/xml",
+               "controlGroup": "M",
+               "created": "2016-05-31T04:52:26.015Z"
+            },
+            {
+               "label": "MODS Record",
+               "state": "A",
+               "size": 1646,
+               "mimeType": "application\/xml",
+               "controlGroup": "M",
+               "created": "2016-05-29T07:47:48.589Z"
+            },
+            {
+               "label": "MODS Record",
+               "state": "A",
+               "size": 1465,
+               "mimeType": "application\/xml",
+               "controlGroup": "M",
+               "created": "2016-05-29T07:44:54.892Z"
+            },
+            {
+               "label": "MODS Record",
+               "state": "A",
+               "size": 696,
+               "mimeType": "application\/xml",
+               "controlGroup": "M",
+               "created": "2016-05-29T07:43:48.354Z"
+            },
+            {
+               "label": "MODS Record",
+               "state": "A",
+               "size": 1339,
+               "mimeType": "application\/xml",
+               "controlGroup": "M",
+               "created": "2016-05-29T05:04:00.621Z"
+            },
+            {
+               "label": "MODS Record",
+               "state": "A",
+               "size": 856,
+               "mimeType": "application\/xml",
+               "controlGroup": "M",
+               "created": "2016-05-29T04:58:59.505Z"
+            }
+         ]
+      },
+      {
+         "dsid": "WORKFLOW",
+         "label": "WORKFLOW DS",
+         "state": "A",
+         "size": 177,
+         "mimeType": "text\/xml",
+         "controlGroup": "M",
+         "created": "2016-06-01T15:49:38.108Z",
+         "versionable": true,
+         "versions": []
+      }
+   ]
+}
