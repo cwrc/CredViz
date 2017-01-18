@@ -196,8 +196,8 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
          return self.countChanges(d);
       });
 
-      this.constructLeftScale();
-      this.constructBottomScale();
+      this.constructLeftAxis();
+      this.constructBottomAxis();
       this.updateBars(ignoredTags);
       this.constructLegend();
       this.constructTitle(title, titleTarget);
@@ -384,25 +384,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
             return true
          }).remove();
 
-      d3.select('.axis--y').call(self.verticalAxis);
-      d3.select('.axis--x').call(self.horizontalAxis);
-
-      //self.updateAxes();
-   };
-
-   CWRC.CreditVisualization.StackedColumnGraph.prototype.updateAxes = function () {
-      var self = this;
-
-      self.updateVerticalAxis();
-      self.updateHorizontalAxis();
-   };
-
-   CWRC.CreditVisualization.StackedColumnGraph.prototype.updateVerticalAxis = function () {
-      d3.select('.axis--y').call(this.verticalAxis);
-   };
-
-   CWRC.CreditVisualization.StackedColumnGraph.prototype.updateHorizontalAxis = function () {
-      d3.select('.axis--x').call(this.horizontalAxis);
+      self.updateAxes();
    };
 
    CWRC.CreditVisualization.StackedColumnGraph.prototype.sanitize = function (data, mergedTagMap) {
@@ -465,7 +447,39 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
       return cleanData;
    };
 
-   CWRC.CreditVisualization.StackedColumnGraph.prototype.constructBottomScale = function () {
+   CWRC.CreditVisualization.StackedColumnGraph.prototype.updateAxes = function () {
+      var self = this;
+
+      self.updateLeftAxis();
+      self.updateBottomAxis();
+   };
+
+   CWRC.CreditVisualization.StackedColumnGraph.prototype.constructLeftAxis = function () {
+      var self = this, verticalAxis, tickLine;
+
+      self.verticalAxis = d3.axisLeft(self.contributionScale)
+         .ticks(10, "s")
+         .tickFormat(d3.format(".0%"));
+
+      tickLine = self.contentGroup
+         .append("g")
+         .attr("class", "axis axis--y")
+         .call(self.verticalAxis);
+
+      tickLine
+         .append("text")
+         .attr("x", 0)
+         .attr("y", self.contributionScale(self.contributionScale.ticks(10).pop()) - 10)
+         .attr("text-anchor", "right")
+         .attr("fill", "#000")
+         .text("Contribution");
+   };
+
+   CWRC.CreditVisualization.StackedColumnGraph.prototype.updateLeftAxis = function () {
+      d3.select('.axis--y').call(this.verticalAxis);
+   };
+
+   CWRC.CreditVisualization.StackedColumnGraph.prototype.constructBottomAxis = function () {
       var self = this;
 
       var tickGroup, existingTickLabels, tickFill, tickX, tickY, tickDY, columnWidth, userLabelHoverHandler;
@@ -479,6 +493,16 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
          .attr("class", "axis axis--x")
          .attr("transform", "translate(0," + self.bounds.getInnerHeight() + ")")
          .call(self.horizontalAxis);
+   };
+
+   CWRC.CreditVisualization.StackedColumnGraph.prototype.updateBottomAxis = function () {
+      var self = this;
+
+      var tickGroup, existingTickLabels, userLabelHoverHandler, columnWidth;
+
+      tickGroup = d3.select('.axis--x');
+
+      tickGroup.call(this.horizontalAxis);
 
       /*
        * replacing each label text with an anchor because we can't change
@@ -525,31 +549,10 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
          .on('mouseover', userLabelHoverHandler)
          .on('mouseout', userLabelHoverHandler);
 
-      columnWidth = self.usersScale.bandwidth(); // labelling for clarity
+      columnWidth = self.usersScale.bandwidth(); // this variable is just a label for clarity
 
       tickGroup.selectAll(".tick text")
          .call(self.wrap, columnWidth);
-   };
-
-   CWRC.CreditVisualization.StackedColumnGraph.prototype.constructLeftScale = function () {
-      var self = this, verticalAxis, tickLine;
-
-      self.verticalAxis = d3.axisLeft(self.contributionScale)
-         .ticks(10, "s")
-         .tickFormat(d3.format(".0%"));
-
-      tickLine = self.contentGroup
-         .append("g")
-         .attr("class", "axis axis--y")
-         .call(self.verticalAxis);
-
-      tickLine
-         .append("text")
-         .attr("x", 0)
-         .attr("y", self.contributionScale(self.contributionScale.ticks(10).pop()) - 10)
-         .attr("text-anchor", "right")
-         .attr("fill", "#000")
-         .text("Contribution");
    };
 
    CWRC.CreditVisualization.StackedColumnGraph.prototype.constructLegend = function () {
