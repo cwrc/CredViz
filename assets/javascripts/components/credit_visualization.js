@@ -6,7 +6,7 @@ ko.components.register('credit_visualization', {
                   <span>User</span>\
                   <select data-bind="options: users, \
                                      optionsText: \'name\',\
-                                     optionsCaption:\'(any)\',\
+                                     optionsCaption:\'(all)\',\
                                      value: filter.user"></select>\
                </label>',
 
