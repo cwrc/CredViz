@@ -214,7 +214,8 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
    CWRC.CreditVisualization.StackedColumnGraph.prototype.constructBars = function (ignoredTags) {
       var self = this;
 
-      var stackVM, workTagStacker, workTagStack, seriesGroupVM, percentFormat, maxValue, segmentHoverHandler;
+      var stackVM, workTagStacker, workTagStack, seriesGroupVM, percentFormat, maxValue, segmentHoverHandler,
+         rectBlocksVM, labelsVM;
 
       if (self.data.length <= 0)
          return;
@@ -279,10 +280,11 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
             .classed('highlight', isMouseEnter);
       };
 
-      var rectBlocksVM = seriesGroupVM.selectAll("rect")
+      // === The actual graphic rects ===
+      rectBlocksVM = seriesGroupVM.selectAll("rect")
          .data(function (d) {
             return d;
-         })
+         });
 
       rectBlocksVM.enter()
          .append("rect")
@@ -299,11 +301,11 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
          .on("mouseover", segmentHoverHandler)
          .on("mouseout", segmentHoverHandler);
 
+      // === Column segment labels ===
       percentFormat = d3.format(".0%");
 
-      var labelsVM =
-         stackVM
-            .enter()
+      labelsVM =
+         seriesGroupVM
             .append("g")
             .attr("class", function (datum) {
                return "labels tag-" + datum.key;
