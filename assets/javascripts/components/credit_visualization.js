@@ -147,16 +147,16 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
 
       data = self.sanitize(data, mergedTagMap);
 
-      //data = data.filter(function (datum) {
-      //   return !self.filter.user || datum.user.id == self.filter.user;
-      //});
-
       data.sort(function (a, b) {
          return self.countChanges(b) - self.countChanges(a)
       });
 
       allChangesCount = d3.sum(data, function (d) {
          return self.countChanges(d);
+      });
+
+      data = data.filter(function (datum) {
+         return !self.filter.user || datum.user.id == self.filter.user;
       });
 
       workTagStacker = d3.stack()
@@ -292,7 +292,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
       this.constructLeftScale();
       this.constructLegend();
       this.constructTitle(title, titleTarget);
-      this.constructNoticeOverlay()
+      this.constructNoticeOverlay();
    };
 
    CWRC.CreditVisualization.StackedColumnGraph.prototype.sanitize = function (data, mergedTagMap) {
@@ -418,7 +418,6 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
          })
          .on('mouseover', userLabelHoverHandler)
          .on('mouseout', userLabelHoverHandler);
-
 
       columnWidth = self.usersScale.bandwidth(); // labelling for clarity
 

@@ -1,0 +1,928 @@
+{
+   "id": "cwrc:abcd1234-5678-efgh-ijkl-mnopqrstuvwx",
+   "name": "Women Persons",
+   "documents": [
+      {
+         "id": "cwrc:dcba1234-8765-hgfe-lkjil-xwvutsrqponm",
+         "name": "Nellie McClung",
+         "modifications": [
+            {
+               "user": {
+                  "id": "sbrown",
+                  "name": "Susan Brown"
+               },
+               "workflow_changes": {
+                  "category": "created",
+                  "stamp": "niso:AO",
+                  "status": "c"
+               },
+               "diff_changes": [
+                  "7617"
+               ]
+            },
+            {
+               "user": {
+                  "id": "sbrown",
+                  "name": "Susan Brown"
+               },
+               "workflow_changes": {
+                  "category": "content_contribution",
+                  "stamp": "niso:AO",
+                  "status": "c"
+               },
+               "diff_changes": [
+                  "7617"
+               ]
+            },
+            {
+               "user": {
+                  "id": "sbrown",
+                  "name": "Susan Brown"
+               },
+               "workflow_changes": {
+                  "category": "content_contribution",
+                  "stamp": "niso:AO",
+                  "status": "c"
+               },
+               "diff_changes": [
+                  "7617"
+               ]
+            },
+            {
+               "user": {
+                  "id": "sbrown",
+                  "name": "Susan Brown"
+               },
+               "workflow_changes": {
+                  "category": "content_contribution",
+                  "stamp": "niso:AO",
+                  "status": "c"
+               },
+               "diff_changes": [
+                  "7617"
+               ]
+            },
+            {
+               "user": {
+                  "id": "sbrown",
+                  "name": "Susan Brown"
+               },
+               "workflow_changes": {
+                  "category": "content_contribution",
+                  "stamp": "niso:AO",
+                  "status": "c"
+               },
+               "diff_changes": [
+                  "7617"
+               ]
+            },
+            {
+               "user": {
+                  "id": "sbrown",
+                  "name": "Susan Brown"
+               },
+               "workflow_changes": {
+                  "category": "content_contribution",
+                  "stamp": "niso:AO",
+                  "status": "c"
+               },
+               "diff_changes": [
+                  "7617"
+               ]
+            },
+            {
+               "user": {
+                  "id": "sbrown",
+                  "name": "Susan Brown"
+               },
+               "workflow_changes": {
+                  "category": "checked",
+                  "stamp": "niso:AO",
+                  "status": "c"
+               },
+               "diff_changes": [
+                  "7617"
+               ]
+            },
+            {
+               "user": {
+                  "id": "sbrown",
+                  "name": "Susan Brown"
+               },
+               "workflow_changes": {
+                  "category": "user_tagged",
+                  "stamp": "niso:AO",
+                  "status": "c"
+               },
+               "diff_changes": [
+                  "7617"
+               ]
+            },
+            {
+               "user": {
+                  "id": "sbrown",
+                  "name": "Susan Brown"
+               },
+               "workflow_changes": {
+                  "category": "published",
+                  "stamp": "niso:AO",
+                  "status": "c"
+               },
+               "diff_changes": [
+                  "7617"
+               ]
+            },
+            {
+               "user": {
+                  "id": "sbrown",
+                  "name": "Susan Brown"
+               },
+               "workflow_changes": {
+                  "category": "peer_reviewed",
+                  "stamp": "niso:AO",
+                  "status": "c"
+               },
+               "diff_changes": [
+                  "7617"
+               ]
+            },
+            {
+               "user": {
+                  "id": "sbrown",
+                  "name": "Susan Brown"
+               },
+               "workflow_changes": {
+                  "category": "evaluated",
+                  "stamp": "niso:AO",
+                  "status": "c"
+               },
+               "diff_changes": [
+                  "7617"
+               ]
+            },
+            {
+               "user": {
+                  "id": "sbrown",
+                  "name": "Susan Brown"
+               },
+               "workflow_changes": {
+                  "category": "peer_evaluated",
+                  "stamp": "niso:AO",
+                  "status": "c"
+               },
+               "diff_changes": [
+                  "7617"
+               ]
+            },
+            {
+               "user": {
+                  "id": "illovan",
+                  "name": "Mihaela Illovan"
+               },
+               "workflow_changes": {
+                  "category": "created",
+                  "stamp": "niso:AO",
+                  "status": "c"
+               },
+               "diff_changes": [
+                  "7617"
+               ]
+            },
+            {
+               "user": {
+                  "id": "illovan",
+                  "name": "Mihaela Illovan"
+               },
+               "workflow_changes": {
+                  "category": "metadata_contribution",
+                  "stamp": "niso:AO",
+                  "status": "c"
+               },
+               "diff_changes": [
+                  "7617"
+               ]
+            },
+            {
+               "user": {
+                  "id": "illovan",
+                  "name": "Mihaela Illovan"
+               },
+               "workflow_changes": {
+                  "category": "content_contribution",
+                  "stamp": "niso:AO",
+                  "status": "c"
+               },
+               "diff_changes": [
+                  "7617"
+               ]
+            },
+            {
+               "user": {
+                  "id": "illovan",
+                  "name": "Mihaela Illovan"
+               },
+               "workflow_changes": {
+                  "category": "checked",
+                  "stamp": "niso:AO",
+                  "status": "c"
+               },
+               "diff_changes": [
+                  "7617"
+               ]
+            },
+            {
+               "user": {
+                  "id": "illovan",
+                  "name": "Mihaela Illovan"
+               },
+               "workflow_changes": {
+                  "category": "user_tagged",
+                  "stamp": "niso:AO",
+                  "status": "c"
+               },
+               "diff_changes": [
+                  "7617"
+               ]
+            },
+            {
+               "user": {
+                  "id": "illovan",
+                  "name": "Mihaela Illovan"
+               },
+               "workflow_changes": {
+                  "category": "rights_assigned",
+                  "stamp": "niso:AO",
+                  "status": "c"
+               },
+               "diff_changes": [
+                  "7617"
+               ]
+            },
+            {
+               "user": {
+                  "id": "illovan",
+                  "name": "Mihaela Illovan"
+               },
+               "workflow_changes": {
+                  "category": "published",
+                  "stamp": "niso:AO",
+                  "status": "c"
+               },
+               "diff_changes": [
+                  "7617"
+               ]
+            },
+            {
+               "user": {
+                  "id": "illovan",
+                  "name": "Mihaela Illovan"
+               },
+               "workflow_changes": {
+                  "category": "peer_evaluated",
+                  "stamp": "niso:AO",
+                  "status": "c"
+               },
+               "diff_changes": [
+                  "7617"
+               ]
+            }
+         ]
+      },
+      {
+         "id": "cwrc:dcba1234-8765-hgfe-lkjil-xwvutsrqpon2",
+         "name": "Emily Murphy",
+         "modifications": [
+            {
+               "user": {
+                  "id": "illovan",
+                  "name": "Mihaela Illovan"
+               },
+               "workflow_changes": {
+                  "category": "created",
+                  "stamp": "niso:AO",
+                  "status": "c"
+               },
+               "diff_changes": [
+                  "7617"
+               ]
+            },
+            {
+               "user": {
+                  "id": "illovan",
+                  "name": "Mihaela Illovan"
+               },
+               "workflow_changes": {
+                  "category": "metadata_contribution",
+                  "stamp": "niso:AO",
+                  "status": "c"
+               },
+               "diff_changes": [
+                  "7617"
+               ]
+            },
+            {
+               "user": {
+                  "id": "illovan",
+                  "name": "Mihaela Illovan"
+               },
+               "workflow_changes": {
+                  "category": "metadata_contribution",
+                  "stamp": "niso:AO",
+                  "status": "c"
+               },
+               "diff_changes": [
+                  "7617"
+               ]
+            },
+            {
+               "user": {
+                  "id": "illovan",
+                  "name": "Mihaela Illovan"
+               },
+               "workflow_changes": {
+                  "category": "content_contribution",
+                  "stamp": "niso:AO",
+                  "status": "c"
+               },
+               "diff_changes": [
+                  "7617"
+               ]
+            },
+            {
+               "user": {
+                  "id": "illovan",
+                  "name": "Mihaela Illovan"
+               },
+               "workflow_changes": {
+                  "category": "content_contribution",
+                  "stamp": "niso:AO",
+                  "status": "c"
+               },
+               "diff_changes": [
+                  "7617"
+               ]
+            },
+            {
+               "user": {
+                  "id": "illovan",
+                  "name": "Mihaela Illovan"
+               },
+               "workflow_changes": {
+                  "category": "checked",
+                  "stamp": "niso:AO",
+                  "status": "c"
+               },
+               "diff_changes": [
+                  "7617"
+               ]
+            },
+            {
+               "user": {
+                  "id": "illovan",
+                  "name": "Mihaela Illovan"
+               },
+               "workflow_changes": {
+                  "category": "checked",
+                  "stamp": "niso:AO",
+                  "status": "c"
+               },
+               "diff_changes": [
+                  "7617"
+               ]
+            },
+            {
+               "user": {
+                  "id": "illovan",
+                  "name": "Mihaela Illovan"
+               },
+               "workflow_changes": {
+                  "category": "user_tagged",
+                  "stamp": "niso:AO",
+                  "status": "c"
+               },
+               "diff_changes": [
+                  "7617"
+               ]
+            },
+            {
+               "user": {
+                  "id": "illovan",
+                  "name": "Mihaela Illovan"
+               },
+               "workflow_changes": {
+                  "category": "user_tagged",
+                  "stamp": "niso:AO",
+                  "status": "c"
+               },
+               "diff_changes": [
+                  "7617"
+               ]
+            },
+            {
+               "user": {
+                  "id": "illovan",
+                  "name": "Mihaela Illovan"
+               },
+               "workflow_changes": {
+                  "category": "rights_assigned",
+                  "stamp": "niso:AO",
+                  "status": "c"
+               },
+               "diff_changes": [
+                  "7617"
+               ]
+            },
+            {
+               "user": {
+                  "id": "illovan",
+                  "name": "Mihaela Illovan"
+               },
+               "workflow_changes": {
+                  "category": "published",
+                  "stamp": "niso:AO",
+                  "status": "c"
+               },
+               "diff_changes": [
+                  "7617"
+               ]
+            },
+            {
+               "user": {
+                  "id": "illovan",
+                  "name": "Mihaela Illovan"
+               },
+               "workflow_changes": {
+                  "category": "peer_evaluated",
+                  "stamp": "niso:AO",
+                  "status": "c"
+               },
+               "diff_changes": [
+                  "7617"
+               ]
+            },
+            {
+               "user": {
+                  "id": "wood",
+                  "name": "Jeanne Wood"
+               },
+               "workflow_changes": {
+                  "category": "metadata_contribution",
+                  "stamp": "niso:AO",
+                  "status": "c"
+               },
+               "diff_changes": [
+                  "7617"
+               ]
+            },
+            {
+               "user": {
+                  "id": "wood",
+                  "name": "Jeanne Wood"
+               },
+               "workflow_changes": {
+                  "category": "content_contribution",
+                  "stamp": "niso:AO",
+                  "status": "c"
+               },
+               "diff_changes": [
+                  "7617"
+               ]
+            },
+            {
+               "user": {
+                  "id": "wood",
+                  "name": "Jeanne Wood"
+               },
+               "workflow_changes": {
+                  "category": "checked",
+                  "stamp": "niso:AO",
+                  "status": "c"
+               },
+               "diff_changes": [
+                  "7617"
+               ]
+            },
+            {
+               "user": {
+                  "id": "wood",
+                  "name": "Jeanne Wood"
+               },
+               "workflow_changes": {
+                  "category": "checked",
+                  "stamp": "niso:AO",
+                  "status": "c"
+               },
+               "diff_changes": [
+                  "7617"
+               ]
+            },
+            {
+               "user": {
+                  "id": "wood",
+                  "name": "Jeanne Wood"
+               },
+               "workflow_changes": {
+                  "category": "user_tagged",
+                  "stamp": "niso:AO",
+                  "status": "c"
+               },
+               "diff_changes": [
+                  "7617"
+               ]
+            },
+            {
+               "user": {
+                  "id": "wood",
+                  "name": "Jeanne Wood"
+               },
+               "workflow_changes": {
+                  "category": "published",
+                  "stamp": "niso:AO",
+                  "status": "c"
+               },
+               "diff_changes": [
+                  "7617"
+               ]
+            },
+            {
+               "user": {
+                  "id": "wood",
+                  "name": "Jeanne Wood"
+               },
+               "workflow_changes": {
+                  "category": "peer_reviewed",
+                  "stamp": "niso:AO",
+                  "status": "c"
+               },
+               "diff_changes": [
+                  "7617"
+               ]
+            },
+            {
+               "user": {
+                  "id": "brittain",
+                  "name": "Melisa Brittain"
+               },
+               "workflow_changes": {
+                  "category": "metadata_contribution",
+                  "stamp": "niso:AO",
+                  "status": "c"
+               },
+               "diff_changes": [
+                  "7617"
+               ]
+            },
+            {
+               "user": {
+                  "id": "brittain",
+                  "name": "Melisa Brittain"
+               },
+               "workflow_changes": {
+                  "category": "content_contribution",
+                  "stamp": "niso:AO",
+                  "status": "c"
+               },
+               "diff_changes": [
+                  "7617"
+               ]
+            },
+            {
+               "user": {
+                  "id": "brittain",
+                  "name": "Melisa Brittain"
+               },
+               "workflow_changes": {
+                  "category": "checked",
+                  "stamp": "niso:AO",
+                  "status": "c"
+               },
+               "diff_changes": [
+                  "7617"
+               ]
+            },
+            {
+               "user": {
+                  "id": "brittain",
+                  "name": "Melisa Brittain"
+               },
+               "workflow_changes": {
+                  "category": "checked",
+                  "stamp": "niso:AO",
+                  "status": "c"
+               },
+               "diff_changes": [
+                  "7617"
+               ]
+            },
+            {
+               "user": {
+                  "id": "brittain",
+                  "name": "Melisa Brittain"
+               },
+               "workflow_changes": {
+                  "category": "user_tagged",
+                  "stamp": "niso:AO",
+                  "status": "c"
+               },
+               "diff_changes": [
+                  "7617"
+               ]
+            },
+            {
+               "user": {
+                  "id": "brittain",
+                  "name": "Melisa Brittain"
+               },
+               "workflow_changes": {
+                  "category": "published",
+                  "stamp": "niso:AO",
+                  "status": "c"
+               },
+               "diff_changes": [
+                  "7617"
+               ]
+            },
+            {
+               "user": {
+                  "id": "brittain",
+                  "name": "Melisa Brittain"
+               },
+               "workflow_changes": {
+                  "category": "peer_reviewed",
+                  "stamp": "niso:AO",
+                  "status": "c"
+               },
+               "diff_changes": [
+                  "7617"
+               ]
+            },
+            {
+               "user": {
+                  "id": "sbrown",
+                  "name": "Susan Brown"
+               },
+               "workflow_changes": {
+                  "category": "metadata_contribution",
+                  "stamp": "niso:AO",
+                  "status": "c"
+               },
+               "diff_changes": [
+                  "7617"
+               ]
+            },
+            {
+               "user": {
+                  "id": "sbrown",
+                  "name": "Susan Brown"
+               },
+               "workflow_changes": {
+                  "category": "content_contribution",
+                  "stamp": "niso:AO",
+                  "status": "c"
+               },
+               "diff_changes": [
+                  "7617"
+               ]
+            },
+            {
+               "user": {
+                  "id": "sbrown",
+                  "name": "Susan Brown"
+               },
+               "workflow_changes": {
+                  "category": "content_contribution",
+                  "stamp": "niso:AO",
+                  "status": "c"
+               },
+               "diff_changes": [
+                  "7617"
+               ]
+            },
+            {
+               "user": {
+                  "id": "sbrown",
+                  "name": "Susan Brown"
+               },
+               "workflow_changes": {
+                  "category": "content_contribution",
+                  "stamp": "niso:AO",
+                  "status": "c"
+               },
+               "diff_changes": [
+                  "7617"
+               ]
+            },
+            {
+               "user": {
+                  "id": "sbrown",
+                  "name": "Susan Brown"
+               },
+               "workflow_changes": {
+                  "category": "checked",
+                  "stamp": "niso:AO",
+                  "status": "c"
+               },
+               "diff_changes": [
+                  "7617"
+               ]
+            },
+            {
+               "user": {
+                  "id": "sbrown",
+                  "name": "Susan Brown"
+               },
+               "workflow_changes": {
+                  "category": "checked",
+                  "stamp": "niso:AO",
+                  "status": "c"
+               },
+               "diff_changes": [
+                  "7617"
+               ]
+            },
+            {
+               "user": {
+                  "id": "sbrown",
+                  "name": "Susan Brown"
+               },
+               "workflow_changes": {
+                  "category": "user_tagged",
+                  "stamp": "niso:AO",
+                  "status": "c"
+               },
+               "diff_changes": [
+                  "7617"
+               ]
+            },
+            {
+               "user": {
+                  "id": "sbrown",
+                  "name": "Susan Brown"
+               },
+               "workflow_changes": {
+                  "category": "user_tagged",
+                  "stamp": "niso:AO",
+                  "status": "c"
+               },
+               "diff_changes": [
+                  "7617"
+               ]
+            },
+            {
+               "user": {
+                  "id": "sbrown",
+                  "name": "Susan Brown"
+               },
+               "workflow_changes": {
+                  "category": "user_tagged",
+                  "stamp": "niso:AO",
+                  "status": "c"
+               },
+               "diff_changes": [
+                  "7617"
+               ]
+            },
+            {
+               "user": {
+                  "id": "sbrown",
+                  "name": "Susan Brown"
+               },
+               "workflow_changes": {
+                  "category": "user_tagged",
+                  "stamp": "niso:AO",
+                  "status": "c"
+               },
+               "diff_changes": [
+                  "7617"
+               ]
+            },
+            {
+               "user": {
+                  "id": "sbrown",
+                  "name": "Susan Brown"
+               },
+               "workflow_changes": {
+                  "category": "user_tagged",
+                  "stamp": "niso:AO",
+                  "status": "c"
+               },
+               "diff_changes": [
+                  "7617"
+               ]
+            },
+            {
+               "user": {
+                  "id": "sbrown",
+                  "name": "Susan Brown"
+               },
+               "workflow_changes": {
+                  "category": "published",
+                  "stamp": "niso:AO",
+                  "status": "c"
+               },
+               "diff_changes": [
+                  "7617"
+               ]
+            },
+            {
+               "user": {
+                  "id": "sbrown",
+                  "name": "Susan Brown"
+               },
+               "workflow_changes": {
+                  "category": "peer_reviewed",
+                  "stamp": "niso:AO",
+                  "status": "c"
+               },
+               "diff_changes": [
+                  "7617"
+               ]
+            },
+            {
+               "user": {
+                  "id": "harvey",
+                  "name": "Kathryn Harvey"
+               },
+               "workflow_changes": {
+                  "category": "metadata_contribution",
+                  "stamp": "niso:AO",
+                  "status": "c"
+               },
+               "diff_changes": [
+                  "7617"
+               ]
+            },
+            {
+               "user": {
+                  "id": "harvey",
+                  "name": "Kathryn Harvey"
+               },
+               "workflow_changes": {
+                  "category": "content_contribution",
+                  "stamp": "niso:AO",
+                  "status": "c"
+               },
+               "diff_changes": [
+                  "7617"
+               ]
+            },
+            {
+               "user": {
+                  "id": "harvey",
+                  "name": "Kathryn Harvey"
+               },
+               "workflow_changes": {
+                  "category": "checked",
+                  "stamp": "niso:AO",
+                  "status": "c"
+               },
+               "diff_changes": [
+                  "7617"
+               ]
+            },
+            {
+               "user": {
+                  "id": "harvey",
+                  "name": "Kathryn Harvey"
+               },
+               "workflow_changes": {
+                  "category": "checked",
+                  "stamp": "niso:AO",
+                  "status": "c"
+               },
+               "diff_changes": [
+                  "7617"
+               ]
+            },
+            {
+               "user": {
+                  "id": "harvey",
+                  "name": "Kathryn Harvey"
+               },
+               "workflow_changes": {
+                  "category": "published",
+                  "stamp": "niso:AO",
+                  "status": "c"
+               },
+               "diff_changes": [
+                  "7617"
+               ]
+            },
+            {
+               "user": {
+                  "id": "harvey",
+                  "name": "Kathryn Harvey"
+               },
+               "workflow_changes": {
+                  "category": "peer_reviewed",
+                  "stamp": "niso:AO",
+                  "status": "c"
+               },
+               "diff_changes": [
+                  "7617"
+               ]
+            }
+         ]
+      }
+   ]
+}

@@ -1,0 +1,68 @@
+[
+   {
+      "predicate": {
+         "value": "hasModel",
+         "alias": "fedora-model",
+         "namespace": "info:fedora\/fedora-system:def\/model#"
+      },
+      "object": {
+         "literal": false,
+         "value": "cwrc:citationCModel"
+      }
+   },
+   {
+      "predicate": {
+         "value": "isMemberOfCollection",
+         "alias": "fedora",
+         "namespace": "info:fedora\/fedora-system:def\/relations-external#"
+      },
+      "object": {
+         "literal": false,
+         "value": "cwrc:abcd1234-5678-efgh-ijkl-mnopqrstuvwx"
+      }
+   },
+   {
+      "predicate": {
+         "value": "isManageableByUser",
+         "alias": "islandora",
+         "namespace": "http:\/\/islandora.ca\/ontology\/relsext#"
+      },
+      "object": {
+         "literal": true,
+         "value": "admin"
+      }
+   },
+   {
+      "predicate": {
+         "value": "isManageableByUser",
+         "alias": "islandora",
+         "namespace": "http:\/\/islandora.ca\/ontology\/relsext#"
+      },
+      "object": {
+         "literal": true,
+         "value": "fedoraAdmin"
+      }
+   },
+   {
+      "predicate": {
+         "value": "isManageableByRole",
+         "alias": "islandora",
+         "namespace": "http:\/\/islandora.ca\/ontology\/relsext#"
+      },
+      "object": {
+         "literal": true,
+         "value": "administrator"
+      }
+   },
+   {
+      "predicate": {
+         "value": "isManageableByRole",
+         "alias": "islandora",
+         "namespace": "http:\/\/islandora.ca\/ontology\/relsext#"
+      },
+      "object": {
+         "literal": true,
+         "value": "Biblifo"
+      }
+   }
+]
