@@ -343,12 +343,6 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
             return baseline + (top - self.contributionScale(dataRow[0])) / 2;
          });
 
-      //maxValue = d3.max(workTagStack.reduce(function (a, b) {
-      //   return a.concat(b.reduce(function (c, d) {
-      //      return c.concat(d);
-      //   }, []));
-      //}, []));
-
       // === Column totals ===
       totalLabelsVM = self.contentGroup.selectAll('.total-labels')
          .data(self.filteredData, function (d) {
@@ -499,7 +493,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
    CWRC.CreditVisualization.StackedColumnGraph.prototype.updateBottomAxis = function () {
       var self = this;
 
-      var tickGroup, existingTickLabels, userLabelHoverHandler, columnWidth;
+      var tickGroup, existingTickLabels, userLabelHoverHandler, columnWidth, tickFill, tickX, tickY, tickDY;
 
       tickGroup = d3.select('.axis--x');
 
@@ -509,14 +503,12 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
        * replacing each label text with an anchor because we can't change
        * the tick construction process to use anchors instead
        */
-      existingTickLabels = tickGroup.selectAll('.tick > text');
-      if (!existingTickLabels.empty()) {
-         tickFill = existingTickLabels.attr('fill');
-         tickX = existingTickLabels.attr('x');
-         tickY = existingTickLabels.attr('y');
-         tickDY = existingTickLabels.attr('dy');
-         existingTickLabels.remove();
-      }
+      existingTickLabels = tickGroup.selectAll('.tick text');
+      tickFill = existingTickLabels.attr('fill');
+      tickX = existingTickLabels.attr('x');
+      tickY = existingTickLabels.attr('y');
+      tickDY = existingTickLabels.attr('dy');
+      existingTickLabels.remove();
 
       userLabelHoverHandler = function () {
          var user, isEnter;
