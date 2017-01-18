@@ -108,7 +108,7 @@ ko.components.register('credit_visualization', {
 
                self.grapher.filter(newVal ? newVal.id : null)
 
-               self.grapher.constructBars(params.ignoreTags);
+               self.grapher.updateBars(params.ignoreTags);
             });
 
             // TODO: re-enable when we don't need triple-nested ajax :(
@@ -133,13 +133,9 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
       self.containerId = containerId;
       self.svg = d3.select('#' + self.containerId + ' svg');
 
-      this.workTypes = CWRC.CreditVisualization.WorkflowChangeTally.CATEGORIES.slice(0);
+      self.workTypes = CWRC.CreditVisualization.WorkflowChangeTally.CATEGORIES.slice(0);
 
-      //self.filter = {
-      //   user: (new URI()).search(true).user
-      //};
-
-      this.bounds = {
+      self.bounds = {
          padding: {top: 20, right: 20, bottom: 60, left: 60},
          getOuterWidth: function () {
             return +self.svg.attr("width");
@@ -155,22 +151,26 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
          },
          legendWidth: 80
       };
-      this.contentGroup = self.svg.append("g");
+      self.contentGroup = self.svg.append("g");
 
-      this.contentGroup.attr("transform", "translate(" + this.bounds.padding.left + "," + this.bounds.padding.top + ")");
+      self.contentGroup.attr("transform", "translate(" + self.bounds.padding.left + "," + self.bounds.padding.top + ")");
 
-      this.usersScale = d3.scaleBand()
-         .rangeRound([0, this.bounds.getInnerWidth() - this.bounds.legendWidth])
+      self.usersScale = d3.scaleBand()
+         .rangeRound([0, self.bounds.getInnerWidth() - self.bounds.legendWidth])
          .padding(0.1)
          .align(0.1);
 
-      this.contributionScale = d3.scaleLinear()
-         .rangeRound([this.bounds.getInnerHeight(), 0]);
+      self.contributionScale = d3.scaleLinear()
+         .rangeRound([self.bounds.getInnerHeight(), 0]);
 
-      this.colorScale = d3.scaleOrdinal(d3.schemeCategory20c);
+      self.colorScale = d3.scaleOrdinal(d3.schemeCategory20c);
       //.range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
 
       self.data = [];
+
+      self.minimumPercent = 0.01; // minimum value to display; 1.00 == 100%
+
+      console.log('set', self.minimumPercent)
    };
 
    CWRC.CreditVisualization.StackedColumnGraph.prototype.render = function (data, title, titleTarget, mergedTagMap, ignoredTags) {
@@ -198,7 +198,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
 
       this.constructLeftScale();
       this.constructBottomScale();
-      this.constructBars(ignoredTags);
+      this.updateBars(ignoredTags);
       this.constructLegend();
       this.constructTitle(title, titleTarget);
       this.constructNoticeOverlay();
@@ -213,11 +213,11 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
       });
    };
 
-   CWRC.CreditVisualization.StackedColumnGraph.prototype.constructBars = function (ignoredTags) {
+   CWRC.CreditVisualization.StackedColumnGraph.prototype.updateBars = function (ignoredTags) {
       var self = this;
 
       var stackVM, workTagStacker, workTagStack, seriesGroupVM, percentFormat, maxValue, segmentHoverHandler,
-         rectBlocksVM, labelsVM, totalLabelsVM;
+         rectBlocksVM, labelsVM, totalLabelsVM, hasSize;
 
       if (self.data.length <= 0)
          return;
@@ -235,6 +235,10 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
             return c.concat(d);
          }, []));
       }, []));
+
+      hasSize = function (positionsRow) {
+         return Math.abs(positionsRow[0] - positionsRow[1]) > self.minimumPercent;
+      };
 
       self.usersScale.domain(self.filteredData.map(function (d) {
          return JSON.stringify(d.user);
@@ -284,10 +288,10 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
       rectBlocksVM = seriesGroupVM.selectAll("rect")
          .data(function (d) {
             return d;
-         })
+         });
 
       rectBlocksVM.enter()
-         .filter(self.hasSize)// removing the empties cleans up the graph DOM for other conditionals
+         .filter(hasSize)// removing the empties cleans up the graph DOM for other conditionals
          .append("rect")
          .attr("x", function (d) {
             return self.usersScale(JSON.stringify(d.data.user));
@@ -311,7 +315,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
             .attr("class", function (datum) {
                return "labels tag-" + datum.key;
             })
-            //.filter(self.hasSize)
+            //.filter(hasSize)
             .selectAll("text")
             .data(function (d) {
                return d;
@@ -319,7 +323,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
 
       labelsVM
          .enter()
-         .filter(self.hasSize)
+         .filter(hasSize)
          .append("text")
          .text(function (d) {
             var value = d[1] - d[0];
@@ -382,6 +386,23 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
 
       d3.select('.axis--y').call(self.verticalAxis);
       d3.select('.axis--x').call(self.horizontalAxis);
+
+      //self.updateAxes();
+   };
+
+   CWRC.CreditVisualization.StackedColumnGraph.prototype.updateAxes = function () {
+      var self = this;
+
+      self.updateVerticalAxis();
+      self.updateHorizontalAxis();
+   };
+
+   CWRC.CreditVisualization.StackedColumnGraph.prototype.updateVerticalAxis = function () {
+      d3.select('.axis--y').call(this.verticalAxis);
+   };
+
+   CWRC.CreditVisualization.StackedColumnGraph.prototype.updateHorizontalAxis = function () {
+      d3.select('.axis--x').call(this.horizontalAxis);
    };
 
    CWRC.CreditVisualization.StackedColumnGraph.prototype.sanitize = function (data, mergedTagMap) {
@@ -442,18 +463,6 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
       });
 
       return cleanData;
-   };
-
-   CWRC.CreditVisualization.StackedColumnGraph.prototype.hasSize = function (positionsRow) {
-      // TODO: this isn't actually logical to what we want. need to filter
-
-      //console.log(stackGroup)
-
-      //return stackGroup.some(function (positionsRow) {
-      console.log(positionsRow[0], positionsRow[1], positionsRow[0] != positionsRow[1], positionsRow.data)
-
-      return positionsRow[0] != positionsRow[1];
-      //})
    };
 
    CWRC.CreditVisualization.StackedColumnGraph.prototype.constructBottomScale = function () {
