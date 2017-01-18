@@ -482,14 +482,12 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
    CWRC.CreditVisualization.StackedColumnGraph.prototype.constructBottomAxis = function () {
       var self = this;
 
-      var tickGroup, existingTickLabels, tickFill, tickX, tickY, tickDY, columnWidth, userLabelHoverHandler;
-
       self.horizontalAxis = d3.axisBottom(self.usersScale)
          .tickFormat(function (datum) {
             return JSON.parse(datum).name;
          });
 
-      tickGroup = self.contentGroup.append("g")
+      self.contentGroup.append("g")
          .attr("class", "axis axis--x")
          .attr("transform", "translate(0," + self.bounds.getInnerHeight() + ")")
          .call(self.horizontalAxis);
