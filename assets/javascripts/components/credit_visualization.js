@@ -243,22 +243,23 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
       columnWidth = self.usersScale.bandwidth();
 
       // create one group for each work type
-      stackVM = self.contentGroup.selectAll('.series')
-         .data(workTagStack, function (d) {
-            // need this to compare by item, not by list index
-            return (d);
-         });
+      stackVM = self.contentGroup
+         .selectAll('g.series')
+         .data(workTagStack)
+      //.data(workTagStack, function (d) {
+      //   // need this to compare by item, not by list index
+      //   return d;
+      //});
 
-      seriesGroupVM =
-         stackVM.enter()
-            .append("g")
-            //.merge(stackVM)
-            .attr("class", function (datum) {
-               return "series tag-" + datum.key;
-            })
-            .attr("fill", function (d) {
-               return self.colorScale(d.key);
-            });
+      stackVM.enter()
+         .append("g")
+         .merge(stackVM)
+         .attr("class", function (datum) {
+            return "series tag-" + datum.key;
+         })
+         .attr("fill", function (d) {
+            return self.colorScale(d.key);
+         });
 
 
       segmentHoverHandler = function (d, rowNumber, group) {
@@ -283,19 +284,23 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
 
       // === The actual graphic rects ===
       rectBlocksVM =
-         seriesGroupVM
+         stackVM
             .selectAll("rect")
             .data(function (d) {
-               console.log(d)
+               console.log('update rect:', d)
 
                return d;
             });
 
-      rectBlocksVM.enter()
-         .filter(hasSize)// removing the empties cleans up the graph DOM for other conditionals
+      rectBlocksVM
+         .enter()
+         //.merge(rectBlocksVM)
+         //.filter(hasSize)// removing the empties cleans up the graph DOM for other conditionals
          .append("rect")
-         //.merge(seriesGroupVM)
+         .merge(rectBlocksVM)
          .attr("x", function (d) {
+            console.log('enter + upate rect rect:', d)
+
             return self.usersScale(JSON.stringify(d.data.user));
          })
          .attr("y", function (dataRow) {
@@ -312,74 +317,76 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
          .on("mouseout", segmentHoverHandler);
 
       // === Column segment labels ===
-      percentFormat = d3.format(".0%");
+      /*
+       percentFormat = d3.format(".0%");
 
-      labelsVM =
-         seriesGroupVM
-            .append("g")
-            .attr("class", function (datum) {
-               return "labels tag-" + datum.key;
-            })
-            //.filter(hasSize)
-            .selectAll("text")
-            .data(function (d) {
-               return d;
-            });
+       labelsVM =
+       seriesGroupVM
+       .append("g")
+       .attr("class", function (datum) {
+       return "labels tag-" + datum.key;
+       })
+       //.filter(hasSize)
+       .selectAll("text")
+       .data(function (d) {
+       return d;
+       });
 
-      labelsVM
-         .enter()
-         //.merge(labelsVM)
-         .filter(hasSize)
-         .append("text")
-         .text(function (d) {
-            var value = d[1] - d[0];
+       labelsVM
+       .enter()
+       //.merge(labelsVM)
+       .filter(hasSize)
+       .append("text")
+       .text(function (d) {
+       var value = d[1] - d[0];
 
-            return value > 0 ? percentFormat(value) : '';
-         })
-         .attr("x", function (d) {
-            return self.usersScale(JSON.stringify(d.data.user)) + columnWidth / 2;
-         })
-         .attr("y", function (dataRow) {
-            var baseline = self.contributionScale(dataRow[0]);
-            var top = self.contributionScale(dataRow[1]);
+       return value > 0 ? percentFormat(value) : '';
+       })
+       .attr("x", function (d) {
+       return self.usersScale(JSON.stringify(d.data.user)) + columnWidth / 2;
+       })
+       .attr("y", function (dataRow) {
+       var baseline = self.contributionScale(dataRow[0]);
+       var top = self.contributionScale(dataRow[1]);
 
-            return baseline + (top - self.contributionScale(dataRow[0])) / 2;
-         });
+       return baseline + (top - self.contributionScale(dataRow[0])) / 2;
+       });
 
-      // === Column totals ===
-      totalLabelsVM = self.contentGroup.selectAll('.total-labels')
-         .data(self.filteredData, function (d) {
-            // need this to compare by item, not by list index
-            return d.user.id;
-         });
+       // === Column totals ===
+       totalLabelsVM = self.contentGroup.selectAll('.total-labels')
+       .data(self.filteredData, function (d) {
+       // need this to compare by item, not by list index
+       return d.user.id;
+       });
 
-      totalLabelsVM.enter()
-         .append('g')
-         .attr("class", function (datum) {
-            return "total-labels total-label-user-" + datum.user.id;
-         })
-         .append("text")
-         .text(function (d) {
-            return percentFormat((self.countChanges(d) || 0) / (self.allChangesCount || 1));
-         })
-         .attr('x', function (d) {
-            return self.usersScale(JSON.stringify(d.user)) + columnWidth / 2;
-         })
-         .attr('y', function (datum, index) {
-            var finalStackRow, userSegment, segmentTop;
+       totalLabelsVM.enter()
+       .append('g')
+       .attr("class", function (datum) {
+       return "total-labels total-label-user-" + datum.user.id;
+       })
+       .append("text")
+       .text(function (d) {
+       return percentFormat((self.countChanges(d) || 0) / (self.allChangesCount || 1));
+       })
+       .attr('x', function (d) {
+       return self.usersScale(JSON.stringify(d.user)) + columnWidth / 2;
+       })
+       .attr('y', function (datum, index) {
+       var finalStackRow, userSegment, segmentTop;
 
-            // each stack row is all segments within a category, so last one is top
-            finalStackRow = workTagStack[workTagStack.length - 1];
-            userSegment = finalStackRow[index]; // the value pair for this column
-            segmentTop = userSegment[1];
+       // each stack row is all segments within a category, so last one is top
+       finalStackRow = workTagStack[workTagStack.length - 1];
+       userSegment = finalStackRow[index]; // the value pair for this column
+       segmentTop = userSegment[1];
 
-            return self.contributionScale(segmentTop) - 4;
-         });
+       return self.contributionScale(segmentTop) - 4;
+       });
+       */
 
       stackVM.exit().remove();
-      labelsVM.exit().remove();
+      //labelsVM.exit().remove();
       rectBlocksVM.exit().remove();
-      totalLabelsVM.exit().remove();
+      //totalLabelsVM.exit().remove();
 
       self.updateAxes();
    };
