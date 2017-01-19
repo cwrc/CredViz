@@ -34,44 +34,40 @@ ko.components.register('credit_visualization', {
 
          var currentURI = new URI();
 
-         ajax('get', '/services/credit_viz' + currentURI.search(), false, function (response) {
+
+         ajax('get', '/services/credit_viz' + currentURI.search(), false, function (credViz) {
             var data, title, multiDoc, titleTarget;
 
             // TODO: infer this from URI param, eg collectionid=5b1...k8y&docId=yz10-ab...
             multiDoc = !params.isDoc;//false;
 
-            if (multiDoc) {
-               data = response.documents.reduce(function (aggregate, document) {
-                  return aggregate.concat(document.modifications);
-               }, []);
+            var document = credViz.documents[0];
 
-               // TODO: re-enable when we don't need triple-nested ajax :(
-               //title = response.name;
+            /**
+             * TODO: When/if the credit_viz service is capable of returning a result with both the project name
+             * TODO: and the project's id, these next two ajax calls will become redundant, and can be collapsed
+             */
 
-               /**
-                * TODO: When/if the credit_viz service is capable of returning a result with both 1. the project name
-                * TODO: and 2. the project's id, these next two ajax calls will become redundant, and can be collapsed
-                * TODO: with the single-document render() call below
-                */
+            ajax('get', '/islandora/rest/v1/object/' + document.id + '/relationship', null, function (relationships) {
+               var parentRelationship, parentId;
 
-               var firstObject = response.documents[0];
+               parentRelationship = relationships.find(function (relationship) {
+                  return relationship.predicate.value == 'isMemberOfCollection'
+               });
 
-               ajax('get', '/islandora/rest/v1/object/' + firstObject.id + '/relationship', null, function (response) {
-                  var parentRelationship, parentId;
+               // object.value is the value of the isMemberOfCollection relationship
+               parentId = parentRelationship.object.value;
 
-                  parentRelationship = response.find(function (relationship) {
-                     return relationship.predicate.value == 'isMemberOfCollection'
-                  });
+               ajax('get', '/islandora/rest/v1/object/' + parentId, null, function (objectDetails) {
+                  title = objectDetails.label;
 
-                  // object.value is the value of the isMemberOfCollection relationship
-                  parentId = parentRelationship.object.value;
-                  titleTarget = '/islandora/object/' + parentId;
-
-                  ajax('get', '/islandora/rest/v1/object/' + parentId, null, function (response) {
-                     title = response.label;
+                  if (multiDoc) {
+                     data = credViz.documents.reduce(function (aggregate, document) {
+                        return aggregate.concat(document.modifications);
+                     }, []);
 
                      self.users(data.map(function (datum) {
-                        return datum.user
+                        return datum.user;
                      }).reduce(function (aggregate, user) {
                         if (!aggregate.find(function (u) {
                               return u.name == user.name;
@@ -82,37 +78,36 @@ ko.components.register('credit_visualization', {
                         return aggregate;
                      }, []));
 
-                     self.grapher.render(data, title, titleTarget, params.mergeTags, params.ignoreTags);
-                  });
+                     title = credViz.name;
+                     titleTarget = '/islandora/object/' + parentId;
+                  } else if (!multiDoc) {
+                     data = document.modifications;
+
+                     self.users(data.map(function (datum) {
+                        return datum.user;
+                     }).reduce(function (aggregate, user) {
+                        if (!aggregate.find(function (u) {
+                              return u.name == user.name;
+                           })) {
+                           aggregate.push(user);
+                        }
+
+                        return aggregate;
+                     }, []));
+
+                     title = document.name;
+                     titleTarget = '/islandora/object/' + document.id;
+                  }
+
+                  self.grapher.render(data, title, titleTarget, params.mergeTags, params.ignoreTags);
                });
-
-               //titleTarget = '/islandora/object/' + doc.id;
-            } else if (!multiDoc) {
-               var doc = response.documents[0];
-
-               data = doc.modifications;
-
-               title = doc.name;
-               titleTarget = '/islandora/object/' + doc.id;
-
-               //self.grapher.render(data, title, titleTarget, params.mergeTags, params.ignoreTags, self.filter.user().id);
-            }
+            });
 
             self.filter.user.subscribe(function (newVal) {
-               //self.grapher.clear()
-               //self.grapher.render(data, title, titleTarget, params.mergeTags, params.ignoreTags, self.filter.user().id);
-
-               //self.grapher.data = (self.grapher.data || []).filter(function (datum) {
-               //   return !newVal || datum.user.id == newVal.id;
-               //});
-
                self.grapher.filter(newVal ? newVal.id : null)
 
                self.grapher.updateBars(params.ignoreTags);
             });
-
-            // TODO: re-enable when we don't need triple-nested ajax :(
-            //self.grapher.render(data, title, titleTarget, params.mergeTags, params.ignoreTags);
          });
       };
 
@@ -206,7 +201,6 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
 
       self.filteredData = (self.data || []).filter(function (datum) {
          return !filterUser || datum.user.id == filterUser;
-         //return !self.filter.user || datum.user.id == self.filter.user;
       });
    };
 
@@ -473,7 +467,8 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
    };
 
    CWRC.CreditVisualization.StackedColumnGraph.prototype.updateLeftAxis = function () {
-      d3.select('.axis--y').call(this.verticalAxis);
+      this.svg
+         .select('.axis--y').call(this.verticalAxis);
    };
 
    CWRC.CreditVisualization.StackedColumnGraph.prototype.constructBottomAxis = function () {
@@ -495,7 +490,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
 
       var tickGroup, existingTickLabels, userLabelHoverHandler, columnWidth, tickFill, tickX, tickY, tickDY;
 
-      tickGroup = d3.select('.axis--x');
+      tickGroup = self.svg.select('.axis--x');
 
       tickGroup.call(this.horizontalAxis);
 
