@@ -34,7 +34,6 @@ ko.components.register('credit_visualization', {
 
          var currentURI = new URI();
 
-
          ajax('get', '/services/credit_viz' + currentURI.search(), false, function (credViz) {
             var data, title, multiDoc, titleTarget;
 
@@ -253,6 +252,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
       seriesGroupVM =
          stackVM.enter()
             .append("g")
+            //.merge(stackVM)
             .attr("class", function (datum) {
                return "series tag-" + datum.key;
             })
@@ -282,21 +282,29 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
       };
 
       // === The actual graphic rects ===
-      rectBlocksVM = seriesGroupVM.selectAll("rect")
-         .data(function (d) {
-            return d;
-         });
+      rectBlocksVM =
+         seriesGroupVM
+            .selectAll("rect")
+            .data(function (d) {
+               console.log(d)
+
+               return d;
+            });
 
       rectBlocksVM.enter()
          .filter(hasSize)// removing the empties cleans up the graph DOM for other conditionals
          .append("rect")
+         //.merge(seriesGroupVM)
          .attr("x", function (d) {
             return self.usersScale(JSON.stringify(d.data.user));
          })
          .attr("y", function (dataRow) {
+            //console.log(dataRow)
             return self.contributionScale(dataRow[1]);
          })
          .attr("height", function (dataRow) {
+            //console.log(dataRow)
+
             return self.contributionScale(dataRow[0]) - self.contributionScale(dataRow[1]);
          })
          .attr("width", columnWidth)
@@ -320,6 +328,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
 
       labelsVM
          .enter()
+         //.merge(labelsVM)
          .filter(hasSize)
          .append("text")
          .text(function (d) {
@@ -370,10 +379,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
       stackVM.exit().remove();
       labelsVM.exit().remove();
       rectBlocksVM.exit().remove();
-      totalLabelsVM.exit()
-         .filter(function (d) {
-            return true
-         }).remove();
+      totalLabelsVM.exit().remove();
 
       self.updateAxes();
    };
