@@ -15,7 +15,7 @@ credit_visualization svg g.series rect.highlight {
    stroke-width: 1px;
 }
 
-credit_visualization svg g.labels text {
+credit_visualization svg g.series text {
    display: none;
 
    text-anchor: middle;
@@ -30,7 +30,7 @@ credit_visualization svg g.labels text {
    pointer-events: none;
 }
 
-credit_visualization svg g.labels text.highlight {
+credit_visualization svg g.series text.highlight {
    display: inherit;
 }
 

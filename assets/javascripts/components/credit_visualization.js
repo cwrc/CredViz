@@ -261,14 +261,16 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
             return self.colorScale(d.key);
          });
 
+      stackVM.exit().remove();
 
+      // === The actual graphic rects ===
       segmentHoverHandler = function (d, rowNumber, group) {
          var keyName, isMouseEnter;
          isMouseEnter = d3.event.type == 'mouseover';
 
          keyName = d3.select(this.parentNode).datum().key;
 
-         // assign the 'highlight' class to hovered elements & unassign it from unhovered ones
+         // assigns the 'highlight' class to hovered elements & unassign it from unhovered ones
          d3.select(d3.event.target).classed("highlight", isMouseEnter);
 
          // do the same for the corresponding legend category
@@ -282,24 +284,22 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
             .classed('highlight', isMouseEnter);
       };
 
-      // === The actual graphic rects ===
       rectBlocksVM =
          stackVM
-            .selectAll("rect")
+            .selectAll("rect") // get the existing rectangles
             .data(function (d) {
-               console.log('update rect:', d)
-
+               //console.log('update rect:', d)
+               //
                return d;
             });
 
       rectBlocksVM
-         .enter()
-         //.merge(rectBlocksVM)
+         .enter()// for new data items...
          //.filter(hasSize)// removing the empties cleans up the graph DOM for other conditionals
-         .append("rect")
-         .merge(rectBlocksVM)
+         .insert("rect", ':first-child')// add a rect & add it at the front to ensure that labels draw on top
+         .merge(rectBlocksVM) // and now update properties on both the new rects and existing ones
          .attr("x", function (d) {
-            console.log('enter + upate rect rect:', d)
+            //console.log('enter + upate rect rect:', d)
 
             return self.usersScale(JSON.stringify(d.data.user));
          })
@@ -317,41 +317,76 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
          .on("mouseout", segmentHoverHandler);
 
       // === Column segment labels ===
+
+      percentFormat = d3.format(".0%");
+
+      labelsVM = stackVM
+         .selectAll('text')
+         .data(function (d) {
+            console.log('update label:', d)
+
+            return d;
+         });
+
+      labelsVM
+         .enter()
+         .append('text')
+         .merge(labelsVM)
+         .text(function (d) {
+            var value = d[1] - d[0];
+
+            return value > 0 ? percentFormat(value) : '';
+         })
+         .attr("x", function (d) {
+            console.log(d)
+
+            return self.usersScale(JSON.stringify(d.data.user)) + columnWidth / 2;
+         })
+         .attr("y", function (dataRow) {
+            var baseline = self.contributionScale(dataRow[0]);
+            var top = self.contributionScale(dataRow[1]);
+
+            return baseline + (top - self.contributionScale(dataRow[0])) / 2;
+         });
+
+
+      //labelsVM =
+      //   stackVM
+      //      .enter()
+      //      .append("g")
+      //      .merge(stackVM)
+      //      .attr("class", function (datum) {
+      //         return "labels tag-" + datum.key;
+      //      })
+      //      //.filter(hasSize)
+      //      .selectAll("text")
+      //      .data(function (d) {
+      //         return d;
+      //      });
+      //
+      //labelsVM
+      //   .enter()
+      //   //.merge(labelsVM)
+      //   //.filter(hasSize)
+      //   .append("text")
+      //   .text(function (d) {
+      //      var value = d[1] - d[0];
+      //
+      //      return value > 0 ? percentFormat(value) : '';
+      //   })
+      //   .attr("x", function (d) {
+      //      return self.usersScale(JSON.stringify(d.data.user)) + columnWidth / 2;
+      //   })
+      //   .attr("y", function (dataRow) {
+      //      var baseline = self.contributionScale(dataRow[0]);
+      //      var top = self.contributionScale(dataRow[1]);
+      //
+      //      return baseline + (top - self.contributionScale(dataRow[0])) / 2;
+      //   });
+
+      labelsVM.exit().remove();
+
       /*
-       percentFormat = d3.format(".0%");
-
-       labelsVM =
-       seriesGroupVM
-       .append("g")
-       .attr("class", function (datum) {
-       return "labels tag-" + datum.key;
-       })
-       //.filter(hasSize)
-       .selectAll("text")
-       .data(function (d) {
-       return d;
-       });
-
-       labelsVM
-       .enter()
-       //.merge(labelsVM)
-       .filter(hasSize)
-       .append("text")
-       .text(function (d) {
-       var value = d[1] - d[0];
-
-       return value > 0 ? percentFormat(value) : '';
-       })
-       .attr("x", function (d) {
-       return self.usersScale(JSON.stringify(d.data.user)) + columnWidth / 2;
-       })
-       .attr("y", function (dataRow) {
-       var baseline = self.contributionScale(dataRow[0]);
-       var top = self.contributionScale(dataRow[1]);
-
-       return baseline + (top - self.contributionScale(dataRow[0])) / 2;
-       });
-
        // === Column totals ===
        totalLabelsVM = self.contentGroup.selectAll('.total-labels')
        .data(self.filteredData, function (d) {
@@ -383,8 +418,6 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
        });
        */
 
-      stackVM.exit().remove();
-      //labelsVM.exit().remove();
       rectBlocksVM.exit().remove();
       //totalLabelsVM.exit().remove();
 
