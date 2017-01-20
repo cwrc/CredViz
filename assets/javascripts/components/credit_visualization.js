@@ -286,16 +286,14 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
          seriesVM
             .selectAll("rect") // get the existing rectangles
             .data(function (d) {
-               //console.log('update rect:', d)
-               //
                return d;
             });
 
       rectBlocksVM
          .enter()// for new data items...
-         //.filter(hasSize)// removing the empties cleans up the graph DOM for other conditionals
          .insert("rect", ':first-child')// add a rect & add it at the front to ensure that labels draw on top
          .merge(rectBlocksVM) // and now update properties on both the new rects and existing ones
+         .filter(hasSize)// removing the empties cleans up the graph DOM for other conditionals
          .attr("x", function (d) {
             //console.log('enter + upate rect rect:', d)
 
@@ -330,6 +328,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
          .enter()
          .append('text')
          .merge(labelsVM)
+         .filter(hasSize)// removing the empties cleans up the graph DOM for other conditionals
          .text(function (d) {
             var value = d[1] - d[0];
 
