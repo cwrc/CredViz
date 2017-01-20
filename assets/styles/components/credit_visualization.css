@@ -34,13 +34,13 @@ credit_visualization svg g.series text.highlight {
    display: inherit;
 }
 
-credit_visualization svg g.total-labels text {
+credit_visualization svg text.total-label {
    display: none;
 
    text-anchor: middle
 }
 
-credit_visualization svg g.total-labels.highlight text {
+credit_visualization svg text.total-label.highlight {
    display: inherit;
 
    font-size: 1.25em;
