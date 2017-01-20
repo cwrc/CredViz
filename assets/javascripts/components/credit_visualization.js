@@ -99,6 +99,7 @@ ko.components.register('credit_visualization', {
                   }
 
                   self.grapher.render(data, title, titleTarget, params.mergeTags, params.ignoreTags);
+                  self.filter.user(null); // trigger another redraw
                });
             });
 
@@ -208,9 +209,6 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
 
       var seriesVM, workTagStacker, workTagStack, formatPercent, maxValue, segmentHoverHandler,
          rectBlocksVM, labelsVM, totalLabelsVM, hasSize, columnWidth, columnWidthThreshold, drawableCanvasWidth;
-
-      if (self.data.length <= 0)
-         return;
 
       workTagStacker = d3.stack()
          .keys(self.workTypes)
