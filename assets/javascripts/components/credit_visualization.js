@@ -349,37 +349,35 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
 
       labelsVM.exit().remove();
 
-      /*
-       // === Column totals ===
-       totalLabelsVM = self.contentGroup.selectAll('.total-labels')
-       .data(self.filteredData, function (d) {
-       // need this to compare by item, not by list index
-       return d.user.id;
-       });
+      // === Column totals ===
+      totalLabelsVM = self.contentGroup.selectAll('.total-labels')
+         .data(self.filteredData, function (d) {
+            // need this to compare by item, not by list index
+            return d.user.id;
+         });
 
-       totalLabelsVM.enter()
-       .append('g')
-       .attr("class", function (datum) {
-       return "total-labels total-label-user-" + datum.user.id;
-       })
-       .append("text")
-       .text(function (d) {
-       return percentFormat((self.countChanges(d) || 0) / (self.allChangesCount || 1));
-       })
-       .attr('x', function (d) {
-       return self.usersScale(JSON.stringify(d.user)) + columnWidth / 2;
-       })
-       .attr('y', function (datum, index) {
-       var finalStackRow, userSegment, segmentTop;
+      totalLabelsVM.enter()
+         .append('g')
+         .attr("class", function (datum) {
+            return "total-labels total-label-user-" + datum.user.id;
+         })
+         .append("text")
+         .text(function (d) {
+            return formatPercent((self.countChanges(d) || 0) / (self.allChangesCount || 1));
+         })
+         .attr('x', function (d) {
+            return self.usersScale(JSON.stringify(d.user)) + columnWidth / 2;
+         })
+         .attr('y', function (datum, index) {
+            var finalStackRow, userSegment, segmentTop;
 
-       // each stack row is all segments within a category, so last one is top
-       finalStackRow = workTagStack[workTagStack.length - 1];
-       userSegment = finalStackRow[index]; // the value pair for this column
-       segmentTop = userSegment[1];
+            // each stack row is all segments within a category, so last one is top
+            finalStackRow = workTagStack[workTagStack.length - 1];
+            userSegment = finalStackRow[index]; // the value pair for this column
+            segmentTop = userSegment[1];
 
-       return self.contributionScale(segmentTop) - 4;
-       });
-       */
+            return self.contributionScale(segmentTop) - 4;
+         });
 
       //totalLabelsVM.exit().remove();
 
