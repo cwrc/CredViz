@@ -206,7 +206,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
    CWRC.CreditVisualization.StackedColumnGraph.prototype.updateBars = function (ignoredTags) {
       var self = this;
 
-      var stackVM, workTagStacker, workTagStack, seriesGroupVM, percentFormat, maxValue, segmentHoverHandler,
+      var stackVM, workTagStacker, workTagStack, seriesGroupVM, formatPercent, maxValue, segmentHoverHandler,
          rectBlocksVM, labelsVM, totalLabelsVM, hasSize, columnWidth, columnWidthThreshold, drawableCanvasWidth;
 
       if (self.data.length <= 0)
@@ -316,15 +316,15 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
          .on("mouseover", segmentHoverHandler)
          .on("mouseout", segmentHoverHandler);
 
+      rectBlocksVM.exit().remove();
+
       // === Column segment labels ===
 
-      percentFormat = d3.format(".0%");
+      formatPercent = d3.format(".0%");
 
       labelsVM = stackVM
          .selectAll('text')
          .data(function (d) {
-            console.log('update label:', d)
-
             return d;
          });
 
@@ -335,11 +335,9 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
          .text(function (d) {
             var value = d[1] - d[0];
 
-            return value > 0 ? percentFormat(value) : '';
+            return value > 0 ? formatPercent(value) : '';
          })
          .attr("x", function (d) {
-            console.log(d)
-
             return self.usersScale(JSON.stringify(d.data.user)) + columnWidth / 2;
          })
          .attr("y", function (dataRow) {
@@ -348,41 +346,6 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
 
             return baseline + (top - self.contributionScale(dataRow[0])) / 2;
          });
-
-
-      //labelsVM =
-      //   stackVM
-      //      .enter()
-      //      .append("g")
-      //      .merge(stackVM)
-      //      .attr("class", function (datum) {
-      //         return "labels tag-" + datum.key;
-      //      })
-      //      //.filter(hasSize)
-      //      .selectAll("text")
-      //      .data(function (d) {
-      //         return d;
-      //      });
-      //
-      //labelsVM
-      //   .enter()
-      //   //.merge(labelsVM)
-      //   //.filter(hasSize)
-      //   .append("text")
-      //   .text(function (d) {
-      //      var value = d[1] - d[0];
-      //
-      //      return value > 0 ? percentFormat(value) : '';
-      //   })
-      //   .attr("x", function (d) {
-      //      return self.usersScale(JSON.stringify(d.data.user)) + columnWidth / 2;
-      //   })
-      //   .attr("y", function (dataRow) {
-      //      var baseline = self.contributionScale(dataRow[0]);
-      //      var top = self.contributionScale(dataRow[1]);
-      //
-      //      return baseline + (top - self.contributionScale(dataRow[0])) / 2;
-      //   });
 
       labelsVM.exit().remove();
 
@@ -418,7 +381,6 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
        });
        */
 
-      rectBlocksVM.exit().remove();
       //totalLabelsVM.exit().remove();
 
       self.updateAxes();
