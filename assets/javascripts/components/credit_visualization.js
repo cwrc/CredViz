@@ -316,7 +316,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
 
       // === Column segment labels ===
 
-      formatPercent = d3.format(".0%");
+      formatPercent = d3.format(".1%");
 
       labelsVM = seriesVM
          .selectAll('text')
@@ -456,7 +456,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
 
       self.verticalAxis = d3.axisLeft(self.contributionScale)
          .ticks(10, "s")
-         .tickFormat(d3.format(".0%"));
+         .tickFormat(d3.format(".1%"));
 
       tickLine = self.contentGroup
          .append("g")
