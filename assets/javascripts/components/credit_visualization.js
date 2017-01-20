@@ -243,7 +243,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
       // create one group for each work type
       seriesVM = self.contentGroup
          .selectAll('g.series')
-         .data(workTagStack)
+         .data(workTagStack);
       //.data(workTagStack, function (d) {
       //   // need this to compare by item, not by list index
       //   return d;
@@ -379,102 +379,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
             return self.contributionScale(segmentTop) - 4;
          });
 
-      //.append('text')
-      //.text(function (d) {
-      //   return formatPercent((self.countChanges(d) || 0) / (self.allChangesCount || 1));
-      //})
-      //.attr('x', function (d) {
-      //   return self.usersScale(JSON.stringify(d.user)) + columnWidth / 2;
-      //})
-      //.attr('y', function (datum, index) {
-      //   var finalStackRow, userSegment, segmentTop;
-      //
-      //   // each stack row is all segments within a category, so last one is top
-      //   finalStackRow = workTagStack[workTagStack.length - 1];
-      //   userSegment = finalStackRow[index]; // the value pair for this column
-      //   segmentTop = userSegment[1];
-      //
-      //   return self.contributionScale(segmentTop) - 4;
-      //});
-
-      // try just adding teh text labels directly, and skip the group entirely.
-      //
-      //var derp =
-      //   totalLabelGroups
-      //      .enter()
-      //      //.selectAll('g.total-label')
-      //      .append('text')
-      //      .text(function (d) {
-      //         return formatPercent((self.countChanges(d) || 0) / (self.allChangesCount || 1));
-      //      })
-      //      .attr('x', function (d) {
-      //         return self.usersScale(JSON.stringify(d.user)) + columnWidth / 2;
-      //      })
-      //      .attr('y', function (datum, index) {
-      //         var finalStackRow, userSegment, segmentTop;
-      //
-      //         // each stack row is all segments within a category, so last one is top
-      //         finalStackRow = workTagStack[workTagStack.length - 1];
-      //         userSegment = finalStackRow[index]; // the value pair for this column
-      //         segmentTop = userSegment[1];
-      //
-      //         return self.contributionScale(segmentTop) - 4;
-      //      });
-
-
       totalLabelGroups.exit().remove();
-
-      //totalLabelsVM =
-      //   totalLabelGroups
-      //   //.enter()
-      //   //.merge(totalLabelGroups)
-      //      .selectAll('text')
-      //      .data(function (d) {
-      //         console.log('sadface', d)
-      //         return d;
-      //      });
-      //
-      //totalLabelsVM
-      //////.enter()
-      //   .append('text')
-      //   //   //.merge(totalLabelsVM)
-      //   .text('nermal')
-
-      //totalLabelsVM =
-      //   self.contentGroup
-      //      .selectAll('.total-labels')
-      //      .data(self.filteredData, function (d) {
-      //         // need this to compare by item, not by list index
-      //         return d.user.id;
-      //      });
-      //
-      //totalLabelsVM.enter()
-      //   .append('g')
-      //   .attr("class", function (datum) {
-      //      return "total-labels total-label-user-" + datum.user.id;
-      //   })
-      //   .append("text")
-      //   .merge(totalLabelsVM)
-      //   .text(function (d) {
-      //      console.log(d)
-      //
-      //      return formatPercent((self.countChanges(d) || 0) / (self.allChangesCount || 1));
-      //   })
-      //   .attr('x', function (d) {
-      //      return self.usersScale(JSON.stringify(d.user)) + columnWidth / 2;
-      //   })
-      //   .attr('y', function (datum, index) {
-      //      var finalStackRow, userSegment, segmentTop;
-      //
-      //      // each stack row is all segments within a category, so last one is top
-      //      finalStackRow = workTagStack[workTagStack.length - 1];
-      //      userSegment = finalStackRow[index]; // the value pair for this column
-      //      segmentTop = userSegment[1];
-      //
-      //      return self.contributionScale(segmentTop) - 4;
-      //   });
-      //
-      //totalLabelsVM.exit().remove();
 
       self.updateAxes();
    };
