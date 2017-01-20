@@ -173,8 +173,6 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
          self.workTypes.splice(self.workTypes.indexOf(tag), 1)
       });
 
-      console.log('render')
-
       data = self.sanitize(data, mergedTagMap);
 
       data = data.sort(function (a, b) {
@@ -295,20 +293,16 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
          .merge(rectBlocksVM) // and now update properties on both the new rects and existing ones
          .filter(hasSize)// removing the empties cleans up the graph DOM for other conditionals
          .attr("x", function (d) {
-            //console.log('enter + upate rect rect:', d)
-
             return self.usersScale(JSON.stringify(d.data.user));
          })
          .attr("y", function (dataRow) {
-            //console.log(dataRow)
             return self.contributionScale(dataRow[1]);
          })
          .attr("height", function (dataRow) {
-            //console.log(dataRow)
-
             return self.contributionScale(dataRow[0]) - self.contributionScale(dataRow[1]);
          })
          .attr("width", columnWidth)
+         .classed('filled', true)
          .on("mouseover", segmentHoverHandler)
          .on("mouseout", segmentHoverHandler);
 
@@ -334,6 +328,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
 
             return value > 0 ? formatPercent(value) : '';
          })
+         .classed('filled', true)
          .attr("x", function (d) {
             return self.usersScale(JSON.stringify(d.data.user)) + columnWidth / 2;
          })
@@ -569,7 +564,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
             .classed("highlight", isEnter);
 
          segments = self.svg.selectAll('.tag-' + columnName)
-            .selectAll('rect, text');
+            .selectAll('rect.filled, text.filled');
 
          if (segments.size() > 0) {
             segments.classed("highlight", isEnter);
