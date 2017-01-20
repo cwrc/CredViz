@@ -206,7 +206,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
    CWRC.CreditVisualization.StackedColumnGraph.prototype.updateBars = function (ignoredTags) {
       var self = this;
 
-      var stackVM, workTagStacker, workTagStack, seriesGroupVM, formatPercent, maxValue, segmentHoverHandler,
+      var seriesVM, workTagStacker, workTagStack, formatPercent, maxValue, segmentHoverHandler,
          rectBlocksVM, labelsVM, totalLabelsVM, hasSize, columnWidth, columnWidthThreshold, drawableCanvasWidth;
 
       if (self.data.length <= 0)
@@ -243,7 +243,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
       columnWidth = self.usersScale.bandwidth();
 
       // create one group for each work type
-      stackVM = self.contentGroup
+      seriesVM = self.contentGroup
          .selectAll('g.series')
          .data(workTagStack)
       //.data(workTagStack, function (d) {
@@ -251,9 +251,9 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
       //   return d;
       //});
 
-      stackVM.enter()
+      seriesVM.enter()
          .append("g")
-         .merge(stackVM)
+         .merge(seriesVM)
          .attr("class", function (datum) {
             return "series tag-" + datum.key;
          })
@@ -261,7 +261,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
             return self.colorScale(d.key);
          });
 
-      stackVM.exit().remove();
+      seriesVM.exit().remove();
 
       // === The actual graphic rects ===
       segmentHoverHandler = function (d, rowNumber, group) {
@@ -285,7 +285,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
       };
 
       rectBlocksVM =
-         stackVM
+         seriesVM
             .selectAll("rect") // get the existing rectangles
             .data(function (d) {
                //console.log('update rect:', d)
@@ -322,7 +322,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
 
       formatPercent = d3.format(".0%");
 
-      labelsVM = stackVM
+      labelsVM = seriesVM
          .selectAll('text')
          .data(function (d) {
             return d;
@@ -350,18 +350,21 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
       labelsVM.exit().remove();
 
       // === Column totals ===
-      totalLabelsVM = self.contentGroup.selectAll('.total-labels')
-         .data(self.filteredData, function (d) {
-            // need this to compare by item, not by list index
-            return d.user.id;
-         });
+      var totalLabelGroups =
+         self.contentGroup
+            .selectAll('.total-label')
+            .data(self.filteredData, function (d) {
+               //   need this to compare by item, not by list index
+               return d.user.id;
+            });
 
-      totalLabelsVM.enter()
-         .append('g')
+      totalLabelGroups
+         .enter()
+         .insert('text', '#' + self.containerId + ' g.legend')
+         .merge(totalLabelGroups)
          .attr("class", function (datum) {
-            return "total-labels total-label-user-" + datum.user.id;
+            return "total-label total-label-user-" + datum.user.id;
          })
-         .append("text")
          .text(function (d) {
             return formatPercent((self.countChanges(d) || 0) / (self.allChangesCount || 1));
          })
@@ -379,6 +382,101 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
             return self.contributionScale(segmentTop) - 4;
          });
 
+      //.append('text')
+      //.text(function (d) {
+      //   return formatPercent((self.countChanges(d) || 0) / (self.allChangesCount || 1));
+      //})
+      //.attr('x', function (d) {
+      //   return self.usersScale(JSON.stringify(d.user)) + columnWidth / 2;
+      //})
+      //.attr('y', function (datum, index) {
+      //   var finalStackRow, userSegment, segmentTop;
+      //
+      //   // each stack row is all segments within a category, so last one is top
+      //   finalStackRow = workTagStack[workTagStack.length - 1];
+      //   userSegment = finalStackRow[index]; // the value pair for this column
+      //   segmentTop = userSegment[1];
+      //
+      //   return self.contributionScale(segmentTop) - 4;
+      //});
+
+      // try just adding teh text labels directly, and skip the group entirely.
+      //
+      //var derp =
+      //   totalLabelGroups
+      //      .enter()
+      //      //.selectAll('g.total-label')
+      //      .append('text')
+      //      .text(function (d) {
+      //         return formatPercent((self.countChanges(d) || 0) / (self.allChangesCount || 1));
+      //      })
+      //      .attr('x', function (d) {
+      //         return self.usersScale(JSON.stringify(d.user)) + columnWidth / 2;
+      //      })
+      //      .attr('y', function (datum, index) {
+      //         var finalStackRow, userSegment, segmentTop;
+      //
+      //         // each stack row is all segments within a category, so last one is top
+      //         finalStackRow = workTagStack[workTagStack.length - 1];
+      //         userSegment = finalStackRow[index]; // the value pair for this column
+      //         segmentTop = userSegment[1];
+      //
+      //         return self.contributionScale(segmentTop) - 4;
+      //      });
+
+
+      totalLabelGroups.exit().remove();
+
+      //totalLabelsVM =
+      //   totalLabelGroups
+      //   //.enter()
+      //   //.merge(totalLabelGroups)
+      //      .selectAll('text')
+      //      .data(function (d) {
+      //         console.log('sadface', d)
+      //         return d;
+      //      });
+      //
+      //totalLabelsVM
+      //////.enter()
+      //   .append('text')
+      //   //   //.merge(totalLabelsVM)
+      //   .text('nermal')
+
+      //totalLabelsVM =
+      //   self.contentGroup
+      //      .selectAll('.total-labels')
+      //      .data(self.filteredData, function (d) {
+      //         // need this to compare by item, not by list index
+      //         return d.user.id;
+      //      });
+      //
+      //totalLabelsVM.enter()
+      //   .append('g')
+      //   .attr("class", function (datum) {
+      //      return "total-labels total-label-user-" + datum.user.id;
+      //   })
+      //   .append("text")
+      //   .merge(totalLabelsVM)
+      //   .text(function (d) {
+      //      console.log(d)
+      //
+      //      return formatPercent((self.countChanges(d) || 0) / (self.allChangesCount || 1));
+      //   })
+      //   .attr('x', function (d) {
+      //      return self.usersScale(JSON.stringify(d.user)) + columnWidth / 2;
+      //   })
+      //   .attr('y', function (datum, index) {
+      //      var finalStackRow, userSegment, segmentTop;
+      //
+      //      // each stack row is all segments within a category, so last one is top
+      //      finalStackRow = workTagStack[workTagStack.length - 1];
+      //      userSegment = finalStackRow[index]; // the value pair for this column
+      //      segmentTop = userSegment[1];
+      //
+      //      return self.contributionScale(segmentTop) - 4;
+      //   });
+      //
       //totalLabelsVM.exit().remove();
 
       self.updateAxes();
