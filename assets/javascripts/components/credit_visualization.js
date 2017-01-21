@@ -28,11 +28,13 @@ ko.components.register('credit_visualization', {
 
       params.mergeTags = params.mergeTags || {};
 
+      var currentURI = new URI();
+
+      history.replaceState({filter: ko.mapping.toJS(self.filter)}, 'Credit Visualization', currentURI);
+
       // BEHAVIOUR
       self.getWorkData = function (id) {
          self.grapher = new CWRC.CreditVisualization.StackedColumnGraph(self.id());
-
-         var currentURI = new URI();
 
          ajax('get', '/services/credit_viz' + currentURI.search(), false, function (credViz) {
             var data, title, multiDoc, titleTarget;
@@ -104,9 +106,18 @@ ko.components.register('credit_visualization', {
             });
 
             self.filter.user.subscribe(function (newVal) {
-               self.grapher.filter(newVal ? newVal.id : null)
+               var currentURI = new URI();
+
+               self.grapher.filter(newVal ? newVal.id : null);
 
                self.grapher.updateBars(params.ignoreTags);
+
+               if (newVal)
+                  currentURI.setSearch('user', newVal.id);
+               else
+                  currentURI.removeSearch('user');
+
+               history.pushState({filter: ko.mapping.toJS(self.filter)}, 'Credit Visualization', currentURI);
             });
          });
       };
