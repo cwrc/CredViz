@@ -21,9 +21,14 @@ ko.components.register('credit_visualization', {
 
       self.testing = params['testing'];
 
+      var uriParams = (new URI()).search(true);
+      var pidList = uriParams['pid[]'] || [];
+
       self.users = ko.observableArray();
       self.filter = {
-         user: ko.observable((new URI()).search(true).user || {})
+         user: ko.observable(uriParams.user || {}),
+         pid: ko.observableArray(pidList instanceof Array ? pidList : [pidList]),
+         collectionId: ko.observable(uriParams.collectionId)
       };
 
       params.mergeTags = params.mergeTags || {};
@@ -31,6 +36,23 @@ ko.components.register('credit_visualization', {
       var currentURI = new URI();
 
       history.replaceState({filter: ko.mapping.toJS(self.filter)}, 'Credit Visualization', currentURI);
+
+      self.buildURI = function () {
+         var uri = new URI();
+
+         for (var filterName in self.filter) {
+            var value = self.filter[filterName]();
+
+            if (value instanceof Array && value.length > 0)
+               uri.setSearch(filterName + '[]', value);
+            else if (value)
+               uri.setSearch(filterName, filterName == 'user' ? value.id : value);
+            else
+               uri.removeSearch(filterName);
+         }
+
+         return uri;
+      };
 
       // BEHAVIOUR
       self.getWorkData = function (id) {
@@ -105,19 +127,16 @@ ko.components.register('credit_visualization', {
                });
             });
 
-            self.filter.user.subscribe(function (newVal) {
-               var currentURI = new URI();
+            self.filter.pid.subscribe(function (newVal) {
 
+            });
+
+            self.filter.user.subscribe(function (newVal) {
                self.grapher.filter(newVal ? newVal.id : null);
 
                self.grapher.updateBars(params.ignoreTags);
 
-               if (newVal)
-                  currentURI.setSearch('user', newVal.id);
-               else
-                  currentURI.removeSearch('user');
-
-               history.pushState({filter: ko.mapping.toJS(self.filter)}, 'Credit Visualization', currentURI);
+               history.pushState({filter: ko.mapping.toJS(self.filter)}, 'Credit Visualization', self.buildURI());
             });
          });
       };
