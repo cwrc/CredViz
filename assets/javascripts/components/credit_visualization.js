@@ -2,12 +2,24 @@ ko.components.register('credit_visualization', {
    template: ' <div data-bind="attr: {id: id()}">\
                   <svg width="1024" height="500" ></svg>\
                </div>\
+              <!-- <header>\
+                  <span>User Contributions to</span>\
+                  <a href="#" data-bind="attr: {href: titleTarget}, text: titleText"></a>,\
+                  <span>by Type</span>\
+               </header>-->\
                <label>\
                   <span>User</span>\
                   <select data-bind="options: users, \
                                      optionsText: \'name\',\
                                      optionsCaption:\'(all)\',\
                                      value: filter.user"></select>\
+               </label>\
+               <label>\
+                  <span>Document</span>\
+                  <select data-bind="options: documents, \
+                                     optionsText: \'name\',\
+                                     optionsCaption:\'(all)\',\
+                                     value: filter.pid"></select>\
                </label>',
 
    /**
@@ -25,6 +37,11 @@ ko.components.register('credit_visualization', {
       var pidList = uriParams['pid[]'] || [];
 
       self.users = ko.observableArray();
+      self.documents = ko.observableArray();
+      self.titleText = ko.observable();
+      self.titleTarget = ko.observable();
+
+
       self.filter = {
          user: ko.observable(uriParams.user || {}),
          pid: ko.observableArray(pidList instanceof Array ? pidList : [pidList]),
@@ -89,55 +106,46 @@ ko.components.register('credit_visualization', {
                         return aggregate.concat(document.modifications);
                      }, []);
 
-                     self.users(data.map(function (datum) {
-                        return datum.user;
-                     }).reduce(function (aggregate, user) {
-                        if (!aggregate.find(function (u) {
-                              return u.name == user.name;
-                           })) {
-                           aggregate.push(user);
-                        }
-
-                        return aggregate;
-                     }, []));
-
-                     title = credViz.name;
-                     titleTarget = '/islandora/object/' + parentId;
+                     self.titleText(credViz.name);
+                     self.titleTarget('/islandora/object/' + parentId); // TODO: replace these with a pureComputed
+                     //                                                    TODO: ie. look at filter, see if pid is empty, then project view
                   } else if (!multiDoc) {
                      data = document.modifications;
 
-                     self.users(data.map(function (datum) {
-                        return datum.user;
-                     }).reduce(function (aggregate, user) {
-                        if (!aggregate.find(function (u) {
-                              return u.name == user.name;
-                           })) {
-                           aggregate.push(user);
-                        }
-
-                        return aggregate;
-                     }, []));
-
-                     title = document.name;
-                     titleTarget = '/islandora/object/' + document.id;
+                     self.titleText(document.name);
+                     self.titleTarget('/islandora/object/' + document.id);
                   }
 
+                  self.users(data.map(function (datum) {
+                     return datum.user;
+                  }).reduce(function (aggregate, user) {
+                     if (!aggregate.find(function (u) {
+                           return u.name == user.name;
+                        })) {
+                        aggregate.push(user);
+                     }
+
+                     return aggregate;
+                  }, []));
+
+                  self.documents(credViz.documents);
+
                   self.grapher.render(data, title, titleTarget, params.mergeTags, params.ignoreTags);
+                  console.log(self.filter.pid())
                   self.filter.user(null); // trigger another redraw
                });
             });
 
-            self.filter.pid.subscribe(function (newVal) {
-
-            });
-
-            self.filter.user.subscribe(function (newVal) {
-               self.grapher.filter(newVal ? newVal.id : null);
+            var filterUpdateListener = function (newVal) {
+               self.grapher.filter(ko.mapping.toJS(self.filter));
 
                self.grapher.updateBars(params.ignoreTags);
 
                history.pushState({filter: ko.mapping.toJS(self.filter)}, 'Credit Visualization', self.buildURI());
-            });
+            };
+
+            self.filter.user.subscribe(filterUpdateListener);
+            self.filter.pid.subscribe(filterUpdateListener);
          });
       };
 
@@ -224,11 +232,21 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
       this.constructNoticeOverlay();
    };
 
-   CWRC.CreditVisualization.StackedColumnGraph.prototype.filter = function (filterUser) {
+   CWRC.CreditVisualization.StackedColumnGraph.prototype.filter = function (filter) {
       var self = this;
 
+      var matchesUser, matchesDocument;
+
+      matchesUser = function (datum) {
+         return !filter.user || datum.user.id == filter.user
+      };
+
+      matchesDocument = function (datum) {
+         return !filter.pid || filter.pid.length == 0 || filter.pid.indexOf(datum.document.id) >= 0
+      };
+
       self.filteredData = (self.data || []).filter(function (datum) {
-         return !filterUser || datum.user.id == filterUser;
+         return matchesUser(datum) && matchesDocument(datum);
       });
    };
 
@@ -530,11 +548,13 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
        * the tick construction process to use anchors instead
        */
       existingTickLabels = tickGroup.selectAll('.tick text');
-      tickFill = existingTickLabels.attr('fill');
-      tickX = existingTickLabels.attr('x');
-      tickY = existingTickLabels.attr('y');
-      tickDY = existingTickLabels.attr('dy');
-      existingTickLabels.remove();
+      if (!existingTickLabels.empty()) {
+         tickFill = existingTickLabels.attr('fill');
+         tickX = existingTickLabels.attr('x');
+         tickY = existingTickLabels.attr('y');
+         tickDY = existingTickLabels.attr('dy');
+         existingTickLabels.remove();
+      }
 
       userLabelHoverHandler = function () {
          var user, isEnter;
