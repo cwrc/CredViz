@@ -36,17 +36,63 @@ ko.components.register('credit_visualization', {
       var uriParams = (new URI()).search(true);
       var pidList = uriParams['pid[]'] || [];
 
-      self.users = ko.observableArray();
-      self.documents = ko.observableArray();
-      self.titleText = ko.observable();
-      self.titleTarget = ko.observable();
-
-
       self.filter = {
          user: ko.observable(uriParams.user || {}),
          pid: ko.observableArray(pidList instanceof Array ? pidList : [pidList]),
          collectionId: ko.observable(uriParams.collectionId)
       };
+
+      self.allModifications = ko.pureComputed(function () {
+         var data;
+
+         if (!self.totalModel())
+            return [];
+
+         if (self.isProjectView()) {
+            data = self.totalModel().documents.reduce(function (aggregate, document) {
+               return aggregate.concat(document.modifications);
+            }, []);
+         } else {
+            data = self.totalModel().documents[0].modifications;
+         }
+
+         return data;
+      });
+
+      self.users = ko.pureComputed(function () {
+         var users;
+
+         users = self.allModifications().map(function (datum) {
+            return datum.user;
+         }).reduce(function (aggregate, user) {
+            if (!aggregate.find(function (u) {
+                  return u.name == user.name;
+               })) {
+               aggregate.push(user);
+            }
+
+            return aggregate;
+         }, []);
+
+         return users;
+      });
+      self.totalModel = ko.observable();
+
+      self.documents = ko.pureComputed(function () {
+         return self.totalModel() ? self.totalModel().documents : [];
+      });
+
+      self.isProjectView = ko.pureComputed(function () {
+         return !self.filter.pid() || self.filter.pid().length == 0
+      });
+
+      self.titleText = ko.pureComputed(function () {
+         if (self.totalModel())
+            return self.isProjectView() ? self.totalModel().name : self.totalModel().documents[0].name;
+         else
+            return '';
+      });
+      self.titleTarget = ko.observable();
 
       params.mergeTags = params.mergeTags || {};
 
@@ -76,7 +122,7 @@ ko.components.register('credit_visualization', {
          self.grapher = new CWRC.CreditVisualization.StackedColumnGraph(self.id());
 
          ajax('get', '/services/credit_viz' + currentURI.search(), false, function (credViz) {
-            var data, title, multiDoc, titleTarget;
+            var title, multiDoc, titleTarget;
 
             // TODO: infer this from URI param, eg collectionid=5b1...k8y&docId=yz10-ab...
             multiDoc = !params.isDoc;//false;
@@ -101,37 +147,17 @@ ko.components.register('credit_visualization', {
                ajax('get', '/islandora/rest/v1/object/' + parentId, null, function (objectDetails) {
                   title = objectDetails.label;
 
+                  self.totalModel(credViz);
+
                   if (multiDoc) {
-                     data = credViz.documents.reduce(function (aggregate, document) {
-                        return aggregate.concat(document.modifications);
-                     }, []);
-
-                     self.titleText(credViz.name);
-                     self.titleTarget('/islandora/object/' + parentId); // TODO: replace these with a pureComputed
-                     //                                                    TODO: ie. look at filter, see if pid is empty, then project view
+                     // TODO: replace these with a pureComputed
+                     // TODO: ie. look at filter, see if pid is empty, then project view
+                     self.titleTarget('/islandora/object/' + parentId);
                   } else if (!multiDoc) {
-                     data = document.modifications;
-
-                     self.titleText(document.name);
                      self.titleTarget('/islandora/object/' + document.id);
                   }
 
-                  self.users(data.map(function (datum) {
-                     return datum.user;
-                  }).reduce(function (aggregate, user) {
-                     if (!aggregate.find(function (u) {
-                           return u.name == user.name;
-                        })) {
-                        aggregate.push(user);
-                     }
-
-                     return aggregate;
-                  }, []));
-
-                  self.documents(credViz.documents);
-
-                  self.grapher.render(data, title, titleTarget, params.mergeTags, params.ignoreTags);
-                  console.log(self.filter.pid())
+                  self.grapher.render(self.allModifications(), title, titleTarget, params.mergeTags, params.ignoreTags);
                   self.filter.user(null); // trigger another redraw
                });
             });
@@ -237,7 +263,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
       var matchesUser, matchesDocument;
 
       matchesUser = function (datum) {
-         return !filter.user || datum.user.id == filter.user
+         return !filter.user || datum.user.id == filter.user.id
       };
 
       matchesDocument = function (datum) {
