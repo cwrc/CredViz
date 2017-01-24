@@ -41,7 +41,7 @@ ko.components.register('credit_visualization', {
       };
 
       self.allModifications = ko.pureComputed(function () {
-         var data;
+         var data, countChanges;
 
          if (!self.totalModel())
             return [];
@@ -54,7 +54,31 @@ ko.components.register('credit_visualization', {
             data = self.totalModel().documents[0].modifications;
          }
 
+         countChanges = CWRC.CreditVisualization.StackedColumnGraph.countChanges;
+
+         data = self.sanitize(data).sort(function (a, b) {
+            return countChanges(b) - countChanges(a)
+         });
+
          return data;
+      });
+
+      self.filteredModifications = ko.pureComputed(function () {
+         var filter, dataset, matchesUser, matchesDocument;
+
+         filter = self.filter;
+
+         matchesUser = function (datum) {
+            return !filter.user() || datum.user.id == filter.user().id
+         };
+
+         matchesDocument = function (datum) {
+            return !filter.pid() || filter.pid().length == 0 || filter.pid().indexOf(datum.document.id) >= 0
+         };
+
+         return (self.allModifications() || []).filter(function (datum) {
+            return matchesUser(datum) && matchesDocument(datum);
+         });
       });
 
       self.users = ko.pureComputed(function () {
@@ -124,6 +148,54 @@ ko.components.register('credit_visualization', {
          return uri;
       };
 
+      self.sanitize = function (data) {
+         var self = this, changeset, removable, mergedTagMap, cleanData;
+
+         cleanData = [];
+         mergedTagMap = params.mergeTags;
+
+         // the endpoint returns each workflow change as a separate entry, so we're mering it here.
+         data.forEach(function (modification, i) {
+            var existingRecord = cleanData.find(function (other) {
+               return other.user.id == modification.user.id;
+            });
+
+            if (!existingRecord) {
+               existingRecord = {
+                  user: modification.user,
+                  workflow_changes: new CWRC.CreditVisualization.WorkflowChangeTally()
+               };
+               cleanData.push(existingRecord)
+            }
+
+            var key, scalarContributions;
+
+            key = modification.workflow_changes.category;
+
+            // these categories also have relevant file size diff data
+            scalarContributions = ['created', 'deposited', 'content_contribution'];
+
+            if (scalarContributions.indexOf(key) >= 0)
+               existingRecord.workflow_changes[key] += parseInt(modification.diff_changes);
+            else
+               existingRecord.workflow_changes[key] += 1;
+         });
+
+         // also merge together categories that have aliases
+         cleanData.forEach(function (modification) {
+            changeset = modification.workflow_changes;
+
+            for (var mergedTag in mergedTagMap) {
+               var primaryTag = mergedTagMap[mergedTag];
+
+               changeset[primaryTag] = (changeset[primaryTag] || 0) + (changeset[mergedTag] || 0);
+               changeset[mergedTag] = 0;
+            }
+         });
+
+         return cleanData;
+      };
+
       // BEHAVIOUR
       self.getWorkData = function (id) {
          ajax('get', '/services/credit_viz' + currentURI.search(), false, function (credViz) {
@@ -131,7 +203,6 @@ ko.components.register('credit_visualization', {
              * TODO: When/if the credit_viz service is capable of returning a result with both the project name
              * TODO: and the project's id, these next two ajax calls will become redundant, and can be collapsed
              */
-
             ajax('get', '/islandora/rest/v1/object/' + credViz.documents[0].id + '/relationship', null, function (relationships) {
                var parentRelationship, parentId;
 
@@ -143,23 +214,30 @@ ko.components.register('credit_visualization', {
                parentId = parentRelationship.object.value;
 
                ajax('get', '/islandora/rest/v1/object/' + parentId, null, function (objectDetails) {
+                  var data, totalNumChanges, filterUpdateListener;
+
                   self.totalModel(credViz);
 
-                  // TODO: remove - this should be returned in later versions of the credviz api
+                  // TODO: remove - later versions of the credviz api should already contain the id
                   self.totalModel().id = parentId;
 
-                  self.grapher = new CWRC.CreditVisualization.StackedColumnGraph(self.htmlId(), self.allModifications(), params.mergeTags, params.ignoreTags);
+                  data = self.allModifications();
 
-                  var filterUpdateListener = function (newVal) {
-                     self.grapher.filter(ko.mapping.toJS(self.filter));
+                  totalNumChanges = data.reduce(function (aggregate, datum) {
+                     return aggregate + CWRC.CreditVisualization.StackedColumnGraph.countChanges(datum);
+                  }, 0);
 
-                     self.grapher.updateBars();
+                  self.grapher = new CWRC.CreditVisualization.StackedColumnGraph(self.htmlId(), data, params.mergeTags, params.ignoreTags, totalNumChanges);
+
+                  filterUpdateListener = function (newVal) {
+                     self.grapher.updateBars(self.filteredModifications());
 
                      history.pushState({filter: ko.mapping.toJS(self.filter)}, 'Credit Visualization', self.buildURI());
                   };
 
-                  self.filter.user.subscribe(filterUpdateListener);
-                  self.filter.pid.subscribe(filterUpdateListener);
+                  for (var key in self.filter) {
+                     self.filter[key].subscribe(filterUpdateListener);
+                  }
 
                   self.filter.user(null); // trigger a redraw to use now-loaded data
                });
@@ -167,7 +245,7 @@ ko.components.register('credit_visualization', {
          });
       };
 
-      // d3 loads after KO, so push the fetch to the event stack.
+      // d3 loads after KO, so push the AJAX fetch to the event stack.
       window.setTimeout(function () {
          self.getWorkData();
       });
@@ -178,13 +256,11 @@ var CWRC = CWRC || {};
 CWRC.CreditVisualization = CWRC.CreditVisualization || {};
 
 (function StackedColumnGraph() {
-   CWRC.CreditVisualization.StackedColumnGraph = function (containerId, data, mergedTagMap, ignoredTags) {
+   CWRC.CreditVisualization.StackedColumnGraph = function (containerId, data, mergedTagMap, ignoredTags, allChangesCount) {
       var self = this;
 
       self.containerId = containerId;
       self.svg = d3.select('#' + self.containerId + ' svg');
-
-      self.workTypes = CWRC.CreditVisualization.WorkflowChangeTally.CATEGORIES.slice(0);
 
       self.bounds = {
          padding: {top: 20, right: 20, bottom: 60, left: 60},
@@ -218,51 +294,22 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
 
       self.minimumPercent = 0.01; // minimum value to display; 1.00 == 100%
 
+      self.workTypes = CWRC.CreditVisualization.WorkflowChangeTally.CATEGORIES.slice(0);
+
       // removing the types from the list will mean that the Ordinal Scale will ignore those values.
       (Object.keys(mergedTagMap).concat(ignoredTags)).forEach(function (tag) {
          self.workTypes.splice(self.workTypes.indexOf(tag), 1)
       });
 
-      data = self.sanitize(data, mergedTagMap);
-
-      data = data.sort(function (a, b) {
-         return self.countChanges(b) - self.countChanges(a)
-      });
-
-      self.data = data;
-
-      self.allChangesCount = d3.sum(self.data, function (d) {
-         return self.countChanges(d);
-      });
-
-      self.filteredData = self.data;
+      self.allChangesCount = allChangesCount;
 
       this.constructLeftAxis();
       this.constructBottomAxis();
-      this.updateBars();
       this.constructLegend();
       this.constructNoticeOverlay();
    };
 
-   CWRC.CreditVisualization.StackedColumnGraph.prototype.filter = function (filter) {
-      var self = this;
-
-      var matchesUser, matchesDocument;
-
-      matchesUser = function (datum) {
-         return !filter.user || datum.user.id == filter.user.id
-      };
-
-      matchesDocument = function (datum) {
-         return !filter.pid || filter.pid.length == 0 || filter.pid.indexOf(datum.document.id) >= 0
-      };
-
-      self.filteredData = (self.data || []).filter(function (datum) {
-         return matchesUser(datum) && matchesDocument(datum);
-      });
-   };
-
-   CWRC.CreditVisualization.StackedColumnGraph.prototype.updateBars = function () {
+   CWRC.CreditVisualization.StackedColumnGraph.prototype.updateBars = function (filteredData) {
       var self = this;
 
       var seriesVM, workTagStacker, workTagStack, formatPercent, maxValue, segmentHoverHandler,
@@ -274,7 +321,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
             return (datum.workflow_changes[key] || 0) / self.allChangesCount
          });
 
-      workTagStack = workTagStacker(self.filteredData);
+      workTagStack = workTagStacker(filteredData);
 
       maxValue = d3.max(workTagStack.reduce(function (a, b) {
          return a.concat(b.reduce(function (c, d) {
@@ -289,8 +336,8 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
       drawableCanvasWidth = self.bounds.getInnerWidth() - self.bounds.legendWidth;
       columnWidthThreshold = 4;
 
-      self.usersScale.rangeRound([0, self.filteredData.length >= columnWidthThreshold ? drawableCanvasWidth : drawableCanvasWidth / columnWidthThreshold]);
-      self.usersScale.domain(self.filteredData.map(function (d) {
+      self.usersScale.rangeRound([0, filteredData.length >= columnWidthThreshold ? drawableCanvasWidth : drawableCanvasWidth / columnWidthThreshold]);
+      self.usersScale.domain(filteredData.map(function (d) {
          return JSON.stringify(d.user);
       }));
       self.contributionScale.domain([0, maxValue]).nice();
@@ -405,7 +452,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
       var totalLabelGroups =
          self.contentGroup
             .selectAll('.total-label')
-            .data(self.filteredData, function (d) {
+            .data(filteredData, function (d) {
                //   need this to compare by item, not by list index
                return d.user.id;
             });
@@ -418,7 +465,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
             return "total-label total-label-user-" + datum.user.id;
          })
          .text(function (d) {
-            return formatPercent((self.countChanges(d) || 0) / (self.allChangesCount || 1));
+            return formatPercent((CWRC.CreditVisualization.StackedColumnGraph.countChanges(d) || 0) / (self.allChangesCount || 1));
          })
          .attr('x', function (d) {
             return self.usersScale(JSON.stringify(d.user)) + columnWidth / 2;
@@ -437,66 +484,6 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
       totalLabelGroups.exit().remove();
 
       self.updateAxes();
-   };
-
-   CWRC.CreditVisualization.StackedColumnGraph.prototype.sanitize = function (data, mergedTagMap) {
-      var self = this, changeset, removable;
-
-      var cleanData = [];
-
-      // merge all mods from the same user
-      //removable = [];
-
-      // the endpoint returns each workflow change as a separate entry, so we're mering it here.
-      data.forEach(function (modification, i) {
-         var existingRecord = cleanData.find(function (other) {
-            return other.user.id == modification.user.id;
-         });
-
-         if (!existingRecord) {
-            existingRecord = {
-               user: modification.user,
-               workflow_changes: new CWRC.CreditVisualization.WorkflowChangeTally()
-            };
-            cleanData.push(existingRecord)
-         }
-
-         //for (var key in modification.workflow_changes) {
-         //   firstRecord.workflow_changes[key] = (firstRecord.workflow_changes[key] || 0) + modification.workflow_changes[key];
-         //}
-
-         var key, scalarContributions;
-
-         key = modification.workflow_changes.category;
-
-         // these catgeories also have relevant file size diff data
-         scalarContributions = ['created', 'deposited', 'content_contribution'];
-
-         if (scalarContributions.indexOf(key) >= 0)
-            existingRecord.workflow_changes[key] += parseInt(modification.diff_changes);
-         else
-            existingRecord.workflow_changes[key] += 1;
-
-         //removable.push(modification);
-      });
-
-      //removable.forEach(function (modification) {
-      //   cleanData.splice(cleanData.indexOf(modification), 1)
-      //});
-
-      // also merge together categories that have aliases
-      cleanData.forEach(function (modification) {
-         changeset = modification.workflow_changes;
-
-         for (var mergedTag in mergedTagMap) {
-            var primaryTag = mergedTagMap[mergedTag];
-
-            changeset[primaryTag] = (changeset[primaryTag] || 0) + (changeset[mergedTag] || 0);
-            changeset[mergedTag] = 0;
-         }
-      });
-
-      return cleanData;
    };
 
    CWRC.CreditVisualization.StackedColumnGraph.prototype.updateAxes = function () {
@@ -709,7 +696,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
       }).join(' ')
    };
 
-   CWRC.CreditVisualization.StackedColumnGraph.prototype.countChanges = function (datum) {
+   CWRC.CreditVisualization.StackedColumnGraph.countChanges = function (datum) {
       var total = 0;
 
       for (var type in datum.workflow_changes)
