@@ -2,11 +2,11 @@ ko.components.register('credit_visualization', {
    template: ' <div data-bind="attr: {id: id()}">\
                   <svg width="1024" height="500" ></svg>\
                </div>\
-              <!-- <header>\
+               <header>\
                   <span>User Contributions to</span>\
                   <a href="#" data-bind="attr: {href: titleTarget}, text: titleText"></a>,\
                   <span>by Type</span>\
-               </header>-->\
+               </header>\
                <label>\
                   <span>User</span>\
                   <select data-bind="options: users, \
@@ -228,7 +228,6 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
       this.constructBottomAxis();
       this.updateBars(ignoredTags);
       this.constructLegend();
-      this.constructTitle(title, titleTarget);
       this.constructNoticeOverlay();
    };
 
@@ -667,32 +666,6 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
          .append('text')
          .attr('x', self.bounds.getInnerWidth() / 2)
          .attr('y', self.bounds.getInnerHeight() / 2);
-   };
-
-   CWRC.CreditVisualization.StackedColumnGraph.prototype.constructTitle = function (titleLabel, titleTarget) {
-      var self = this;
-
-      var labelGroup =
-         self.contentGroup
-            .append('text')
-            .attr('text-anchor', 'middle')
-            .attr('x', (self.bounds.getInnerWidth() / 2))
-            .attr('y', self.bounds.getOuterHeight() - (self.bounds.padding.bottom / 2))
-            .attr('class', 'title');
-
-      labelGroup
-         .append('tspan')
-         .text('User Contributions to ');
-
-      labelGroup
-         .append('tspan')
-         .append('a')
-         .attr('xlink:href', titleTarget)
-         .text(titleLabel || '(Unknown)');
-
-      labelGroup
-         .append('tspan')
-         .text(', by Type')
    };
 
    CWRC.CreditVisualization.StackedColumnGraph.prototype.setNotice = function (msg) {

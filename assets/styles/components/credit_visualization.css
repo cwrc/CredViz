@@ -2,6 +2,10 @@ credit_visualization {
    display: block;
 }
 
+credit_visualization header {
+   margin-bottom: 1em;
+}
+
 credit_visualization svg .bar {
    fill: steelblue;
 }
