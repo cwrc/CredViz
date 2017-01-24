@@ -1,5 +1,5 @@
 ko.components.register('credit_visualization', {
-   template: ' <div data-bind="attr: {id: id()}">\
+   template: ' <div data-bind="attr: {id: htmlId()}">\
                   <svg width="1024" height="500" ></svg>\
                </div>\
                <header>\
@@ -27,7 +27,7 @@ ko.components.register('credit_visualization', {
    viewModel: function (params) {
       var self = this;
 
-      self.id = ko.observable(params.id || 'creditvis');
+      self.htmlId = ko.observable(params.id || 'creditvis');
 
       // STATE
 
@@ -126,11 +126,7 @@ ko.components.register('credit_visualization', {
 
       // BEHAVIOUR
       self.getWorkData = function (id) {
-         self.grapher = new CWRC.CreditVisualization.StackedColumnGraph(self.id());
-
          ajax('get', '/services/credit_viz' + currentURI.search(), false, function (credViz) {
-            var title, titleTarget;
-
             /**
              * TODO: When/if the credit_viz service is capable of returning a result with both the project name
              * TODO: and the project's id, these next two ajax calls will become redundant, and can be collapsed
@@ -147,14 +143,12 @@ ko.components.register('credit_visualization', {
                parentId = parentRelationship.object.value;
 
                ajax('get', '/islandora/rest/v1/object/' + parentId, null, function (objectDetails) {
-                  title = objectDetails.label;
-
                   self.totalModel(credViz);
 
                   // TODO: remove - this should be returned in later versions of the credviz api
                   self.totalModel().id = parentId;
 
-                  self.grapher.render(self.allModifications(), title, titleTarget, params.mergeTags, params.ignoreTags);
+                  self.grapher = new CWRC.CreditVisualization.StackedColumnGraph(self.htmlId(), self.allModifications(), params.mergeTags, params.ignoreTags);
 
                   var filterUpdateListener = function (newVal) {
                      self.grapher.filter(ko.mapping.toJS(self.filter));
@@ -167,7 +161,7 @@ ko.components.register('credit_visualization', {
                   self.filter.user.subscribe(filterUpdateListener);
                   self.filter.pid.subscribe(filterUpdateListener);
 
-                  self.filter.user(null); // trigger another redraw
+                  self.filter.user(null); // trigger a redraw to use now-loaded data
                });
             });
          });
@@ -184,7 +178,7 @@ var CWRC = CWRC || {};
 CWRC.CreditVisualization = CWRC.CreditVisualization || {};
 
 (function StackedColumnGraph() {
-   CWRC.CreditVisualization.StackedColumnGraph = function (containerId) {
+   CWRC.CreditVisualization.StackedColumnGraph = function (containerId, data, mergedTagMap, ignoredTags) {
       var self = this;
 
       self.containerId = containerId;
@@ -222,13 +216,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
       self.colorScale = d3.scaleOrdinal(d3.schemeCategory20c);
       //.range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
 
-      self.data = [];
-
       self.minimumPercent = 0.01; // minimum value to display; 1.00 == 100%
-   };
-
-   CWRC.CreditVisualization.StackedColumnGraph.prototype.render = function (data, title, titleTarget, mergedTagMap, ignoredTags) {
-      var self = this;
 
       // removing the types from the list will mean that the Ordinal Scale will ignore those values.
       (Object.keys(mergedTagMap).concat(ignoredTags)).forEach(function (tag) {
@@ -242,11 +230,12 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
       });
 
       self.data = data;
-      self.filteredData = self.data;
 
       self.allChangesCount = d3.sum(self.data, function (d) {
          return self.countChanges(d);
       });
+
+      self.filteredData = self.data;
 
       this.constructLeftAxis();
       this.constructBottomAxis();
