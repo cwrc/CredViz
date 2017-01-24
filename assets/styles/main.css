@@ -89,7 +89,7 @@ body > header .description a:hover {
    font-family: "Special Elite", "Courier New", Courier, monospace;
 }
 
-main header {
+main section > header {
    margin: 1em auto;
    max-width: 66%;
    border-bottom: 1px dotted black;
