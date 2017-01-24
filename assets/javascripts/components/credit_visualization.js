@@ -31,8 +31,6 @@ ko.components.register('credit_visualization', {
 
       // STATE
 
-      self.testing = params['testing'];
-
       var uriParams = (new URI()).search(true);
       var pidList = uriParams['pid[]'] || [];
 
@@ -82,17 +80,26 @@ ko.components.register('credit_visualization', {
          return self.totalModel() ? self.totalModel().documents : [];
       });
 
+      self.firstDocument = ko.pureComputed(function () {
+         return self.documents()[0];
+      });
+
       self.isProjectView = ko.pureComputed(function () {
          return !self.filter.pid() || self.filter.pid().length == 0
       });
 
       self.titleText = ko.pureComputed(function () {
          if (self.totalModel())
-            return self.isProjectView() ? self.totalModel().name : self.totalModel().documents[0].name;
+            return self.isProjectView() ? self.totalModel().name : self.firstDocument().name;
          else
             return '';
       });
-      self.titleTarget = ko.observable();
+      self.titleTarget = ko.pureComputed(function () {
+         if (self.totalModel())
+            return '/islandora/object/' + (self.isProjectView() ? self.totalModel().id : self.firstDocument().id);
+         else
+            return '/';
+      });
 
       params.mergeTags = params.mergeTags || {};
 
@@ -122,10 +129,7 @@ ko.components.register('credit_visualization', {
          self.grapher = new CWRC.CreditVisualization.StackedColumnGraph(self.id());
 
          ajax('get', '/services/credit_viz' + currentURI.search(), false, function (credViz) {
-            var title, multiDoc, titleTarget;
-
-            // TODO: infer this from URI param, eg collectionid=5b1...k8y&docId=yz10-ab...
-            multiDoc = !params.isDoc;//false;
+            var title, titleTarget;
 
             var document = credViz.documents[0];
 
@@ -149,13 +153,8 @@ ko.components.register('credit_visualization', {
 
                   self.totalModel(credViz);
 
-                  if (multiDoc) {
-                     // TODO: replace these with a pureComputed
-                     // TODO: ie. look at filter, see if pid is empty, then project view
-                     self.titleTarget('/islandora/object/' + parentId);
-                  } else if (!multiDoc) {
-                     self.titleTarget('/islandora/object/' + document.id);
-                  }
+                  // TODO: remove - this should be returned in later versions of the credviz api
+                  self.totalModel().id = parentId;
 
                   self.grapher.render(self.allModifications(), title, titleTarget, params.mergeTags, params.ignoreTags);
                   self.filter.user(null); // trigger another redraw
@@ -806,5 +805,3 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
    CWRC.CreditVisualization.WorkflowChangeTally.CATEGORIES =
       Object.keys(CWRC.CreditVisualization.WorkflowChangeTally.CATEGORIES_TO_STAMPS);
 })();
-
-
