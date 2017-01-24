@@ -131,14 +131,12 @@ ko.components.register('credit_visualization', {
          ajax('get', '/services/credit_viz' + currentURI.search(), false, function (credViz) {
             var title, titleTarget;
 
-            var document = credViz.documents[0];
-
             /**
              * TODO: When/if the credit_viz service is capable of returning a result with both the project name
              * TODO: and the project's id, these next two ajax calls will become redundant, and can be collapsed
              */
 
-            ajax('get', '/islandora/rest/v1/object/' + document.id + '/relationship', null, function (relationships) {
+            ajax('get', '/islandora/rest/v1/object/' + credViz.documents[0].id + '/relationship', null, function (relationships) {
                var parentRelationship, parentId;
 
                parentRelationship = relationships.find(function (relationship) {
@@ -157,20 +155,21 @@ ko.components.register('credit_visualization', {
                   self.totalModel().id = parentId;
 
                   self.grapher.render(self.allModifications(), title, titleTarget, params.mergeTags, params.ignoreTags);
+
+                  var filterUpdateListener = function (newVal) {
+                     self.grapher.filter(ko.mapping.toJS(self.filter));
+
+                     self.grapher.updateBars();
+
+                     history.pushState({filter: ko.mapping.toJS(self.filter)}, 'Credit Visualization', self.buildURI());
+                  };
+
+                  self.filter.user.subscribe(filterUpdateListener);
+                  self.filter.pid.subscribe(filterUpdateListener);
+
                   self.filter.user(null); // trigger another redraw
                });
             });
-
-            var filterUpdateListener = function (newVal) {
-               self.grapher.filter(ko.mapping.toJS(self.filter));
-
-               self.grapher.updateBars(params.ignoreTags);
-
-               history.pushState({filter: ko.mapping.toJS(self.filter)}, 'Credit Visualization', self.buildURI());
-            };
-
-            self.filter.user.subscribe(filterUpdateListener);
-            self.filter.pid.subscribe(filterUpdateListener);
          });
       };
 
@@ -251,7 +250,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
 
       this.constructLeftAxis();
       this.constructBottomAxis();
-      this.updateBars(ignoredTags);
+      this.updateBars();
       this.constructLegend();
       this.constructNoticeOverlay();
    };
@@ -274,7 +273,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
       });
    };
 
-   CWRC.CreditVisualization.StackedColumnGraph.prototype.updateBars = function (ignoredTags) {
+   CWRC.CreditVisualization.StackedColumnGraph.prototype.updateBars = function () {
       var self = this;
 
       var seriesVM, workTagStacker, workTagStack, formatPercent, maxValue, segmentHoverHandler,
