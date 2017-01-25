@@ -21,7 +21,12 @@ ko.components.register('credit_visualization', {
                                      optionsValue: \'id\',\
                                      optionsCaption:\'(all)\',\
                                      value: filter.pid"></select>\
-               </label>',
+               </label>\
+               <div class="embed-overlay" data-bind="visible: embedVisible">\
+                  <span data-bind="text: embedTarget"></span>\
+                  <a href="#" data-bind="click: function(){ toggleEmbed() }">x</a>\
+               </div>\
+               <button data-bind="click: function(){ toggleEmbed() }">Embed</button>',
 
    /**
     */
@@ -41,7 +46,18 @@ ko.components.register('credit_visualization', {
          collectionId: ko.observable(uriParams.collectionId)
       };
 
-      console.log(self.filter.pid(), 'dont understand')
+      self.embedTarget = ko.observable('derp');
+      self.embedVisible = ko.observable(false);
+
+      self.toggleEmbed = function () {
+         var uri = new URI();
+
+         self.embedVisible(!self.embedVisible());
+
+         console.log('help')
+
+         self.embedTarget('<iframe src="' + uri + '"></iframe>');
+      };
 
       self.allModifications = ko.pureComputed(function () {
          var data, countChanges, documents;
