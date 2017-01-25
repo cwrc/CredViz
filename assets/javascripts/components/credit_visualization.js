@@ -18,6 +18,7 @@ ko.components.register('credit_visualization', {
                   <span>Document</span>\
                   <select data-bind="options: documents, \
                                      optionsText: \'name\',\
+                                     optionsValue: \'id\',\
                                      optionsCaption:\'(all)\',\
                                      value: filter.pid"></select>\
                </label>',
@@ -40,18 +41,25 @@ ko.components.register('credit_visualization', {
          collectionId: ko.observable(uriParams.collectionId)
       };
 
+      console.log(self.filter.pid(), 'dont understand')
+
       self.allModifications = ko.pureComputed(function () {
-         var data, countChanges;
+         var data, countChanges, documents;
 
          if (!self.totalModel())
             return [];
 
+         documents = self.totalModel().documents;
+
          if (self.isProjectView()) {
-            data = self.totalModel().documents.reduce(function (aggregate, document) {
+            data = documents.reduce(function (aggregate, document) {
                return aggregate.concat(document.modifications);
             }, []);
          } else {
-            data = self.totalModel().documents[0].modifications;
+            data = documents.find(function (doc) {
+               // TODO: this really would be nicer to include in filteredModifications instead
+               return doc.id == self.filter.pid()
+            }).modifications;
          }
 
          countChanges = CWRC.CreditVisualization.StackedColumnGraph.countChanges;
@@ -73,12 +81,24 @@ ko.components.register('credit_visualization', {
          };
 
          matchesDocument = function (datum) {
-            return !filter.pid() || filter.pid().length == 0 || filter.pid().indexOf(datum.document.id) >= 0
+            // todo: this is curretnly actually accomplished in totalModifications because we don't have document
+            // todo: data here
+            return true;
+
+            //return !filter.pid() ||
+            //   filter.pid().length == 0 ||
+            //filter.pid().indexOf(datum.document.id) >= 0
          };
 
          return (self.allModifications() || []).filter(function (datum) {
             return matchesUser(datum) && matchesDocument(datum);
          });
+      });
+
+      self.totalNumChanges = ko.pureComputed(function () {
+         return self.allModifications().reduce(function (aggregate, datum) {
+            return aggregate + CWRC.CreditVisualization.StackedColumnGraph.countChanges(datum);
+         }, 0);
       });
 
       self.users = ko.pureComputed(function () {
@@ -214,23 +234,17 @@ ko.components.register('credit_visualization', {
                parentId = parentRelationship.object.value;
 
                ajax('get', '/islandora/rest/v1/object/' + parentId, null, function (objectDetails) {
-                  var data, totalNumChanges, filterUpdateListener;
+                  var filterUpdateListener;
 
                   self.totalModel(credViz);
 
                   // TODO: remove - later versions of the credviz api should already contain the id
                   self.totalModel().id = parentId;
 
-                  data = self.allModifications();
-
-                  totalNumChanges = data.reduce(function (aggregate, datum) {
-                     return aggregate + CWRC.CreditVisualization.StackedColumnGraph.countChanges(datum);
-                  }, 0);
-
-                  self.grapher = new CWRC.CreditVisualization.StackedColumnGraph(self.htmlId(), data, params.mergeTags, params.ignoreTags, totalNumChanges);
+                  self.grapher = new CWRC.CreditVisualization.StackedColumnGraph(self.htmlId(), params.mergeTags, params.ignoreTags);
 
                   filterUpdateListener = function (newVal) {
-                     self.grapher.updateBars(self.filteredModifications());
+                     self.grapher.updateBars(self.filteredModifications(), self.totalNumChanges());
 
                      history.pushState({filter: ko.mapping.toJS(self.filter)}, 'Credit Visualization', self.buildURI());
                   };
@@ -256,7 +270,7 @@ var CWRC = CWRC || {};
 CWRC.CreditVisualization = CWRC.CreditVisualization || {};
 
 (function StackedColumnGraph() {
-   CWRC.CreditVisualization.StackedColumnGraph = function (containerId, data, mergedTagMap, ignoredTags, allChangesCount) {
+   CWRC.CreditVisualization.StackedColumnGraph = function (containerId, mergedTagMap, ignoredTags) {
       var self = this;
 
       self.containerId = containerId;
@@ -301,15 +315,13 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
          self.workTypes.splice(self.workTypes.indexOf(tag), 1)
       });
 
-      self.allChangesCount = allChangesCount;
-
       this.constructLeftAxis();
       this.constructBottomAxis();
       this.constructLegend();
       this.constructNoticeOverlay();
    };
 
-   CWRC.CreditVisualization.StackedColumnGraph.prototype.updateBars = function (filteredData) {
+   CWRC.CreditVisualization.StackedColumnGraph.prototype.updateBars = function (filteredData, allChangesCount) {
       var self = this;
 
       var seriesVM, workTagStacker, workTagStack, formatPercent, maxValue, segmentHoverHandler,
@@ -318,7 +330,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
       workTagStacker = d3.stack()
          .keys(self.workTypes)
          .value(function (datum, key) {
-            return (datum.workflow_changes[key] || 0) / self.allChangesCount
+            return (datum.workflow_changes[key] || 0) / allChangesCount
          });
 
       workTagStack = workTagStacker(filteredData);
@@ -465,7 +477,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
             return "total-label total-label-user-" + datum.user.id;
          })
          .text(function (d) {
-            return formatPercent((CWRC.CreditVisualization.StackedColumnGraph.countChanges(d) || 0) / (self.allChangesCount || 1));
+            return formatPercent((CWRC.CreditVisualization.StackedColumnGraph.countChanges(d) || 0) / (allChangesCount || 1));
          })
          .attr('x', function (d) {
             return self.usersScale(JSON.stringify(d.user)) + columnWidth / 2;
@@ -623,7 +635,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
       };
 
       legendItem = legendGroup.selectAll(".legendItem")
-         .data(self.workTypes.slice().reverse())
+         .data(self.workTypes.slice())
          .enter().append("g")
          .attr("class", "legendItem")
          .attr("class", function (columnName, i) {
