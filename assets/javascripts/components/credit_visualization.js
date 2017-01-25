@@ -22,11 +22,13 @@ ko.components.register('credit_visualization', {
                                      optionsCaption:\'(all)\',\
                                      value: filter.pid"></select>\
                </label>\
-               <div class="embed-overlay" data-bind="visible: embedVisible">\
-                  <span data-bind="text: embedTarget"></span>\
-                  <a href="#" data-bind="click: function(){ toggleEmbed() }">x</a>\
+               <div class="embed-popup" data-bind="visible: embedVisible">\
+                  <p>Copy this HTML to your page:</p>\
+                  <code data-bind="text: embedTarget"></code>\
+                  <button data-bind="click: toggleEmbed">Close</button>\
                </div>\
-               <button data-bind="click: function(){ toggleEmbed() }">Embed</button>',
+               <div class="overlay" data-bind="visible: embedVisible, click: toggleEmbed"></div>\
+               <button data-bind="click: toggleEmbed">Embed</button>',
 
    /**
     */
@@ -46,15 +48,13 @@ ko.components.register('credit_visualization', {
          collectionId: ko.observable(uriParams.collectionId)
       };
 
-      self.embedTarget = ko.observable('derp');
+      self.embedTarget = ko.observable('');
       self.embedVisible = ko.observable(false);
 
       self.toggleEmbed = function () {
          var uri = new URI();
 
          self.embedVisible(!self.embedVisible());
-
-         console.log('help')
 
          self.embedTarget('<iframe src="' + uri + '"></iframe>');
       };
