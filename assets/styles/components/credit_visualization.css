@@ -135,3 +135,31 @@ credit-visualization .overlay {
 
    background: rgba(0, 0, 0, 0.3);
 }
+
+credit-visualization .documents,
+credit-visualization .filters {
+   margin: 0.5em;
+}
+
+credit-visualization .documents {
+   display: inline-block;
+
+   vertical-align: top;
+
+   text-align: left;
+}
+
+credit-visualization .documents header,
+credit-visualization .filters header {
+   margin-bottom: 0.5em;
+}
+
+credit-visualization .documents label {
+   display: block;
+}
+
+credit-visualization .filters {
+   display: inline-block;
+
+   vertical-align: top;
+}
