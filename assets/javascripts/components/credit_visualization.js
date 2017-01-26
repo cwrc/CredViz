@@ -48,7 +48,7 @@ ko.components.register('credit-visualization', {
 
       var uriParams = (new URI()).search(true);
       var pidList = uriParams['pid[]'] || [];
-      var userList = uriParams['user[]'] || [];
+      var userList = uriParams['users[]'] || [];
 
       self.filter = {
          users: ko.observableArray(userList instanceof Array ? userList : [userList]),
@@ -205,17 +205,11 @@ ko.components.register('credit-visualization', {
          for (var filterName in self.filter) {
             var value = self.filter[filterName]();
 
-            console.log('precheck', value, value instanceof Array)
-
             if (value instanceof Array) {
-               console.log('array', value)
                uri.setSearch(filterName + '[]', value);
             } else if (value) {
-               console.log('single', value)
                uri.setSearch(filterName, filterName == 'user' ? value.id : value);
             } else {
-               console.log('remove', filterName)
-               console.log('remove', filterName + '[]')
                uri.removeSearch(filterName);
                uri.removeSearch(filterName + '[]');
             }
@@ -309,7 +303,10 @@ ko.components.register('credit-visualization', {
                      self.filter[key].subscribe(filterUpdateListener);
                   }
 
-                  self.filter.users([]); // trigger a redraw to use now-loaded data
+                  // trigger a redraw to use now-loaded data
+                  var users = self.filter.users();
+                  self.filter.users([]);
+                  self.filter.users(users);
                });
             });
          });
