@@ -138,13 +138,10 @@ credit-visualization .overlay {
 
 credit-visualization .documents,
 credit-visualization .filters {
-   margin: 0.5em;
-}
-
-credit-visualization .documents {
    display: inline-block;
-
    vertical-align: top;
+
+   margin: 0.5em;
 
    text-align: left;
 }
@@ -154,12 +151,7 @@ credit-visualization .filters header {
    margin-bottom: 0.5em;
 }
 
-credit-visualization .documents label {
+credit-visualization .documents label,
+credit-visualization .filters label {
    display: block;
-}
-
-credit-visualization .filters {
-   display: inline-block;
-
-   vertical-align: top;
 }
