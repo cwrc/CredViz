@@ -205,12 +205,20 @@ ko.components.register('credit-visualization', {
          for (var filterName in self.filter) {
             var value = self.filter[filterName]();
 
-            if (value instanceof Array && value.length > 0)
+            console.log('precheck', value, value instanceof Array)
+
+            if (value instanceof Array) {
+               console.log('array', value)
                uri.setSearch(filterName + '[]', value);
-            else if (value)
+            } else if (value) {
+               console.log('single', value)
                uri.setSearch(filterName, filterName == 'user' ? value.id : value);
-            else
+            } else {
+               console.log('remove', filterName)
+               console.log('remove', filterName + '[]')
                uri.removeSearch(filterName);
+               uri.removeSearch(filterName + '[]');
+            }
          }
 
          return uri;
@@ -292,8 +300,6 @@ ko.components.register('credit-visualization', {
                   self.grapher = new CWRC.CreditVisualization.StackedColumnGraph(self.htmlId(), params.mergeTags, params.ignoreTags);
 
                   filterUpdateListener = function (newVal) {
-                     console.log(self.filteredModifications())
-
                      self.grapher.updateBars(self.filteredModifications(), self.totalNumChanges());
 
                      history.pushState({filter: ko.mapping.toJS(self.filter)}, 'Credit Visualization', self.buildURI());
