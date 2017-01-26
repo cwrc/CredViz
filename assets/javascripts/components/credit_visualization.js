@@ -7,20 +7,24 @@ ko.components.register('credit-visualization', {
                   <a href="#" data-bind="attr: {href: titleTarget}, text: titleText"></a>,\
                   <span>by Type</span>\
                </header>\
-               <label>\
-                  <span>User</span>\
-                  <select data-bind="options: users, \
-                                     optionsText: \'name\',\
-                                     optionsCaption:\'(all)\',\
-                                     value: filter.user"></select>\
-               </label>\
-               <div>\
+               <div class="documents">\
                   <header>Documents</header>\
                   <div data-bind="foreach: documents">\
                      <label>\
                         <input type="checkbox" data-bind="value: $data.id,\
                                                           checked: $parent.filter.pid" />\
                         <span data-bind="text: $data.name">Document</span>\
+                     </label>\
+                  </div>\
+               </div>\
+               <div class="filters">\
+                  <div>\
+                     <label>\
+                        <span>User</span>\
+                        <select data-bind="options: users, \
+                                           optionsText: \'name\',\
+                                           optionsCaption:\'(all)\',\
+                                           value: filter.user"></select>\
                      </label>\
                   </div>\
                </div>\
