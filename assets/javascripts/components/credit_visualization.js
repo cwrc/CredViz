@@ -293,7 +293,12 @@ ko.components.register('credit-visualization', {
 
                   self.grapher = new CWRC.CreditVisualization.StackedColumnGraph(self.htmlId(), params.mergeTags, params.ignoreTags);
 
+                  var historyUpdating = false;
+
                   filterUpdateListener = function (newVal) {
+                     if (historyUpdating)
+                        return;
+
                      self.grapher.updateBars(self.filteredModifications(), self.totalNumChanges());
 
                      history.pushState({filter: ko.mapping.toJS(self.filter)}, 'Credit Visualization', self.buildURI());
@@ -303,6 +308,18 @@ ko.components.register('credit-visualization', {
                      self.filter[key].subscribe(filterUpdateListener);
                   }
 
+                  window.addEventListener('popstate', function (event) {
+                     var historicalFilter = history.state.filter;
+                     historyUpdating = true;
+
+                     for (var key in self.filter) {
+                        self.filter[key](historicalFilter[key])
+                     }
+
+                     historyUpdating = false;
+                  });
+
+// TODO: this is a hack to force it to draw the initial. It shouldn't be necessary. Something is wrong in the D3 section
                   // trigger a redraw to use now-loaded data
                   var users = self.filter.users();
                   self.filter.users([]);
