@@ -1,4 +1,4 @@
-ko.components.register('credit_visualization', {
+ko.components.register('credit-visualization', {
    template: ' <div data-bind="attr: {id: htmlId()}">\
                   <svg width="1024" height="500" ></svg>\
                </div>\
