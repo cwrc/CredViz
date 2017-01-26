@@ -14,14 +14,16 @@ ko.components.register('credit_visualization', {
                                      optionsCaption:\'(all)\',\
                                      value: filter.user"></select>\
                </label>\
-               <label>\
-                  <span>Document</span>\
-                  <select data-bind="options: documents, \
-                                     optionsText: \'name\',\
-                                     optionsValue: \'id\',\
-                                     optionsCaption:\'(all)\',\
-                                     value: filter.pid"></select>\
-               </label>\
+               <div>\
+                  <header>Documents</header>\
+                  <div data-bind="foreach: documents">\
+                     <label>\
+                        <input type="checkbox" data-bind="value: $data.id,\
+                                                          checked: $parent.filter.pid" />\
+                        <span data-bind="text: $data.name">Document</span>\
+                     </label>\
+                  </div>\
+               </div>\
                <div class="embed-popup" data-bind="visible: embedVisible">\
                   <p>Copy this HTML to your page:</p>\
                   <code data-bind="text: embedTarget"></code>\
@@ -145,7 +147,7 @@ ko.components.register('credit_visualization', {
       });
 
       self.isProjectView = ko.pureComputed(function () {
-         return !self.filter.pid() || self.filter.pid().length == 0
+         return !self.filter.pid() || self.filter.pid().length != 1;
       });
 
       self.titleText = ko.pureComputed(function () {
