@@ -142,8 +142,10 @@ ko.components.register('credit_visualization', {
          return self.totalModel() ? self.totalModel().documents : [];
       });
 
-      self.firstDocument = ko.pureComputed(function () {
-         return self.documents()[0];
+      self.selectedDocuments = ko.pureComputed(function () {
+         return self.documents().filter(function (doc) {
+            return self.filter.pid().indexOf(doc.id) >= 0;
+         });
       });
 
       self.isProjectView = ko.pureComputed(function () {
@@ -152,13 +154,13 @@ ko.components.register('credit_visualization', {
 
       self.titleText = ko.pureComputed(function () {
          if (self.totalModel())
-            return self.isProjectView() ? self.totalModel().name : self.firstDocument().name;
+            return self.isProjectView() ? self.totalModel().name : self.selectedDocuments()[0].name;
          else
             return '';
       });
       self.titleTarget = ko.pureComputed(function () {
          if (self.totalModel())
-            return '/islandora/object/' + (self.isProjectView() ? self.totalModel().id : self.firstDocument().id);
+            return '/islandora/object/' + (self.isProjectView() ? self.totalModel().id : self.selectedDocuments()[0].id);
          else
             return '/';
       });
