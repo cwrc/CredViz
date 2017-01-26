@@ -18,14 +18,15 @@ ko.components.register('credit-visualization', {
                   </div>\
                </div>\
                <div class="filters">\
-                  <div>\
+                  <div class="users">\
+                     <header>Users</header>\
+                     <!-- ko foreach: users -->\
                      <label>\
-                        <span>User</span>\
-                        <select data-bind="options: users, \
-                                           optionsText: \'name\',\
-                                           optionsCaption:\'(all)\',\
-                                           value: filter.user"></select>\
+                        <input type="checkbox" data-bind="value: $data.id,\
+                                                          checked: $parent.filter.users" />\
+                        <span data-bind="text: $data.name">User</span>\
                      </label>\
+                     <!-- /ko -->\
                   </div>\
                </div>\
                <div class="embed-popup" data-bind="visible: embedVisible">\
@@ -47,9 +48,10 @@ ko.components.register('credit-visualization', {
 
       var uriParams = (new URI()).search(true);
       var pidList = uriParams['pid[]'] || [];
+      var userList = uriParams['user[]'] || [];
 
       self.filter = {
-         user: ko.observable(uriParams.user || {}),
+         users: ko.observableArray(userList instanceof Array ? userList : [userList]),
          pid: ko.observableArray(pidList instanceof Array ? pidList : [pidList]),
          collectionId: ko.observable(uriParams.collectionId)
       };
@@ -99,7 +101,9 @@ ko.components.register('credit-visualization', {
          filter = self.filter;
 
          matchesUser = function (datum) {
-            return !filter.user() || datum.user.id == filter.user().id
+            return !filter.users() ||
+               filter.users().length == 0 ||
+               filter.users().indexOf(datum.user.id) >= 0
          };
 
          matchesDocument = function (datum) {
@@ -148,8 +152,6 @@ ko.components.register('credit-visualization', {
 
       self.selectedDocuments = ko.pureComputed(function () {
          return self.documents().filter(function (doc) {
-            console.log(doc, self.filter.pid())
-
             return self.filter.pid().indexOf(doc.id) >= 0;
          });
       });
@@ -290,6 +292,8 @@ ko.components.register('credit-visualization', {
                   self.grapher = new CWRC.CreditVisualization.StackedColumnGraph(self.htmlId(), params.mergeTags, params.ignoreTags);
 
                   filterUpdateListener = function (newVal) {
+                     console.log(self.filteredModifications())
+
                      self.grapher.updateBars(self.filteredModifications(), self.totalNumChanges());
 
                      history.pushState({filter: ko.mapping.toJS(self.filter)}, 'Credit Visualization', self.buildURI());
@@ -299,7 +303,7 @@ ko.components.register('credit-visualization', {
                      self.filter[key].subscribe(filterUpdateListener);
                   }
 
-                  self.filter.user(null); // trigger a redraw to use now-loaded data
+                  self.filter.users([]); // trigger a redraw to use now-loaded data
                });
             });
          });
