@@ -55,7 +55,7 @@ ko.components.register('credit-visualization', {
 
       var uriParams = (new URI()).search(true);
       var pidList = uriParams['pid[]'] || [];
-      var userList = uriParams['users[]'] || [];
+      var userList = params.user || uriParams['users[]'] || [];
 
       self.filter = {
          collectionId: ko.observable(uriParams.collectionId),
