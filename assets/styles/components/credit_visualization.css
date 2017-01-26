@@ -1,28 +1,28 @@
-credit_visualization {
+credit-visualization {
    display: block;
    position: relative;
 
    padding: 1em 0;
 }
 
-credit_visualization header {
+credit-visualization header {
    margin-bottom: 1em;
 }
 
-credit_visualization svg .bar {
+credit-visualization svg .bar {
    fill: steelblue;
 }
 
-credit_visualization svg .axis path {
+credit-visualization svg .axis path {
    display: none;
 }
 
-credit_visualization svg g.series rect.highlight {
+credit-visualization svg g.series rect.highlight {
    stroke: black;
    stroke-width: 1px;
 }
 
-credit_visualization svg g.series text {
+credit-visualization svg g.series text {
    display: none;
 
    text-anchor: middle;
@@ -37,27 +37,27 @@ credit_visualization svg g.series text {
    pointer-events: none;
 }
 
-credit_visualization svg g.series text.highlight {
+credit-visualization svg g.series text.highlight {
    display: inherit;
 }
 
-credit_visualization svg text.total-label {
+credit-visualization svg text.total-label {
    display: none;
 
    text-anchor: middle
 }
 
-credit_visualization svg text.total-label.highlight {
+credit-visualization svg text.total-label.highlight {
    display: inherit;
 
    font-size: 1.25em;
 }
 
-credit_visualization svg a text:hover {
+credit-visualization svg a text:hover {
    text-decoration: underline;
 }
 
-credit_visualization svg .legend .highlight text {
+credit-visualization svg .legend .highlight text {
    font-size: 110%;
 
    cursor: default;
@@ -66,32 +66,32 @@ credit_visualization svg .legend .highlight text {
    user-select: none;
 }
 
-credit_visualization svg .legend .highlight rect {
+credit-visualization svg .legend .highlight rect {
    stroke: black;
    stroke-width: 2px;
 }
 
-credit_visualization svg .notice-label text {
+credit-visualization svg .notice-label text {
    fill: white;
 
    text-anchor: middle;
 }
 
-credit_visualization svg .notice-label rect {
+credit-visualization svg .notice-label rect {
    padding: 1em;
 
    fill: rgba(51, 51, 51, 0.61);
 }
 
-credit_visualization svg .title a {
+credit-visualization svg .title a {
    font-style: italic;
 }
 
-credit_visualization svg .title a:hover {
+credit-visualization svg .title a:hover {
    text-decoration: underline;
 }
 
-credit_visualization .embed-popup {
+credit-visualization .embed-popup {
    position: absolute;
 
    top: 33%;
@@ -109,7 +109,7 @@ credit_visualization .embed-popup {
    background: #fff;
 }
 
-credit_visualization .embed-popup code {
+credit-visualization .embed-popup code {
    display: block;
 
    margin-bottom: 1em;
@@ -124,7 +124,7 @@ credit_visualization .embed-popup code {
    text-align: left;
 }
 
-credit_visualization .overlay {
+credit-visualization .overlay {
    position: absolute;
 
    left: 0;
