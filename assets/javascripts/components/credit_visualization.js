@@ -1,41 +1,48 @@
 ko.components.register('credit-visualization', {
-   template: ' <div data-bind="attr: {id: htmlId()}">\
-                  <svg width="1024" height="500" ></svg>\
+   template: ' <div class="error" data-bind="visible: errorText">\
+                  <header>Error</header>\
+                  <p><span data-bind="text: errorText"></span></p>\
                </div>\
-               <header>\
-                  <span>User Contributions to</span>\
-                  <a href="#" data-bind="attr: {href: titleTarget}, text: titleText"></a>,\
-                  <span>by Type</span>\
-               </header>\
-               <div class="documents">\
-                  <header>Documents</header>\
-                  <div data-bind="foreach: documents">\
-                     <label>\
-                        <input type="checkbox" data-bind="value: $data.id,\
-                                                          checked: $parent.filter.pid" />\
-                        <span data-bind="text: $data.name">Document</span>\
-                     </label>\
+               <div data-bind="visible: !errorText()">\
+                  <div data-bind="attr: {id: htmlId()}">\
+                     <svg width="1024" height="500" ></svg>\
                   </div>\
-               </div>\
-               <div class="filters">\
-                  <div class="users">\
-                     <header>Users</header>\
-                     <!-- ko foreach: users -->\
-                     <label>\
-                        <input type="checkbox" data-bind="value: $data.id,\
-                                                          checked: $parent.filter.users" />\
-                        <span data-bind="text: $data.name">User</span>\
-                     </label>\
-                     <!-- /ko -->\
+                  <header>\
+                     <span>User Contributions to</span>\
+                     <a href="#" data-bind="attr: {href: titleTarget}, text: titleText"></a>,\
+                     <span>by Type</span>\
+                  </header>\
+                  <div class="documents">\
+                     <header>Documents</header>\
+                     <div data-bind="foreach: documents">\
+                        <label>\
+                           <input type="checkbox" data-bind="value: $data.id,\
+                                                             checked: $parent.filter.pid" />\
+                           <span data-bind="text: $data.name">Document</span>\
+                        </label>\
+                     </div>\
                   </div>\
-               </div>\
-               <div class="embed-popup" data-bind="visible: embedVisible">\
-                  <p>Copy this HTML to your page:</p>\
-                  <code data-bind="text: embedTarget"></code>\
-                  <button data-bind="click: toggleEmbed">Close</button>\
-               </div>\
-               <div class="overlay" data-bind="visible: embedVisible, click: toggleEmbed"></div>\
-               <button data-bind="click: toggleEmbed">Embed</button>',
+                  <div class="filters">\
+                     <div class="users">\
+                        <header>Users</header>\
+                        <!-- ko foreach: users -->\
+                        <label>\
+                           <input type="checkbox" data-bind="value: $data.id,\
+                                                             checked: $parent.filter.users" />\
+                           <span data-bind="text: $data.name">User</span>\
+                        </label>\
+                        <!-- /ko -->\
+                     </div>\
+                  </div>\
+                  <div class="overlay" data-bind="visible: errorText"></div>\
+                  <div class="embed-popup" data-bind="visible: embedVisible">\
+                     <p>Copy this HTML to your page:</p>\
+                     <code data-bind="text: embedTarget"></code>\
+                     <button data-bind="click: toggleEmbed">Close</button>\
+                  </div>\
+                  <div class="overlay" data-bind="visible: embedVisible, click: toggleEmbed"></div>\
+                  <button data-bind="click: toggleEmbed">Embed</button>\
+               </div>',
 
    /**
     */
@@ -51,10 +58,12 @@ ko.components.register('credit-visualization', {
       var userList = uriParams['users[]'] || [];
 
       self.filter = {
+         collectionId: ko.observable(uriParams.collectionId),
          users: ko.observableArray(userList instanceof Array ? userList : [userList]),
-         pid: ko.observableArray(pidList instanceof Array ? pidList : [pidList]),
-         collectionId: ko.observable(uriParams.collectionId)
+         pid: ko.observableArray(pidList instanceof Array ? pidList : [pidList])
       };
+
+      self.errorText = ko.observable();
 
       self.embedTarget = ko.observable('');
       self.embedVisible = ko.observable(false);
@@ -268,6 +277,11 @@ ko.components.register('credit-visualization', {
 
       // BEHAVIOUR
       self.getWorkData = function (id) {
+         if (!self.filter.collectionId() && self.filter.pid().length == 0) {
+            self.errorText('Must provide a project id')
+            return;
+         }
+
          ajax('get', '/services/credit_viz' + currentURI.search(), false, function (credViz) {
             /**
              * TODO: When/if the credit_viz service is capable of returning a result with both the project name
