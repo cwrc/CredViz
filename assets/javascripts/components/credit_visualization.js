@@ -41,8 +41,10 @@ ko.components.register('credit-visualization', {
                      <button data-bind="click: toggleEmbed">Close</button>\
                   </div>\
                   <div class="overlay" data-bind="visible: embedVisible, click: toggleEmbed"></div>\
-                  <button data-bind="click: toggleEmbed">Embed</button>\
-               </div>',
+                  <button data-bind="click: toggleEmbed">Link</button>\
+                  <button data-bind="click: saveScreenshot">Save Image</button>\
+               </div>\
+               ',
 
    /**
     */
@@ -50,6 +52,22 @@ ko.components.register('credit-visualization', {
       var self = this;
 
       self.htmlId = ko.observable(params.id || 'creditvis');
+
+      self.saveScreenshot = function () {
+         var domNode = document.querySelector('credit-visualization');
+
+         domtoimage
+            .toJpeg(domNode, {
+               quality: 0.95,
+               bgcolor: '#fff'
+            })
+            .then(function (dataUrl) {
+               var link = document.createElement('a');
+               link.download = 'screen.jpeg';
+               link.href = dataUrl;
+               link.click();
+            });
+      };
 
       // STATE
 
