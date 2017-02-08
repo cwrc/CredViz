@@ -8,7 +8,7 @@ ko.components.register('credit-visualization', {
                      <svg width="1024" height="500" ></svg>\
                   </div>\
                   <header>\
-                     <span>User Contributions to</span>\
+                     <span>Contributions to</span>\
                      <a href="#" data-bind="attr: {href: titleTarget}, text: titleText"></a>,\
                      <span>by Type</span>\
                   </header>\
@@ -278,7 +278,7 @@ ko.components.register('credit-visualization', {
       // BEHAVIOUR
       self.getWorkData = function (id) {
          if (!self.filter.collectionId() && self.filter.pid().length == 0) {
-            self.errorText('Must provide a project id')
+            self.errorText('Must provide a project id');
             return;
          }
 
