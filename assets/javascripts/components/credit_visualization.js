@@ -43,31 +43,17 @@ ko.components.register('credit-visualization', {
                   <div class="overlay" data-bind="visible: embedVisible, click: toggleEmbed"></div>\
                   <button data-bind="click: toggleEmbed">Link</button>\
                   <button data-bind="click: saveScreenshot">Save Image</button>\
+                  <button data-bind="click: savePDF">Save PDF</button>\
                </div>\
                ',
 
    /**
+    * Uses dom-to-node to produce images. https://github.com/tsayen/dom-to-image
     */
    viewModel: function (params) {
       var self = this;
 
       self.htmlId = ko.observable(params.id || 'creditvis');
-
-      self.saveScreenshot = function () {
-         var domNode = document.querySelector('credit-visualization');
-
-         domtoimage
-            .toJpeg(domNode, {
-               quality: 0.95,
-               bgcolor: '#fff'
-            })
-            .then(function (dataUrl) {
-               var link = document.createElement('a');
-               link.download = 'screen.jpeg';
-               link.href = dataUrl;
-               link.click();
-            });
-      };
 
       // STATE
 
@@ -294,6 +280,77 @@ ko.components.register('credit-visualization', {
       };
 
       // BEHAVIOUR
+      self.saveScreenshot = function () {
+         var domNode, display;
+
+         domNode = document.querySelector('credit-visualization');
+
+         display = domNode.style.display;
+         domNode.style.display = 'inline-block';
+
+         domtoimage
+            .toJpeg(domNode, {
+               quality: 1.0,
+               bgcolor: '#fff'
+            })
+            .then(function (dataUrl) {
+               var link = document.createElement('a');
+               link.download = 'screen.jpeg';
+               link.href = dataUrl;
+               domNode.style.display = display;
+               link.click();
+            });
+      };
+
+      self.savePDF = function () {
+         var domNode, display, pdf;
+
+         domNode = document.querySelector('credit-visualization');
+
+         display = domNode.style.display;
+         domNode.style.display = 'inline-block';
+
+         domtoimage
+            .toPng(domNode, {
+               bgcolor: '#fff'
+            })
+            .then(function (dataUrl) {
+               var pdf, pdfWidth, pdfHeight, image, margin, x, y, aspectRatio, pdfImageWidth, pdfImageHeight;
+
+               pdf = new jsPDF('portrait', 'mm'); // orientation, sizeUnit
+
+               image = new Image();
+
+               image.src = dataUrl;
+
+               aspectRatio = image.width / image.height;
+
+               x = 0;
+               y = 0;
+
+               pdfWidth = pdf.internal.pageSize.width;
+               pdfHeight = pdf.internal.pageSize.height;
+
+               margin = 0.10 * pdfWidth; //mm
+
+               pdfImageWidth = 0.80 * pdfWidth;
+               pdfImageHeight = pdfImageWidth / aspectRatio;
+
+
+               pdf.addImage(dataUrl, 'JPEG', margin + x, margin + y, pdfImageWidth, pdfImageHeight);
+
+               //console.log('image', image.width, image.height)
+               //console.log(aspectRatio);
+               //console.log('pdfImage', pdfImageWidth, 'x', pdfImageHeight)
+               //console.log('pdf', pdfWidth, 'x', pdfHeight)
+               //console.log(pdf)
+
+               domNode.style.display = display;
+
+               pdf.save('screen.pdf');
+            });
+      };
+
       self.getWorkData = function (id) {
          if (!self.filter.collectionId() && self.filter.pid().length == 0) {
             self.errorText('Must provide a project id');
