@@ -60,6 +60,9 @@ ko.components.register('credit-visualization', {
 
    /**
     * Uses dom-to-node to produce images. https://github.com/tsayen/dom-to-image
+    *
+    * @param id - the HTML id to assign to the SVG wrapper div, which is then used internally to locate this instance's graph
+    * @param
     */
    viewModel: function (params) {
       var self = this;
@@ -722,6 +725,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
       tickLine = self.contentGroup
          .append("g")
          .attr("class", "axis axis--y")
+         .style("font-size", "12px")
          .call(self.verticalAxis);
 
       tickLine
@@ -730,6 +734,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
          .attr("y", self.contributionScale(self.contributionScale.ticks(10).pop()) - 10)
          .attr("text-anchor", "right")
          .attr("fill", "#000")
+         .attr("font-size", "10px")
          .text("Contribution");
    };
 
@@ -758,6 +763,8 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
       var tickGroup, existingTickLabels, userLabelHoverHandler, columnWidth, tickFill, tickX, tickY, tickDY;
 
       tickGroup = self.svg.select('.axis--x');
+
+      tickGroup.style("font-size", "11px");
 
       tickGroup.call(this.horizontalAxis);
 
@@ -851,7 +858,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
          .attr("transform", function (d, i) {
             return "translate(0," + i * 20 + ")";
          })
-         .style("font", "10px sans-serif")
+         .style("font", "12px sans-serif")
          .on('mouseover', legendHoverHandler)
          .on('mouseout', legendHoverHandler);
 
