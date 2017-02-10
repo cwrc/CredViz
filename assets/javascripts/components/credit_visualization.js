@@ -34,16 +34,27 @@ ko.components.register('credit-visualization', {
                         <!-- /ko -->\
                      </div>\
                   </div>\
-                  <div class="overlay" data-bind="visible: errorText"></div>\
-                  <div class="embed-popup" data-bind="visible: embedVisible">\
-                     <p>Copy this HTML to your page:</p>\
-                     <code data-bind="text: embedTarget"></code>\
-                     <button data-bind="click: toggleEmbed">Close</button>\
+                  <div class="actions">\
+                     <div class="overlay" data-bind="visible: errorText"></div>\
+                     <div class="embed popup" data-bind="visible: embedVisible">\
+                        <p>Copy this HTML to your page:</p>\
+                        <code data-bind="text: embedTarget"></code>\
+                        <button data-bind="click: toggleEmbed">Close</button>\
+                     </div>\
+                     <div class="overlay" data-bind="visible: embedVisible, click: toggleEmbed"></div>\
+                     <button data-bind="click: toggleEmbed">Link</button>\
+                     <div class="download-popup popup" data-bind="visible: downloadVisible">\
+                        <p>Save as...</p>\
+                        <div class="options">\
+                           <button data-bind="click: function() { saveScreenshot(\'png\') }">PNG</button>\
+                           <button data-bind="click: function() { saveScreenshot(\'jpg\') }">JPG</button>\
+                           <button data-bind="click: savePDF">PDF</button>\
+                        </div>\
+                        <button data-bind="click: toggleDownload">Close</button>\
+                     </div>\
+                     <div class="overlay" data-bind="visible: downloadVisible, click: toggleDownload"></div>\
+                     <button data-bind="click: toggleDownload">Download</button>\
                   </div>\
-                  <div class="overlay" data-bind="visible: embedVisible, click: toggleEmbed"></div>\
-                  <button data-bind="click: toggleEmbed">Link</button>\
-                  <button data-bind="click: saveScreenshot">Save Image</button>\
-                  <button data-bind="click: savePDF">Save PDF</button>\
                </div>\
                ',
 
@@ -72,12 +83,18 @@ ko.components.register('credit-visualization', {
       self.embedTarget = ko.observable('');
       self.embedVisible = ko.observable(false);
 
+      self.downloadVisible = ko.observable(false);
+
       self.toggleEmbed = function () {
          var uri = new URI();
 
          self.embedVisible(!self.embedVisible());
 
          self.embedTarget('<iframe src="' + uri + '"></iframe>');
+      };
+
+      self.toggleDownload = function () {
+         self.downloadVisible(!self.downloadVisible());
       };
 
       self.allModifications = ko.pureComputed(function () {
@@ -280,26 +297,58 @@ ko.components.register('credit-visualization', {
       };
 
       // BEHAVIOUR
-      self.saveScreenshot = function () {
-         var domNode, display;
+
+      // filter for hiding HTML nodes in screenshots
+      var uiFilter = function (node) {
+         var nodeClasses, hiddenClasses;
+
+         // everything that's not an element probably should stay, since probably just content
+         // also, you can't get attributes on non-elements
+         if (node.nodeType != Node.ELEMENT_NODE)
+            return true;
+
+         nodeClasses = (node.getAttribute('class') || '').split(/\s/);
+         hiddenClasses = ['overlay', 'popup', 'actions'];
+
+         return nodeClasses.every(function (nodeClass) {
+            return hiddenClasses.indexOf(nodeClass) < 0;
+         });
+      };
+
+      self.saveScreenshot = function (type) {
+         var domNode, display, downloadImage;
 
          domNode = document.querySelector('credit-visualization');
 
          display = domNode.style.display;
          domNode.style.display = 'inline-block';
 
-         domtoimage
-            .toJpeg(domNode, {
-               quality: 1.0,
-               bgcolor: '#fff'
-            })
-            .then(function (dataUrl) {
-               var link = document.createElement('a');
-               link.download = 'screen.jpeg';
-               link.href = dataUrl;
-               domNode.style.display = display;
-               link.click();
-            });
+         downloadImage = function (dataUrl) {
+            var link = document.createElement('a');
+
+            link.download = (type == 'png') ? 'screen.png' : 'screen.jpeg';
+            link.href = dataUrl;
+
+            domNode.style.display = display;
+
+            link.click();
+         };
+
+         if (type == 'png')
+            domtoimage
+               .toPng(domNode, {
+                  bgcolor: '#fff',
+                  filter: uiFilter
+               })
+               .then(downloadImage);
+         else
+            domtoimage
+               .toJpeg(domNode, {
+                  quality: 1.0,
+                  bgcolor: '#fff',
+                  filter: uiFilter
+               })
+               .then(downloadImage);
       };
 
       self.savePDF = function () {
@@ -312,7 +361,8 @@ ko.components.register('credit-visualization', {
 
          domtoimage
             .toPng(domNode, {
-               bgcolor: '#fff'
+               bgcolor: '#fff',
+               filter: uiFilter
             })
             .then(function (dataUrl) {
                var pdf, pdfWidth, pdfHeight, image, margin, x, y, aspectRatio, pdfImageWidth, pdfImageHeight;

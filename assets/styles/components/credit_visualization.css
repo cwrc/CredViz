@@ -91,10 +91,11 @@ credit-visualization svg .title a:hover {
    text-decoration: underline;
 }
 
-credit-visualization .embed-popup {
+credit-visualization .popup {
    position: absolute;
 
    top: 33%;
+   left: 25%;
    right: 25%;
    z-index: 5;
 
@@ -109,7 +110,7 @@ credit-visualization .embed-popup {
    background: #fff;
 }
 
-credit-visualization .embed-popup code {
+credit-visualization .popup code {
    display: block;
 
    margin-bottom: 1em;
@@ -122,6 +123,21 @@ credit-visualization .embed-popup code {
    background: rgb(242, 242, 242);
 
    text-align: left;
+}
+
+credit-visualization button {
+   margin: 0.5em;
+   padding: 0.25em 0.5em;
+}
+
+credit-visualization .download-popup .options {
+   margin-bottom: 1em;
+}
+
+credit-visualization .download-popup .options button {
+   margin: 0.5em 1em;
+
+   padding: 0.5em 2em;
 }
 
 credit-visualization .overlay {
