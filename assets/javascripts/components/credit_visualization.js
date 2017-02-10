@@ -326,7 +326,7 @@ ko.components.register('credit-visualization', {
          downloadImage = function (dataUrl) {
             var link = document.createElement('a');
 
-            link.download = (type == 'png') ? 'screen.png' : 'screen.jpeg';
+            link.download = self.titleText() + ((type == 'png') ? '.png' : '.jpeg');
             link.href = dataUrl;
 
             domNode.style.display = display;
@@ -395,9 +395,7 @@ ko.components.register('credit-visualization', {
                //console.log('pdf', pdfWidth, 'x', pdfHeight)
                //console.log(pdf)
 
-               domNode.style.display = display;
-
-               pdf.save('screen.pdf');
+               pdf.save(self.titleText() + '.pdf');
             });
       };
 
