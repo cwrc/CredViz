@@ -7,7 +7,7 @@ ko.components.register('credit-visualization', {
                   <div data-bind="attr: {id: htmlId()}">\
                      <svg width="1024" height="500" ></svg>\
                   </div>\
-                  <header>\
+                  <header class="graph-title">\
                      <span>Contributions to</span>\
                      <a href="#" data-bind="attr: {href: titleTarget}, text: titleText"></a>,\
                      <span>by Type</span>\
@@ -716,7 +716,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
    };
 
    CWRC.CreditVisualization.StackedColumnGraph.prototype.constructLeftAxis = function () {
-      var self = this, verticalAxis, tickLine;
+      var self = this, tickLine;
 
       self.verticalAxis = d3.axisLeft(self.contributionScale)
          .ticks(10, "s")
