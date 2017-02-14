@@ -4,6 +4,11 @@ ko.components.register('credit-visualization', {
                   <p><span data-bind="text: errorText"></span></p>\
                </div>\
                <div data-bind="visible: !errorText()">\
+                  <div class="view-tabs">\
+                     <a href="#" data-bind="click: function() { view(\'graph\') }, css: {selected: isView(\'graph\')}">Graph</a><!--\
+                     --><a href="#" data-bind="click: function() { view(\'timeline\') }, css: {selected: isView(\'timeline\')}">Timeline</a><!--\
+                     --><a href="#" data-bind="click: function() { view(\'table\') }, css: {selected: isView(\'table\')}">Table</a>\
+                  </div>\
                   <div data-bind="attr: {id: htmlId()}">\
                      <svg width="1024" height="500" ></svg>\
                   </div>\
@@ -98,6 +103,12 @@ ko.components.register('credit-visualization', {
 
       self.toggleDownload = function () {
          self.downloadVisible(!self.downloadVisible());
+      };
+
+      self.view = ko.observable('graph');
+
+      self.isView = function (viewName) {
+         return self.view() == viewName;
       };
 
       self.allModifications = ko.pureComputed(function () {

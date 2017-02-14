@@ -9,86 +9,30 @@ credit-visualization header {
    margin-bottom: 1em;
 }
 
-credit-visualization svg .bar {
-   fill: steelblue;
+credit-visualization * {
+   transition: all 0.1s ease-out;
 }
 
-credit-visualization svg .axis path {
-   display: none;
+credit-visualization .view-tabs a {
+   display: inline-block;
+
+   padding: 0.25em 0.75em;
+
+   color: black;
+   text-decoration: none;
+
+   border-left: 1px solid black;
 }
 
-credit-visualization svg g.series rect.highlight {
-   stroke: black;
-   stroke-width: 1px;
+credit-visualization .view-tabs a:last-of-type {
+   border-right: 1px solid black;
 }
 
-credit-visualization svg g.series text {
-   display: none;
+credit-visualization .view-tabs a:hover,
+credit-visualization .view-tabs .selected {
+   background: #333;
 
-   text-anchor: middle;
-   alignment-baseline: middle;
-
-   fill: black;
-   font-size: 1.25em;
-   font-weight: bold;
-   stroke: white;
-   stroke-width: 0.03em;
-
-   pointer-events: none;
-}
-
-credit-visualization svg g.series text.highlight {
-   display: inherit;
-}
-
-credit-visualization svg text.total-label {
-   display: none;
-
-   text-anchor: middle
-}
-
-credit-visualization svg text.total-label.highlight {
-   display: inherit;
-
-   font-size: 1.25em;
-}
-
-credit-visualization svg a text:hover {
-   text-decoration: underline;
-}
-
-credit-visualization svg .legend .highlight text {
-   font-size: 110%;
-
-   cursor: default;
-   -webkit-user-select: none;
-   -moz-user-select: none;
-   user-select: none;
-}
-
-credit-visualization svg .legend .highlight rect {
-   stroke: black;
-   stroke-width: 2px;
-}
-
-credit-visualization svg .notice-label text {
-   fill: white;
-
-   text-anchor: middle;
-}
-
-credit-visualization svg .notice-label rect {
-   padding: 1em;
-
-   fill: rgba(51, 51, 51, 0.61);
-}
-
-credit-visualization svg .title a {
-   font-style: italic;
-}
-
-credit-visualization svg .title a:hover {
-   text-decoration: underline;
+   color: white;
 }
 
 credit-visualization .popup {
