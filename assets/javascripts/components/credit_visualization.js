@@ -16,7 +16,8 @@ ko.components.register('credit-visualization', {
                      <!-- timeline here -->\
                   </div>\
                   <div data-bind="visible: isView(\'Table\'), attr: {id: htmlId()}">\
-                     <credit-visualization-table data-bind="style: {width: width + \'px\', height: height + \'px\'}" params="data: filteredModifications"></credit-visualization-table>\
+                     <credit-visualization-table data-bind="style: {width: width + \'px\', height: height + \'px\'}" \
+                                                 params="filteredModifications: filteredModifications, totalNumChanges: totalNumChanges"></credit-visualization-table>\
                   </div>\
                   <header class="graph-title">\
                      <span>Contributions to</span>\

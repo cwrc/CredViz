@@ -76,7 +76,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
       var self = this;
 
       var seriesVM, workTagStacker, workTagStack, formatPercent, maxValue, segmentHoverHandler,
-         rectBlocksVM, labelsVM, totalLabelsVM, hasSize, columnWidth, columnWidthThreshold, drawableCanvasWidth;
+         rectBlocksVM, labelsVM, hasSize, columnWidth, columnWidthThreshold, drawableCanvasWidth;
 
       workTagStacker = d3.stack()
          .keys(self.workTypes)
