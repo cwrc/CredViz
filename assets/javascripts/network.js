@@ -24,7 +24,7 @@
                }
             } else {
                // throw 4/5xx no matter what, so that the testing framework sees it.
-               throw "ERROR: " + request.status + " (" + method.toUpperCase() + " " + uri + ")\n\"" + request.response + "\" ";
+               throw "ERROR: " + request.status + " (" + method.toTitleCase() + " " + uri + ")\n\"" + request.response + "\" ";
             }
          }
       };

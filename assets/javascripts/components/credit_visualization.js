@@ -4,13 +4,19 @@ ko.components.register('credit-visualization', {
                   <p><span data-bind="text: errorText"></span></p>\
                </div>\
                <div data-bind="visible: !errorText()">\
-                  <div class="view-tabs">\
-                     <a href="#" data-bind="click: function() { view(\'graph\') }, css: {selected: isView(\'graph\')}">Graph</a><!--\
-                     --><a href="#" data-bind="click: function() { view(\'timeline\') }, css: {selected: isView(\'timeline\')}">Timeline</a><!--\
-                     --><a href="#" data-bind="click: function() { view(\'table\') }, css: {selected: isView(\'table\')}">Table</a>\
+                  <div class="view-tabs" data-bind="foreach: views">\
+                     <a href="#" data-bind="click: function() { $parent.view($data) }, \
+                                            css: {selected: $parent.isView($data)}, \
+                                            text: $data"></a>\
                   </div>\
-                  <div data-bind="attr: {id: htmlId()}">\
-                     <svg width="1024" height="500" ></svg>\
+                  <div data-bind="visible: isView(\'Graph\'), attr: {id: htmlId()}">\
+                     <svg data-bind="attr: {width: width, height: height}"></svg>\
+                  </div>\
+                  <div data-bind="visible: isView(\'Timeline\'), attr: {id: htmlId()}">\
+                     <!-- timeline here -->\
+                  </div>\
+                  <div data-bind="visible: isView(\'Table\'), attr: {id: htmlId()}">\
+                     <credit-visualization-table data-bind="style: {width: width + \'px\', height: height + \'px\'}" params="data: filteredModifications"></credit-visualization-table>\
                   </div>\
                   <header class="graph-title">\
                      <span>Contributions to</span>\
@@ -60,8 +66,7 @@ ko.components.register('credit-visualization', {
                      <div class="overlay" data-bind="visible: downloadVisible, click: toggleDownload"></div>\
                      <button data-bind="click: toggleDownload">Download</button>\
                   </div>\
-               </div>\
-               ',
+               </div>',
 
    /**
     * Uses dom-to-node to produce images. https://github.com/tsayen/dom-to-image
@@ -73,6 +78,8 @@ ko.components.register('credit-visualization', {
       var self = this;
 
       self.htmlId = ko.observable(params.id || 'creditvis');
+      self.width = params.width || 1024;
+      self.height = params.height || 500;
 
       // STATE
 
@@ -105,7 +112,9 @@ ko.components.register('credit-visualization', {
          self.downloadVisible(!self.downloadVisible());
       };
 
-      self.view = ko.observable('graph');
+      //self.views = ['Graph', 'Timeline', 'Table'];
+      self.views = ['Graph', 'Table'];
+      self.view = ko.observable('Graph');
 
       self.isView = function (viewName) {
          return self.view() == viewName;
@@ -489,6 +498,12 @@ ko.components.register('credit-visualization', {
 
 var CWRC = CWRC || {};
 CWRC.CreditVisualization = CWRC.CreditVisualization || {};
+
+CWRC.toTitleCase = function (string) {
+   return string.split(/\s/g).map(function (word) {
+      return word[0].toUpperCase() + word.slice(1);
+   }).join(' ')
+};
 
 (function WorkflowChangeTally() {
    CWRC.CreditVisualization.WorkflowChangeTally = function () {
