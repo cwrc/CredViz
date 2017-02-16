@@ -5433,7 +5433,7 @@ var   t1$1 = new Date;
     "p": function(x, p) { return formatRounded(x * 100, p); },
     "r": formatRounded,
     "s": formatPrefixAuto,
-    "X": function(x) { return Math.round(x).toString(16).toUpperCase(); },
+    "X": function(x) { return Math.round(x).toString(16).toTitleCase(); },
     "x": function(x) { return Math.round(x).toString(16); }
   };
 

@@ -385,7 +385,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
          if (segments.size() > 0) {
             segments.classed("highlight", isEnter);
          } else {
-            self.setNotice(isEnter ? 'No "' + self.toUpperCase(columnName.replace('_', ' ')) + '" contributions' : '');
+            self.setNotice(isEnter ? 'No "' + CWRC.toTitleCase(columnName.replace('_', ' ')) + '" contributions' : '');
          }
       };
 
@@ -415,7 +415,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
          .attr("dy", ".35em")
          .attr("text-anchor", "end")
          .text(function (columnName) {
-            return self.toUpperCase(columnName.replace('_', ' '));
+            return CWRC.toTitleCase(columnName.replace('_', ' '));
          });
    };
 
@@ -455,12 +455,6 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
          rectSelection.attr('width', 0);
          rectSelection.attr('height', 0);
       }
-   };
-
-   CWRC.CreditVisualization.StackedColumnGraph.prototype.toUpperCase = function (string) {
-      return string.split(/\s/g).map(function (word) {
-         return word[0].toUpperCase() + word.slice(1);
-      }).join(' ')
    };
 
    CWRC.CreditVisualization.StackedColumnGraph.countChanges = function (datum) {
