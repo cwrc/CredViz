@@ -64,8 +64,6 @@ ko.components.register('credit-visualization-table', {
       // This is done on a polling loop because the D3 graph doesn't have a conveniently accessible event here
       self.fetchWorkColors = function () {
          if (document.querySelector('svg g')) {
-            console.log('found it')
-
             for (var workType in self.workTypeColors) {
                var graphLegendItem, snakeWorkType;
 
