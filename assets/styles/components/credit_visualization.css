@@ -5,8 +5,8 @@ credit-visualization {
    padding: 1em 0;
 }
 
-credit-visualization header {
-   margin-bottom: 1em;
+credit-visualization header.graph-title {
+   margin: 0.5em 0 1em 0;
 }
 
 credit-visualization * {
