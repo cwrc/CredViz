@@ -31,7 +31,10 @@ ko.components.register('credit-visualization-table', {
          });
       });
 
-      self.workTypes = CWRC.CreditVisualization.WorkflowChangeTally.CATEGORIES.slice(0);
+      self.workTypes = CWRC.CreditVisualization.WorkflowChangeTally.CATEGORIES.slice(0).filter(function (workType) {
+         return params.ignoreTags.indexOf(workType) < 0;
+      });
+
       self.cleanLabel = function (workType) {
          return CWRC.toTitleCase(workType.replace('_', ' '));
       };
@@ -73,8 +76,7 @@ ko.components.register('credit-visualization-table', {
 
                self.workTypeColors[workType](graphLegendItem ? graphLegendItem.getAttribute('fill') : '');
             }
-         }
-         else {
+         } else {
             window.setTimeout(self.fetchWorkColors, 500);
          }
       };

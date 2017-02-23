@@ -17,7 +17,10 @@ ko.components.register('credit-visualization', {
                   </div>\
                   <div data-bind="visible: isView(\'Table\')">\
                      <credit-visualization-table data-bind="style: {width: width + \'px\', height: height + \'px\'}" \
-                                                 params="filteredModifications: filteredModifications, totalNumChanges: totalNumChanges"></credit-visualization-table>\
+                                                 params="filteredModifications: filteredModifications, \
+                                                         totalNumChanges: totalNumChanges, \
+                                                         ignoreTags: ignoreTags,\
+                                                         mergeTags: mergeTags"></credit-visualization-table>\
                   </div>\
                   <header class="graph-title">\
                      <span>Contributions to</span>\
@@ -261,7 +264,8 @@ ko.components.register('credit-visualization', {
          return target;
       });
 
-      params.mergeTags = params.mergeTags || {};
+      self.mergeTags = params.mergeTags || {};
+      self.ignoreTags = params.ignoreTags || [];
 
       self.buildURI = function () {
          var uri = new URI();
@@ -288,7 +292,7 @@ ko.components.register('credit-visualization', {
          var self = this, changeset, removable, mergedTagMap, cleanData;
 
          cleanData = [];
-         mergedTagMap = params.mergeTags;
+         mergedTagMap = self.mergeTags;
 
          // the endpoint returns each workflow change as a separate entry, so we're mering it here.
          data.forEach(function (modification, i) {
@@ -464,7 +468,7 @@ ko.components.register('credit-visualization', {
                   // TODO: remove - later versions of the credviz api should already contain the id
                   self.totalModel().id = parentId;
 
-                  self.grapher = new CWRC.CreditVisualization.StackedColumnGraph(self.htmlId(), params.mergeTags, params.ignoreTags);
+                  self.grapher = new CWRC.CreditVisualization.StackedColumnGraph(self.htmlId(), self.mergeTags, self.ignoreTags);
 
                   filterUpdateListener = function (newVal) {
                      if (historyUpdating)
