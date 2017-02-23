@@ -12,7 +12,8 @@ ko.components.register('credit-visualization-table', {
                      <tr>\
                         <th data-bind="text: $parent.cleanLabel(workType)"></th>\
                         <!-- ko foreach: {data: $parent.users, as: \'user\' } -->\
-                           <td data-bind="text: $parents[1].getContributionForType(user, workType)"></td>\
+                           <td class="contribution" data-bind="text: $parents[1].getContributionForType(user, workType),\
+                                                               css: {nil: $parents[1].isBlankContribution(user, workType)}"></td>\
                         <!-- /ko -->\
                      </tr>\
                   </tbody>\
@@ -47,7 +48,11 @@ ko.components.register('credit-visualization-table', {
 
          percentage = Math.round(((datum.workflow_changes[workType] || 0) / self.totalNumChanges() ) * 100 * decimalShifter);
 
-         return percentage / decimalShifter + '%';
+         return (percentage / decimalShifter) || '\u2013';
+      };
+
+      self.isBlankContribution = function (user, workType) {
+         return !parseInt(self.getContributionForType(user, workType));
       }
    }
 });
