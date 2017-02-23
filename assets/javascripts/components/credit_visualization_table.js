@@ -32,7 +32,8 @@ ko.components.register('credit-visualization-table', {
       });
 
       self.workTypes = CWRC.CreditVisualization.WorkflowChangeTally.CATEGORIES.slice(0).filter(function (workType) {
-         return params.ignoreTags.indexOf(workType) < 0;
+         return params.ignoreTags.indexOf(workType) < 0 &&
+            Object.keys(params.mergeTags).indexOf(workType) < 0;
       });
 
       self.cleanLabel = function (workType) {

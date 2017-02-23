@@ -10,6 +10,7 @@ credit-visualization-table {
 
 credit-visualization-table table {
    width: 100%;
+   height: 100%;
 
    border-collapse: collapse;
 }
