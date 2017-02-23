@@ -40,3 +40,15 @@ credit-visualization-table table td {
 credit-visualization-table table thead th {
    padding-top: 0;
 }
+
+credit-visualization-table table td.contribution:after {
+   content: '%';
+}
+
+credit-visualization-table table td.nil {
+   opacity: 0.3;
+}
+
+credit-visualization-table table td.nil:after {
+   display: none;
+}
