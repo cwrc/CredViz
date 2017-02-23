@@ -9,7 +9,7 @@ ko.components.register('credit-visualization-table', {
                      </tr>\
                   </thead>\
                   <tbody data-bind="foreach: {data: workTypes, as: \'workType\'}">\
-                     <tr>\
+                     <tr data-bind="style: {background: $parent.workTypeColors[workType]}">\
                         <th data-bind="text: $parent.cleanLabel(workType)"></th>\
                         <!-- ko foreach: {data: $parent.users, as: \'user\' } -->\
                            <td class="contribution" data-bind="text: $parents[1].getContributionForType(user, workType),\
@@ -53,6 +53,33 @@ ko.components.register('credit-visualization-table', {
 
       self.isBlankContribution = function (user, workType) {
          return !parseInt(self.getContributionForType(user, workType));
-      }
+      };
+
+      self.workTypeColors = self.workTypes.reduce(function (agg, workType) {
+         agg[workType] = ko.observable();
+
+         return agg;
+      }, {});
+
+      // This is done on a polling loop because the D3 graph doesn't have a conveniently accessible event here
+      self.fetchWorkColors = function () {
+         if (document.querySelector('svg g')) {
+            console.log('found it')
+
+            for (var workType in self.workTypeColors) {
+               var graphLegendItem, snakeWorkType;
+
+               snakeWorkType = workType.toLowerCase().replace(' ', '_');
+
+               graphLegendItem = document.querySelector('.legend-' + snakeWorkType + ' rect');
+
+               self.workTypeColors[workType](graphLegendItem ? graphLegendItem.getAttribute('fill') : '');
+            }
+         }
+         else {
+            window.setTimeout(self.fetchWorkColors, 500);
+         }
+      };
+      self.fetchWorkColors();
    }
 });

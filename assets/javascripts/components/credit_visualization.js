@@ -12,10 +12,10 @@ ko.components.register('credit-visualization', {
                   <div data-bind="visible: isView(\'Graph\'), attr: {id: htmlId()}">\
                      <svg data-bind="attr: {width: width, height: height}"></svg>\
                   </div>\
-                  <div data-bind="visible: isView(\'Timeline\'), attr: {id: htmlId()}">\
+                  <div data-bind="visible: isView(\'Timeline\')">\
                      <!-- timeline here -->\
                   </div>\
-                  <div data-bind="visible: isView(\'Table\'), attr: {id: htmlId()}">\
+                  <div data-bind="visible: isView(\'Table\')">\
                      <credit-visualization-table data-bind="style: {width: width + \'px\', height: height + \'px\'}" \
                                                  params="filteredModifications: filteredModifications, totalNumChanges: totalNumChanges"></credit-visualization-table>\
                   </div>\
@@ -83,16 +83,23 @@ ko.components.register('credit-visualization', {
       self.height = params.height || 500;
 
       // STATE
+      var uriParams, pidList, userList, currentURI, historyUpdating;
 
-      var uriParams = (new URI()).search(true);
-      var pidList = uriParams['pid[]'] || [];
-      var userList = params.user || uriParams['users[]'] || [];
+      uriParams = (new URI()).search(true);
+      pidList = uriParams['pid[]'] || [];
+      userList = params.user || uriParams['users[]'] || [];
+
+      historyUpdating = false;
 
       self.filter = {
          collectionId: ko.observable(uriParams.collectionId),
          users: ko.observableArray(userList instanceof Array ? userList : [userList]),
          pid: ko.observableArray(pidList instanceof Array ? pidList : [pidList])
       };
+
+      currentURI = new URI();
+
+      history.replaceState({filter: ko.mapping.toJS(self.filter)}, 'Credit Visualization', currentURI);
 
       self.errorText = ko.observable();
 
@@ -115,7 +122,14 @@ ko.components.register('credit-visualization', {
 
       //self.views = ['Graph', 'Timeline', 'Table'];
       self.views = ['Graph', 'Table'];
-      self.view = ko.observable('Graph');
+      self.view = ko.observable(uriParams.view || 'Graph');
+
+      self.view.subscribe(function (newView) {
+         if (historyUpdating)
+            return;
+
+         history.pushState({filter: ko.mapping.toJS(self.filter)}, 'Credit Visualization', self.buildURI());
+      });
 
       self.isView = function (viewName) {
          return self.view() == viewName;
@@ -249,10 +263,6 @@ ko.components.register('credit-visualization', {
 
       params.mergeTags = params.mergeTags || {};
 
-      var currentURI = new URI();
-
-      history.replaceState({filter: ko.mapping.toJS(self.filter)}, 'Credit Visualization', currentURI);
-
       self.buildURI = function () {
          var uri = new URI();
 
@@ -268,6 +278,8 @@ ko.components.register('credit-visualization', {
                uri.removeSearch(filterName + '[]');
             }
          }
+
+         uri.setSearch('view', self.view());
 
          return uri;
       };
@@ -453,8 +465,6 @@ ko.components.register('credit-visualization', {
                   self.totalModel().id = parentId;
 
                   self.grapher = new CWRC.CreditVisualization.StackedColumnGraph(self.htmlId(), params.mergeTags, params.ignoreTags);
-
-                  var historyUpdating = false;
 
                   filterUpdateListener = function (newVal) {
                      if (historyUpdating)
