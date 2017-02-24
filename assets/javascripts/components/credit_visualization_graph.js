@@ -28,7 +28,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
       self.svg = d3.select('#' + self.containerId + ' svg');
 
       self.bounds = {
-         padding: {top: 20, right: 20, bottom: 60, left: 60},
+         padding: {top: 20, right: 20, bottom: 20, left: 60},
          getOuterWidth: function () {
             return +self.svg.attr("width");
          },
