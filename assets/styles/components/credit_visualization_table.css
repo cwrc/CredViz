@@ -24,7 +24,7 @@ credit-visualization-table table th {
 /*}*/
 
 credit-visualization-table table tbody th {
-   /*width: 5em;*/
+   width: 10em;
 
    text-align: right;
 }
