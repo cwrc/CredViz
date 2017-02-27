@@ -86,7 +86,7 @@ ko.components.register('credit-visualization', {
       self.height = params.height || 500;
 
       // STATE
-      var uriParams, pidList, userList, currentURI, historyUpdating;
+      var uriParams, pidList, userList, historyUpdating;
 
       uriParams = (new URI()).search(true);
       pidList = uriParams['pid[]'] || [];
@@ -99,10 +99,6 @@ ko.components.register('credit-visualization', {
          users: ko.observableArray(userList instanceof Array ? userList : [userList]),
          pid: ko.observableArray(pidList instanceof Array ? pidList : [pidList])
       };
-
-      currentURI = new URI();
-
-      history.replaceState({filter: ko.mapping.toJS(self.filter)}, 'Credit Visualization', currentURI);
 
       self.errorText = ko.observable();
 
@@ -131,7 +127,7 @@ ko.components.register('credit-visualization', {
          if (historyUpdating)
             return;
 
-         history.pushState({filter: ko.mapping.toJS(self.filter)}, 'Credit Visualization', self.buildURI());
+         self.history.save()
       });
 
       self.isView = function (viewName) {
@@ -266,27 +262,6 @@ ko.components.register('credit-visualization', {
 
       self.mergeTags = params.mergeTags || {};
       self.ignoreTags = params.ignoreTags || [];
-
-      self.buildURI = function () {
-         var uri = new URI();
-
-         for (var filterName in self.filter) {
-            var value = self.filter[filterName]();
-
-            if (value instanceof Array) {
-               uri.setSearch(filterName + '[]', value);
-            } else if (value) {
-               uri.setSearch(filterName, filterName == 'user' ? value.id : value);
-            } else {
-               uri.removeSearch(filterName);
-               uri.removeSearch(filterName + '[]');
-            }
-         }
-
-         uri.setSearch('view', self.view());
-
-         return uri;
-      };
 
       self.sanitize = function (data) {
          var self = this, changeset, removable, mergedTagMap, cleanData;
@@ -440,6 +415,8 @@ ko.components.register('credit-visualization', {
       };
 
       self.getWorkData = function (id) {
+         var currentURI = new URI();
+
          if (!self.filter.collectionId() && self.filter.pid().length == 0) {
             self.errorText('Must provide a project id');
             return;
@@ -471,38 +448,77 @@ ko.components.register('credit-visualization', {
                   self.grapher = new CWRC.CreditVisualization.StackedColumnGraph(self.htmlId(), self.mergeTags, self.ignoreTags);
 
                   filterUpdateListener = function (newVal) {
-                     if (historyUpdating)
-                        return;
-
                      self.grapher.updateBars(self.filteredModifications(), self.totalNumChanges());
 
-                     history.pushState({filter: ko.mapping.toJS(self.filter)}, 'Credit Visualization', self.buildURI());
+                     if (!historyUpdating) {
+                        self.history.save();
+                     }
                   };
 
                   for (var key in self.filter) {
                      self.filter[key].subscribe(filterUpdateListener);
                   }
 
-                  window.addEventListener('popstate', function (event) {
-                     var historicalFilter = history.state.filter;
-                     historyUpdating = true;
-
-                     for (var key in self.filter) {
-                        self.filter[key](historicalFilter[key])
-                     }
-
-                     historyUpdating = false;
-                  });
+                  window.addEventListener('popstate', self.history.load);
 
 // TODO: this is a hack to force it to draw the initial. It shouldn't be necessary. Something is wrong in the D3 section
                   // trigger a redraw to use now-loaded data
+                  historyUpdating = true;
                   var users = self.filter.users();
                   self.filter.users([]);
                   self.filter.users(users);
+                  historyUpdating = false;
                });
             });
          });
       };
+
+      self.history = {
+         save: function (merge) {
+            var data, uri;
+
+            data = {
+               filter: ko.mapping.toJS(self.filter),
+               view: self.view()
+            };
+
+            uri = new URI();
+
+            for (var filterName in self.filter) {
+               var value = self.filter[filterName]();
+
+               if (value instanceof Array) {
+                  uri.setSearch(filterName + '[]', value);
+               } else if (value) {
+                  uri.setSearch(filterName, filterName == 'user' ? value.id : value);
+               } else {
+                  uri.removeSearch(filterName);
+                  uri.removeSearch(filterName + '[]');
+               }
+            }
+
+            uri.setSearch('view', self.view());
+
+            if (merge)
+               history.replaceState(data, 'Credit Visualization', uri);
+            else
+               history.pushState(data, 'Credit Visualization', uri);
+         },
+         load: function (event) {
+            var historicalState = history.state;
+            historyUpdating = true;
+
+            for (var key in self.filter) {
+               self.filter[key](historicalState.filter[key]);
+            }
+
+            self.view(historicalState.view);
+
+            historyUpdating = false;
+         }
+      };
+
+      self.history.save(true)
 
       // d3 loads after KO, so push the AJAX fetch to the event stack.
       window.setTimeout(function () {
