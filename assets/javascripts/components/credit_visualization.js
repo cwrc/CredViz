@@ -415,14 +415,27 @@ ko.components.register('credit-visualization', {
       };
 
       self.getWorkData = function (id) {
-         var currentURI = new URI();
+         var currentSearch, forwardingURI;
+
+         currentSearch = (new URI()).search(true);
+         forwardingURI = new URI();
+         forwardingURI.search(''); // sets to empty
+
+         if (currentSearch['pid'])
+            forwardingURI.setSearch('pid', currentSearch.pid);
+
+         if (currentSearch['collectionId'])
+            forwardingURI.setSearch('collectionId', currentSearch.collectionId);
+
+         if (currentSearch['userId'])
+            forwardingURI.setSearch('userId', currentSearch.userId);
 
          if (!self.filter.collectionId() && self.filter.pid().length == 0) {
             self.errorText('Must provide a project id');
             return;
          }
 
-         ajax('get', '/services/credit_viz' + currentURI.search(), false, function (credViz) {
+         ajax('get', '/services/credit_viz' + forwardingURI.search(), false, function (credViz) {
             /**
              * TODO: When/if the credit_viz service is capable of returning a result with both the project name
              * TODO: and the project's id, these next two ajax calls will become redundant, and can be collapsed
