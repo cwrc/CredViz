@@ -9,7 +9,7 @@ ko.components.register('credit-visualization', {
                                             css: {selected: $parent.isView($data)}, \
                                             text: $data"></a>\
                   </div>\
-                  <div data-bind="visible: isView(\'Graph\'), attr: {id: htmlId()}">\
+                  <div data-bind="visible: isView(\'Bar Graph\'), attr: {id: htmlId()}">\
                      <svg data-bind="attr: {width: width, height: height}"></svg>\
                   </div>\
                   <div data-bind="visible: isView(\'Timeline\')">\
@@ -119,9 +119,9 @@ ko.components.register('credit-visualization', {
          self.downloadVisible(!self.downloadVisible());
       };
 
-      //self.views = ['Graph', 'Timeline', 'Table'];
-      self.views = ['Graph', 'Table'];
-      self.view = ko.observable(uriParams.view || 'Graph');
+      //self.views = ['Bar Graph', 'Timeline', 'Table'];
+      self.views = ['Bar Graph', 'Table'];
+      self.view = ko.observable(uriParams.view || 'Bar Graph');
 
       self.view.subscribe(function (newView) {
          if (historyUpdating)
