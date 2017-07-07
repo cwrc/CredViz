@@ -367,7 +367,7 @@ ko.components.register('credit-visualization', {
       };
 
       self.savePDF = function () {
-         var domNode, pdf;
+         var domNode, pdf, linkTarget;
 
          domNode = document.querySelector('credit-visualization');
 
@@ -404,15 +404,38 @@ ko.components.register('credit-visualization', {
 
                   pdf.addImage(dataUrl, 'PNG', imageX, imageY, pdfImageWidth, pdfImageHeight);
 
-                  pdf.setFontSize(12);
+                  pdf.setFontSize(9);
                   pdf.setTextColor(0, 0, 238);
 
-                  var linkTarget = (new URI()).toString();
+                  var linkTarget, textWidth, textHeight, scaledLineHeight, linkPadding;
+
+                  linkTarget = (new URI()).toString();
 
                   linkX = pdfWidth / 2 - pdf.getTextWidth(linkTarget) / 2;
                   linkY = imageY + pdfImageHeight;
 
-                  pdf.textWithLink(linkTarget, linkX, linkY, {url: linkTarget});
+                  linkTarget = pdf.splitTextToSize(linkTarget, pdfWidth - margin * 2);
+
+                  /*
+                   * Docs don't seem to be done for link annotations.
+                   * See: https://github.com/MrRio/jsPDF/issues/170#issuecomment-293975156
+                   */
+
+                  // todo: use textWithLink instead when it accepts multilines
+                  // pdf.textWithLink(linkTarget, linkX, linkY, {url: linkTarget});
+                  linkPadding = 1;
+
+                  textWidth = linkPadding * 2 +
+                     linkTarget.reduce(function (lineA, lineB) {
+                        return Math.max(pdf.getTextWidth(lineA), pdf.getTextWidth(lineB));
+                     });
+
+                  scaledLineHeight = pdf.getLineHeight() / pdf.internal.scaleFactor;
+                  textHeight = linkTarget.length * scaledLineHeight + linkPadding * 2;
+
+                  pdf.text(linkTarget, linkX, linkY);
+                  pdf.link(linkX, linkY - scaledLineHeight, textWidth, textHeight, {url: linkTarget});
+                  //pdf.rect(linkX, linkY - scaledLineHeight, textWidth, textHeight); // useful for debug
 
                   pdf.save(self.titleText() + '.pdf');
                }
