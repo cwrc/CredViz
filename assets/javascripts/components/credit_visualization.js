@@ -174,8 +174,8 @@ ko.components.register('credit-visualization', {
          };
 
          matchesDocument = function (datum) {
-            // todo: this is curretnly actually accomplished in totalModifications because we don't have document
-            // todo: data here
+            // todo: this is curretnly actually accomplished in totalModifications because we don't
+            // todo: have document data available here
             return true;
 
             //return !filter.pid() ||
@@ -367,11 +367,10 @@ ko.components.register('credit-visualization', {
       };
 
       self.savePDF = function () {
-         var domNode, display, pdf;
+         var domNode, pdf;
 
          domNode = document.querySelector('credit-visualization');
 
-         display = domNode.style.display;
          domNode.style.display = 'inline-block';
 
          domtoimage
@@ -380,7 +379,8 @@ ko.components.register('credit-visualization', {
                filter: uiFilter
             })
             .then(function (dataUrl) {
-               var pdf, pdfWidth, pdfHeight, image, margin, x, y, aspectRatio, pdfImageWidth, pdfImageHeight;
+               var pdf, pdfWidth, pdfHeight, image, margin, imageX, imageY, aspectRatio, pdfImageWidth,
+                  pdfImageHeight, linkX, linkY;
 
                pdf = new jsPDF('portrait', 'mm'); // orientation, sizeUnit
 
@@ -388,29 +388,34 @@ ko.components.register('credit-visualization', {
 
                image.src = dataUrl;
 
-               aspectRatio = image.width / image.height;
+               image.onload = function () {
+                  aspectRatio = image.naturalWidth / image.naturalHeight;
 
-               x = 0;
-               y = 0;
+                  pdfWidth = pdf.internal.pageSize.width;
+                  pdfHeight = pdf.internal.pageSize.height;
 
-               pdfWidth = pdf.internal.pageSize.width;
-               pdfHeight = pdf.internal.pageSize.height;
+                  margin = 0.10 * pdfWidth; //mm
 
-               margin = 0.10 * pdfWidth; //mm
+                  imageX = 0 + margin;
+                  imageY = 0 + margin;
 
-               pdfImageWidth = 0.80 * pdfWidth;
-               pdfImageHeight = pdfImageWidth / aspectRatio;
+                  pdfImageWidth = 0.80 * pdfWidth;
+                  pdfImageHeight = pdfImageWidth / aspectRatio;
 
+                  pdf.addImage(dataUrl, 'PNG', imageX, imageY, pdfImageWidth, pdfImageHeight);
 
-               pdf.addImage(dataUrl, 'JPEG', margin + x, margin + y, pdfImageWidth, pdfImageHeight);
+                  pdf.setFontSize(12);
+                  pdf.setTextColor(0, 0, 238);
 
-               //console.log('image', image.width, image.height)
-               //console.log(aspectRatio);
-               //console.log('pdfImage', pdfImageWidth, 'x', pdfImageHeight)
-               //console.log('pdf', pdfWidth, 'x', pdfHeight)
-               //console.log(pdf)
+                  var linkTarget = (new URI()).toString();
 
-               pdf.save(self.titleText() + '.pdf');
+                  linkX = pdfWidth / 2 - pdf.getTextWidth(linkTarget) / 2;
+                  linkY = imageY + pdfImageHeight;
+
+                  pdf.textWithLink(linkTarget, linkX, linkY, {url: linkTarget});
+
+                  pdf.save(self.titleText() + '.pdf');
+               }
             });
       };
 
