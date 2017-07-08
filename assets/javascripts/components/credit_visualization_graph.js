@@ -460,8 +460,9 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
    CWRC.CreditVisualization.StackedColumnGraph.countChanges = function (datum) {
       var total = 0;
 
-      for (var type in datum.workflow_changes)
-         total += datum.workflow_changes[type];
+      for (var type in datum.workflow_changes) {
+         total += datum.workflow_changes[type].weightedValue();
+      }
 
       return total;
    };

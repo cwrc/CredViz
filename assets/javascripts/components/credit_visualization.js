@@ -263,6 +263,16 @@ ko.components.register('credit-visualization', {
 
          return target;
       });
+      self.filename = ko.pureComputed(function () {
+         var generationTime, timeString;
+
+         generationTime = new Date();
+
+         timeString = generationTime.toISOString().replace(':', '-');
+         timeString = timeString.split('T')[0];
+
+         return (self.titleText().toLowerCase() + ' contributions ' + timeString).replace(/\s/g, '_');
+      });
 
       self.mergeTags = params.mergeTags || {};
       self.ignoreTags = params.ignoreTags || [];
@@ -273,7 +283,7 @@ ko.components.register('credit-visualization', {
          cleanData = [];
          mergedTagMap = self.mergeTags;
 
-         // the endpoint returns each workflow change as a separate entry, so we're mering it here.
+         // the endpoint returns each workflow change as a separate entry, so we're merging it here.
          data.forEach(function (modification, i) {
             var existingRecord = cleanData.find(function (other) {
                return other.user.id == modification.user.id;
@@ -287,17 +297,17 @@ ko.components.register('credit-visualization', {
                cleanData.push(existingRecord)
             }
 
-            var key, scalarContributions;
+            var category, scalarContributions;
 
-            key = modification.workflow_changes.category;
+            category = modification.workflow_changes.category;
 
             // these categories also have relevant file size diff data
             scalarContributions = ['created', 'deposited', 'content_contribution'];
 
-            if (scalarContributions.indexOf(key) >= 0)
-               existingRecord.workflow_changes[key] += parseInt(modification.diff_changes);
+            if (scalarContributions.indexOf(category) >= 0)
+               existingRecord.workflow_changes[category].addValue(parseInt(modification.diff_changes));
             else
-               existingRecord.workflow_changes[key] += 1;
+               existingRecord.workflow_changes[category].addValue(1);
          });
 
          // also merge together categories that have aliases
@@ -307,8 +317,8 @@ ko.components.register('credit-visualization', {
             for (var mergedTag in mergedTagMap) {
                var primaryTag = mergedTagMap[mergedTag];
 
-               changeset[primaryTag] = (changeset[primaryTag] || 0) + (changeset[mergedTag] || 0);
-               changeset[mergedTag] = 0;
+               changeset[primaryTag].addValue(changeset[mergedTag].rawValue() || 0);
+               delete changeset[mergedTag];
             }
          });
 
@@ -347,7 +357,7 @@ ko.components.register('credit-visualization', {
          downloadImage = function (dataUrl) {
             var link = document.createElement('a');
 
-            link.download = self.titleText() + ((type == 'png') ? '.png' : '.jpeg');
+            link.download = self.filename() + ((type == 'png') ? '.png' : '.jpeg');
             link.href = dataUrl;
 
             domNode.style.display = display;
@@ -375,7 +385,7 @@ ko.components.register('credit-visualization', {
       };
 
       self.savePDF = function () {
-         var domNode, pdf, linkTarget;
+         var domNode, pdf, linkTarget, textWidth, textHeight, scaledLineHeight, linkPadding;
 
          domNode = document.querySelector('credit-visualization');
 
@@ -390,7 +400,7 @@ ko.components.register('credit-visualization', {
             })
             .then(function (dataUrl) {
                var pdf, pdfWidth, pdfHeight, image, margin, imageX, imageY, aspectRatio, pdfImageWidth,
-                  pdfImageHeight, linkX, linkY;
+                  pdfImageHeight, linkX, linkY, timeString;
 
                pdf = new jsPDF('portrait', 'mm'); // orientation, sizeUnit
 
@@ -416,8 +426,6 @@ ko.components.register('credit-visualization', {
 
                   pdf.setFontSize(9);
                   pdf.setTextColor(0, 0, 238);
-
-                  var linkTarget, textWidth, textHeight, scaledLineHeight, linkPadding;
 
                   scaledLineHeight = pdf.getLineHeight() / pdf.internal.scaleFactor;
 
@@ -448,7 +456,7 @@ ko.components.register('credit-visualization', {
                   pdf.link(linkX, linkY - scaledLineHeight, textWidth, textHeight, {url: linkTarget});
                   //pdf.rect(linkX, linkY - scaledLineHeight, textWidth, textHeight); // useful for debug
 
-                  pdf.save(self.titleText() + '.pdf');
+                  pdf.save(self.filename() + '.pdf');
 
                   self.creationTime('');
                }
@@ -592,20 +600,12 @@ CWRC.toTitleCase = function (string) {
 
 (function WorkflowChangeTally() {
    CWRC.CreditVisualization.WorkflowChangeTally = function () {
-      this.created = 0;
-      this.deposited = 0;
-      this.metadata_contribution = 0;
-      this.content_contribution = 0;
-      this.checked = 0;
-      this.machine_processed = 0;
-      this.user_tagged = 0;
-      this.rights_assigned = 0;
-      this.published = 0;
-      this.peer_reviewed = 0;
-      this.evaluated = 0;
-      this.peer_evaluated = 0;
-      this.withdrawn = 0;
-      this.deleted = 0;
+      var self = this;
+
+      CWRC.CreditVisualization.WorkflowChangeTally.CATEGORIES
+         .forEach(function (key) {
+            self[key] = new CWRC.CreditVisualization.WorkflowChange()
+         });
    };
 
    CWRC.CreditVisualization.WorkflowChangeTally.CATEGORIES_TO_STAMPS = {
@@ -627,4 +627,21 @@ CWRC.toTitleCase = function (string) {
 
    CWRC.CreditVisualization.WorkflowChangeTally.CATEGORIES =
       Object.keys(CWRC.CreditVisualization.WorkflowChangeTally.CATEGORIES_TO_STAMPS);
+})();
+
+(function WorkflowChange() {
+   CWRC.CreditVisualization.WorkflowChange = function () {
+      var self = this;
+
+      self.rawValue = ko.observable(0);
+      self.weight = ko.observable(1);
+
+      self.weightedValue = ko.pureComputed(function () {
+         return self.rawValue() * self.weight();
+      });
+   };
+
+   CWRC.CreditVisualization.WorkflowChange.prototype.addValue = function (newVal) {
+      this.rawValue(this.rawValue() + newVal)
+   };
 })();

@@ -49,8 +49,11 @@ ko.components.register('credit-visualization-table', {
 
          var nDecimals = 1;
          var decimalShifter = Math.pow(10, nDecimals);
+         var value = datum.workflow_changes[workType].weightedValue() || 0;
 
-         percentage = Math.round(((datum.workflow_changes[workType] || 0) / self.totalNumChanges() ) * 100 * decimalShifter);
+         percentage = Math.round(
+            (value / self.totalNumChanges()) * 100 * decimalShifter
+         );
 
          return (percentage / decimalShifter) || '\u2013';
       };
