@@ -70,6 +70,8 @@ ko.components.register('credit-visualization', {
                      <div class="overlay" data-bind="visible: downloadVisible, click: toggleDownload"></div>\
                      <button data-bind="click: toggleDownload">Download</button>\
                   </div>\
+                  <footer data-bind="text: creationTime">\
+                  </footer>\
                </div>',
 
    /**
@@ -106,6 +108,8 @@ ko.components.register('credit-visualization', {
       self.embedVisible = ko.observable(false);
 
       self.downloadVisible = ko.observable(false);
+      self.isPrinting = ko.observable(false);
+      self.creationTime = ko.observable('');
 
       self.toggleEmbed = function () {
          var uri = new URI();
@@ -338,6 +342,8 @@ ko.components.register('credit-visualization', {
          display = domNode.style.display;
          domNode.style.display = 'inline-block';
 
+         self.creationTime('Generated on ' + new Date());
+
          downloadImage = function (dataUrl) {
             var link = document.createElement('a');
 
@@ -347,6 +353,8 @@ ko.components.register('credit-visualization', {
             domNode.style.display = display;
 
             link.click();
+
+            self.creationTime('');
          };
 
          if (type == 'png')
@@ -372,6 +380,8 @@ ko.components.register('credit-visualization', {
          domNode = document.querySelector('credit-visualization');
 
          domNode.style.display = 'inline-block';
+
+         self.creationTime('Generated on ' + new Date());
 
          domtoimage
             .toPng(domNode, {
@@ -409,10 +419,12 @@ ko.components.register('credit-visualization', {
 
                   var linkTarget, textWidth, textHeight, scaledLineHeight, linkPadding;
 
+                  scaledLineHeight = pdf.getLineHeight() / pdf.internal.scaleFactor;
+
                   linkTarget = (new URI()).toString();
 
                   linkX = pdfWidth / 2 - pdf.getTextWidth(linkTarget) / 2;
-                  linkY = imageY + pdfImageHeight;
+                  linkY = imageY + pdfImageHeight + scaledLineHeight;
 
                   linkTarget = pdf.splitTextToSize(linkTarget, pdfWidth - margin * 2);
 
@@ -425,12 +437,11 @@ ko.components.register('credit-visualization', {
                   // pdf.textWithLink(linkTarget, linkX, linkY, {url: linkTarget});
                   linkPadding = 1;
 
-                  textWidth = linkPadding * 2 +
-                     linkTarget.reduce(function (lineA, lineB) {
-                        return Math.max(pdf.getTextWidth(lineA), pdf.getTextWidth(lineB));
-                     });
+                  textWidth = (linkPadding * 2) +
+                     linkTarget.reduce(function (currentMax, line) {
+                        return Math.max(currentMax, pdf.getTextWidth(line));
+                     }, 0);
 
-                  scaledLineHeight = pdf.getLineHeight() / pdf.internal.scaleFactor;
                   textHeight = linkTarget.length * scaledLineHeight + linkPadding * 2;
 
                   pdf.text(linkTarget, linkX, linkY);
@@ -438,6 +449,8 @@ ko.components.register('credit-visualization', {
                   //pdf.rect(linkX, linkY - scaledLineHeight, textWidth, textHeight); // useful for debug
 
                   pdf.save(self.titleText() + '.pdf');
+
+                  self.creationTime('');
                }
             });
       };

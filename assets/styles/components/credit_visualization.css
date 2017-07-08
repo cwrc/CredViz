@@ -122,3 +122,14 @@ credit-visualization .documents label,
 credit-visualization .filters label {
    display: block;
 }
+
+credit-visualization footer {
+   position: absolute;
+
+   bottom: 1em;
+   left: 0;
+   right: 0;
+
+   background: white;
+   font-size: 10pt;
+}
