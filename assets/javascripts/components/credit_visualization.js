@@ -278,7 +278,7 @@ ko.components.register('credit-visualization', {
       self.ignoreTags = params.ignoreTags || [];
 
       self.sanitize = function (data) {
-         var self = this, changeset, removable, mergedTagMap, cleanData;
+         var self = this, changeset, removable, mergedTagMap, cleanData, category, sourceValue;
 
          cleanData = [];
          mergedTagMap = self.mergeTags;
@@ -297,17 +297,14 @@ ko.components.register('credit-visualization', {
                cleanData.push(existingRecord)
             }
 
-            var category, scalarContributions;
-
             category = modification.workflow_changes.category;
 
-            // these categories also have relevant file size diff data
-            scalarContributions = ['created', 'deposited', 'content_contribution'];
-
-            if (scalarContributions.indexOf(category) >= 0)
-               existingRecord.workflow_changes[category].addValue(parseInt(modification.diff_changes));
+            if (CWRC.CreditVisualization.WorkflowChangeTally.isScalar(category))
+               sourceValue = parseInt(modification.diff_changes);
             else
-               existingRecord.workflow_changes[category].addValue(1);
+               sourceValue = 1;
+
+            existingRecord.workflow_changes[category].addValue(sourceValue);
          });
 
          // also merge together categories that have aliases
@@ -608,6 +605,10 @@ CWRC.toTitleCase = function (string) {
          });
    };
 
+   CWRC.CreditVisualization.WorkflowChangeTally.isScalar = function (category) {
+      return CWRC.CreditVisualization.WorkflowChangeTally.SCALAR_CATEGORIES.indexOf(category) >= 0;
+   };
+
    CWRC.CreditVisualization.WorkflowChangeTally.CATEGORIES_TO_STAMPS = {
       created: 'cre',
       deposited: 'dep',
@@ -627,6 +628,9 @@ CWRC.toTitleCase = function (string) {
 
    CWRC.CreditVisualization.WorkflowChangeTally.CATEGORIES =
       Object.keys(CWRC.CreditVisualization.WorkflowChangeTally.CATEGORIES_TO_STAMPS);
+
+   // these are the categories whose values are based on actual filesize diffs
+   CWRC.CreditVisualization.WorkflowChangeTally.SCALAR_CATEGORIES = ['created', 'deposited', 'content_contribution'];
 })();
 
 (function WorkflowChange() {
