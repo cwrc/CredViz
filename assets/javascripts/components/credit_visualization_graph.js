@@ -81,7 +81,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
       workTagStacker = d3.stack()
          .keys(self.workTypes)
          .value(function (datum, key) {
-            return (datum.workflow_changes[key] || 0) / allChangesCount
+            return (datum.workflow_changes[key].weightedValue() || 0) / allChangesCount
          });
 
       workTagStack = workTagStacker(filteredData);
