@@ -75,10 +75,18 @@ ko.components.register('credit-visualization', {
                </div>',
 
    /**
+    * A credit visualization widget designed to plug into CWRC.
+    *
     * Uses dom-to-node to produce images. https://github.com/tsayen/dom-to-image
     *
-    * @param id - the HTML id to assign to the SVG wrapper div, which is then used internally to locate this instance's graph
-    * @param
+    * @params params
+    *         - id: the HTML id to assign to the SVG wrapper div, which is then used internally to locate this instance's graph
+    *         - width: the pixel width of the whole widget
+    *         - height: the pixel height of the whole widget
+    *         - user: the particular user to request data for
+    *         - mergeTags: Hash where keys are the primary tag and values are a list of tags to merge into the primary tag.
+    *         - ignoreTags: List of tags to ignore. Each list element is a string.
+    *
     */
    viewModel: function (params) {
       var self = this;
