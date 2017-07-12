@@ -86,6 +86,7 @@ ko.components.register('credit-visualization', {
     *         - user: the particular user to request data for
     *         - mergeTags: Hash where keys are the primary tag and values are a list of tags to merge into the primary tag.
     *         - ignoreTags: List of tags to ignore. Each list element is a string.
+    *         - tagWeights: Hash that maps tag names to the relative weight for that tag in calulations.
     *
     */
    viewModel: function (params) {
@@ -94,6 +95,7 @@ ko.components.register('credit-visualization', {
       self.htmlId = ko.observable(params.id || 'creditvis');
       self.width = params.width || 1024;
       self.height = params.height || 500;
+      self.tagWeights = params.tagWeights;
 
       // STATE
       var uriParams, pidList, userList, historyUpdating;
@@ -167,7 +169,11 @@ ko.components.register('credit-visualization', {
 
          countChanges = CWRC.CreditVisualization.StackedColumnGraph.countChanges;
 
-         data = self.sanitize(data).sort(function (a, b) {
+         data = self.sanitize(data);
+
+         self.applyWeights(data, self.tagWeights || {});
+
+         data = data.sort(function (a, b) {
             return countChanges(b) - countChanges(a)
          });
 
@@ -328,6 +334,18 @@ ko.components.register('credit-visualization', {
          });
 
          return cleanData;
+      };
+
+      self.applyWeights = function (data, weights) {
+         var weight;
+
+         data.forEach(function (datum) {
+            for (var category in datum.workflow_changes) {
+               weight = weights[category];
+
+               datum.workflow_changes[category].weight(weight == null ? 1 : weight); // compare to null to allow 0
+            }
+         });
       };
 
       // BEHAVIOUR
@@ -512,7 +530,12 @@ ko.components.register('credit-visualization', {
                   // TODO: remove - later versions of the credviz api should already contain the id
                   self.totalModel().id = parentId;
 
-                  self.grapher = new CWRC.CreditVisualization.StackedColumnGraph(self.htmlId(), self.mergeTags, self.ignoreTags);
+                  self.grapher =
+                     new CWRC.CreditVisualization.StackedColumnGraph(
+                        self.htmlId(),
+                        self.mergeTags,
+                        self.ignoreTags,
+                        self.tagWeights);
 
                   filterUpdateListener = function (newVal) {
                      self.grapher.updateBars(self.filteredModifications(), self.totalNumChanges());
