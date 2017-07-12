@@ -21,7 +21,7 @@ var CWRC = CWRC || {};
 CWRC.CreditVisualization = CWRC.CreditVisualization || {};
 
 (function StackedColumnGraph() {
-   CWRC.CreditVisualization.StackedColumnGraph = function (containerId, mergedTagMap, ignoredTags) {
+   CWRC.CreditVisualization.StackedColumnGraph = function (containerId, mergedTagMap, ignoredTags, tagWeights) {
       var self = this;
 
       self.containerId = containerId;
@@ -68,7 +68,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
 
       this.constructLeftAxis();
       this.constructBottomAxis();
-      this.constructLegend();
+      this.constructLegend(tagWeights);
       this.constructNoticeOverlay();
    };
 
@@ -365,7 +365,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
          .call(self.wrap, columnWidth);
    };
 
-   CWRC.CreditVisualization.StackedColumnGraph.prototype.constructLegend = function () {
+   CWRC.CreditVisualization.StackedColumnGraph.prototype.constructLegend = function (tagWeights) {
       var self = this, legendItem, legendGroup, legendHoverHandler;
 
       legendGroup = self.contentGroup.append('g')
@@ -415,7 +415,16 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
          .attr("dy", ".35em")
          .attr("text-anchor", "end")
          .text(function (columnName) {
-            return CWRC.toTitleCase(columnName.replace('_', ' '));
+            var weight, text;
+
+            weight = tagWeights[columnName];
+
+            text = CWRC.toTitleCase(columnName.replace('_', ' '));
+
+            if (weight != null)
+               text = text + ' (x' + weight + ')';
+
+            return text;
          });
    };
 
