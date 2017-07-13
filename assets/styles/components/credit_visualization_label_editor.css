@@ -1,0 +1,31 @@
+credit-visualization-label-editor {
+   display: block;
+
+   margin: 0 auto;
+
+   padding: 0.125em 0;
+
+   /*overflow-y: auto;*/
+}
+
+credit-visualization-label-editor header {
+   font-size: 1.25em;
+}
+
+credit-visualization-label-editor span {
+   display: inline-block;
+
+   padding: 0.25em;
+
+   width: 12em;
+
+   text-align: right;
+}
+
+credit-visualization-label-editor input {
+   width: 12em;
+
+   border-radius: 0.1em;
+   border: 1px solid grey;
+   padding: 0.25em;
+}

@@ -43,9 +43,10 @@ credit-visualization .view-tabs .selected {
 }
 
 credit-visualization .popup {
-   position: absolute;
+   position: fixed;
 
-   top: 33%;
+   top: 10%;
+   /*bottom: 10%;*/
    left: 25%;
    right: 25%;
    z-index: 5;

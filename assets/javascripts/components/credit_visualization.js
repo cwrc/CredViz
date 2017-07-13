@@ -20,7 +20,8 @@ ko.components.register('credit-visualization', {
                                                  params="filteredModifications: filteredModifications, \
                                                          totalNumChanges: totalNumChanges, \
                                                          ignoreTags: ignoreTags,\
-                                                         mergeTags: mergeTags"></credit-visualization-table>\
+                                                         mergeTags: mergeTags, \
+                                                         labels: labels"></credit-visualization-table>\
                   </div>\
                   <header class="graph-title">\
                      <span>Contributions to</span>\
@@ -50,14 +51,14 @@ ko.components.register('credit-visualization', {
                      </div>\
                   </div>\
                   <div class="actions">\
-                     <div class="overlay" data-bind="visible: errorText"></div>\
+                     <button data-bind="click: toggleEmbed">Link</button>\
+                     <button data-bind="click: toggleDownload">Download</button>\
+                     <button data-bind="click: toggleLabelEditor">Edit Labels</button>\
                      <div class="embed popup" data-bind="visible: embedVisible">\
                         <p>Copy this HTML to your page:</p>\
                         <code data-bind="text: embedTarget"></code>\
                         <button data-bind="click: toggleEmbed">Close</button>\
                      </div>\
-                     <div class="overlay" data-bind="visible: embedVisible, click: toggleEmbed"></div>\
-                     <button data-bind="click: toggleEmbed">Link</button>\
                      <div class="download-popup popup" data-bind="visible: downloadVisible">\
                         <p>Save as...</p>\
                         <div class="options">\
@@ -67,8 +68,11 @@ ko.components.register('credit-visualization', {
                         </div>\
                         <button data-bind="click: toggleDownload">Close</button>\
                      </div>\
-                     <div class="overlay" data-bind="visible: downloadVisible, click: toggleDownload"></div>\
-                     <button data-bind="click: toggleDownload">Download</button>\
+                     <div class="popup" data-bind="visible: labelEditorVisible">\
+                        <credit-visualization-label-editor params="labels: labels"></credit-visualization-label-editor>\
+                        <button data-bind="click: toggleLabelEditor">Done</button>\
+                     </div>\
+                     <div class="overlay" data-bind="visible: overlayVisible, click: clickOverlay"></div>\
                   </div>\
                   <footer data-bind="text: creationTime">\
                   </footer>\
@@ -84,7 +88,7 @@ ko.components.register('credit-visualization', {
     *         - width: the pixel width of the whole widget
     *         - height: the pixel height of the whole widget
     *         - user: the particular user to request data for
-    *         - mergeTags: Hash where keys are the primary tag and values are a list of tags to merge into the primary tag.
+    *         - mergeTags: Hash where keys are a tag that maps to the primary tag which the key should be merged into
     *         - ignoreTags: List of tags to ignore. Each list element is a string.
     *         - tagWeights: Hash that maps tag names to the relative weight for that tag in calulations.
     *
@@ -96,6 +100,16 @@ ko.components.register('credit-visualization', {
       self.width = params.width || 1024;
       self.height = params.height || 500;
       self.tagWeights = params.tagWeights;
+      self.mergeTags = params.mergeTags || {};
+      self.ignoreTags = params.ignoreTags || [];
+      self.labels = CWRC.CreditVisualization.WorkflowChangeTally.CATEGORIES.reduce(function (object, category) {
+         var removedTags = Object.keys(self.mergeTags).concat(self.ignoreTags);
+
+         if (removedTags.indexOf(category) < 0)
+            object[category] = ko.observable(CWRC.toTitleCase(category.replace('_', ' ')));
+
+         return object;
+      }, {});
 
       // STATE
       var uriParams, pidList, userList, historyUpdating;
@@ -121,6 +135,8 @@ ko.components.register('credit-visualization', {
       self.isPrinting = ko.observable(false);
       self.creationTime = ko.observable('');
 
+      self.labelEditorVisible = ko.observable(false);
+
       self.toggleEmbed = function () {
          var uri = new URI();
 
@@ -131,6 +147,20 @@ ko.components.register('credit-visualization', {
 
       self.toggleDownload = function () {
          self.downloadVisible(!self.downloadVisible());
+      };
+
+      self.toggleLabelEditor = function () {
+         self.labelEditorVisible(!self.labelEditorVisible());
+      };
+
+      self.overlayVisible = ko.pureComputed(function () {
+         return self.downloadVisible() || self.embedVisible() || self.errorText() || self.labelEditorVisible();
+      });
+
+      self.clickOverlay = function () {
+         self.downloadVisible(false);
+         self.embedVisible(false);
+         self.labelEditorVisible(false);
       };
 
       //self.views = ['Bar Graph', 'Timeline', 'Table'];
@@ -287,9 +317,6 @@ ko.components.register('credit-visualization', {
 
          return (self.titleText().toLowerCase() + ' contributions ' + timeString).replace(/\s/g, '_');
       });
-
-      self.mergeTags = params.mergeTags || {};
-      self.ignoreTags = params.ignoreTags || [];
 
       self.sanitize = function (data) {
          var self = this, changeset, removable, mergedTagMap, cleanData, category, sourceValue;
@@ -533,9 +560,8 @@ ko.components.register('credit-visualization', {
                   self.grapher =
                      new CWRC.CreditVisualization.StackedColumnGraph(
                         self.htmlId(),
-                        self.mergeTags,
-                        self.ignoreTags,
-                        self.tagWeights);
+                        self.tagWeights,
+                        self.labels);
 
                   filterUpdateListener = function (newVal) {
                      self.grapher.updateBars(self.filteredModifications(), self.totalNumChanges());
