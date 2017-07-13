@@ -22,8 +22,12 @@ ko.components.register('credit-visualization-table', {
    viewModel: function (params) {
       var self = this;
 
+      if (!params.labels)
+         throw "Must provide 'labels' parameter to credit-visualization-table";
+
       self.data = params.filteredModifications;
       self.totalNumChanges = params.totalNumChanges;
+      self.labels = params.labels;
 
       self.users = ko.pureComputed(function () {
          return self.data().map(function (d) {
@@ -31,13 +35,13 @@ ko.components.register('credit-visualization-table', {
          });
       });
 
-      self.workTypes = CWRC.CreditVisualization.WorkflowChangeTally.CATEGORIES.slice(0).filter(function (workType) {
+      self.workTypes = Object.keys(self.labels).filter(function (workType) {
          return params.ignoreTags.indexOf(workType) < 0 &&
             Object.keys(params.mergeTags).indexOf(workType) < 0;
       });
 
       self.cleanLabel = function (workType) {
-         return CWRC.toTitleCase(workType.replace('_', ' '));
+         return self.labels[workType];
       };
 
       self.getContributionForType = function (user, workType) {

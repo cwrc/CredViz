@@ -21,7 +21,7 @@ var CWRC = CWRC || {};
 CWRC.CreditVisualization = CWRC.CreditVisualization || {};
 
 (function StackedColumnGraph() {
-   CWRC.CreditVisualization.StackedColumnGraph = function (containerId, mergedTagMap, ignoredTags, tagWeights) {
+   CWRC.CreditVisualization.StackedColumnGraph = function (containerId, tagWeights, labels) {
       var self = this;
 
       self.containerId = containerId;
@@ -59,17 +59,18 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
 
       self.minimumPercent = 0.01; // minimum value to display; 1.00 == 100%
 
-      self.workTypes = CWRC.CreditVisualization.WorkflowChangeTally.CATEGORIES.slice(0);
+      self.workTypes = labels;
 
-      // removing the types from the list will mean that the Ordinal Scale will ignore those values.
-      (Object.keys(mergedTagMap).concat(ignoredTags)).forEach(function (tag) {
-         self.workTypes.splice(self.workTypes.indexOf(tag), 1)
+      Object.keys(self.workTypes).forEach(function (key) {
+         self.workTypes[key].subscribe(function () {
+            self.updateLegend(tagWeights);
+         })
       });
 
-      this.constructLeftAxis();
-      this.constructBottomAxis();
-      this.constructLegend(tagWeights);
-      this.constructNoticeOverlay();
+      self.constructLeftAxis();
+      self.constructBottomAxis();
+      self.constructLegend(tagWeights);
+      self.constructNoticeOverlay();
    };
 
    CWRC.CreditVisualization.StackedColumnGraph.prototype.updateBars = function (filteredData, allChangesCount) {
@@ -79,7 +80,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
          rectBlocksVM, labelsVM, hasSize, columnWidth, columnWidthThreshold, drawableCanvasWidth;
 
       workTagStacker = d3.stack()
-         .keys(self.workTypes)
+         .keys(Object.keys(self.workTypes))
          .value(function (datum, key) {
             return (datum.workflow_changes[key].weightedValue() || 0) / allChangesCount
          });
@@ -104,7 +105,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
          return JSON.stringify(d.user);
       }));
       self.contributionScale.domain([0, maxValue]).nice();
-      self.colorScale.domain(self.workTypes);
+      self.colorScale.domain(Object.keys(self.workTypes));
 
       columnWidth = self.usersScale.bandwidth();
 
@@ -366,10 +367,16 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
    };
 
    CWRC.CreditVisualization.StackedColumnGraph.prototype.constructLegend = function (tagWeights) {
-      var self = this, legendItem, legendGroup, legendHoverHandler;
+      var self = this;
 
-      legendGroup = self.contentGroup.append('g')
+      self.legendGroup = self.contentGroup.append('g')
          .attr('class', 'legend');
+
+      self.updateLegend(tagWeights);
+   };
+
+   CWRC.CreditVisualization.StackedColumnGraph.prototype.updateLegend = function (tagWeights) {
+      var self = this, legendHoverHandler, legendItemsVM, legendItemsEnter;
 
       legendHoverHandler = function (columnName, group, c) {
          var segments, isEnter;
@@ -389,37 +396,47 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
          }
       };
 
-      legendItem = legendGroup.selectAll(".legendItem")
-         .data(self.workTypes.slice())
-         .enter().append("g")
-         .attr("class", "legendItem")
-         .attr("class", function (columnName, i) {
-            return 'legend-' + columnName;
+      legendItemsVM =
+         self.legendGroup
+            .selectAll(".legend-item")
+            .data(Object.keys(self.workTypes));
+
+      legendItemsVM.exit().remove();
+
+      legendItemsEnter = legendItemsVM.enter()
+         .append('g')
+         .attr('class', function (columnName, i) {
+            return 'legend-item legend-' + columnName;
          })
-         .attr("transform", function (d, i) {
+         .attr('transform', function (d, i) {
             return "translate(0," + i * 20 + ")";
          })
-         .style("font", "12px sans-serif")
+         .style('font', '12px sans-serif')
          .on('mouseover', legendHoverHandler)
          .on('mouseout', legendHoverHandler);
 
-      legendItem.append("rect")
-         .attr("x", self.bounds.getInnerWidth() - 18)
-         .attr("width", 18)
-         .attr("height", 18)
-         .attr("fill", this.colorScale);
+      legendItemsEnter.append('rect')
+         .attr('x', self.bounds.getInnerWidth() - 18)
+         .attr('width', 18)
+         .attr('height', 18)
+         .attr('fill', this.colorScale);
 
-      legendItem.append("text")
+      legendItemsEnter.append("text")
          .attr("x", self.bounds.getInnerWidth() - 24)
          .attr("y", 9)
          .attr("dy", ".35em")
-         .attr("text-anchor", "end")
+         .attr("text-anchor", "end");
+
+
+      legendItemsVM
+         .merge(legendItemsEnter)
+         .select('text')
          .text(function (columnName) {
             var weight, text;
 
             weight = tagWeights[columnName];
 
-            text = CWRC.toTitleCase(columnName.replace('_', ' '));
+            text = self.workTypes[columnName]();
 
             if (weight != null)
                text = text + ' (x' + weight + ')';
