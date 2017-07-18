@@ -184,10 +184,10 @@ ko.components.register('credit-visualization', {
       self.allModifications = ko.pureComputed(function () {
          var data, documents;
 
-         if (!self.totalModel())
+         if (!self.fullSource())
             return [];
 
-         documents = self.totalModel().documents;
+         documents = self.fullSource().documents;
 
          if (self.isProjectView()) {
             data = documents.reduce(function (aggregate, document) {
@@ -230,6 +230,8 @@ ko.components.register('credit-visualization', {
             //filter.pid().indexOf(datum.document.id) >= 0
          };
 
+         console.log('filtering:', self.allModifications())
+
          return (self.allModifications() || []).filter(function (datum) {
             return matchesUser(datum) && matchesDocument(datum);
          });
@@ -258,10 +260,10 @@ ko.components.register('credit-visualization', {
 
          return users;
       });
-      self.totalModel = ko.observable();
+      self.fullSource = ko.observable();
 
       self.documents = ko.pureComputed(function () {
-         return self.totalModel() ? self.totalModel().documents : [];
+         return self.fullSource() ? self.fullSource().documents : [];
       });
 
       self.selectedDocuments = ko.pureComputed(function () {
@@ -277,9 +279,9 @@ ko.components.register('credit-visualization', {
       self.titleText = ko.pureComputed(function () {
          var title = '';
 
-         if (self.totalModel()) {
+         if (self.fullSource()) {
             if (self.isProjectView())
-               title += self.totalModel().name;
+               title += self.fullSource().name;
             else {
                var docs = self.selectedDocuments();
 
@@ -292,11 +294,11 @@ ko.components.register('credit-visualization', {
       self.titleTarget = ko.pureComputed(function () {
          var target = '/';
 
-         if (self.totalModel()) {
+         if (self.fullSource()) {
             target += 'islandora/object/';
 
             if (self.isProjectView())
-               target += self.totalModel().id;
+               target += self.fullSource().id;
             else {
                var docs = self.selectedDocuments();
 
@@ -347,21 +349,7 @@ ko.components.register('credit-visualization', {
             existingRecord.addValue(category, sourceValue, modification.workflow_changes.timestamp);
          });
 
-         console.log(cleanData)
-
          return cleanData;
-      };
-
-      self.applyWeights = function (data, weights) {
-         var weight;
-
-         data.forEach(function (datum) {
-            for (var category in datum.workflow_changes) {
-               weight = weights[category];
-
-               datum.workflow_changes[category].weight(weight == null ? 1 : weight); // compare to null to allow 0
-            }
-         });
       };
 
       // BEHAVIOUR
@@ -543,10 +531,10 @@ ko.components.register('credit-visualization', {
                //ajax('get', '/islandora/rest/v1/object/' + parentId + '/datastream/WORKFLOW', null, function (workflowData) {
                var filterUpdateListener;
 
-               self.totalModel(credViz);
+               self.fullSource(credViz);
 
                // TODO: remove - later versions of the credviz api should already contain the id
-               self.totalModel().id = parentId;
+               self.fullSource().id = parentId;
 
                self.grapher =
                   new CWRC.CreditVisualization.StackedColumnGraph(
