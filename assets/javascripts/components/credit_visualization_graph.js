@@ -52,7 +52,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
          .align(0.1);
 
       self.contributionScale = d3.scaleLinear()
-         .rangeRound([self.bounds.getInnerHeight(), 0]);
+         .range([self.bounds.getInnerHeight(), 0]);
 
       self.colorScale = d3.scaleOrdinal(d3.schemeCategory20c);
       //.range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
@@ -170,6 +170,8 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
             return self.contributionScale(dataRow[1]);
          })
          .attr("height", function (dataRow) {
+            console.log(dataRow, self.contributionScale(dataRow[0]) - self.contributionScale(dataRow[1]))
+
             return self.contributionScale(dataRow[0]) - self.contributionScale(dataRow[1]);
          })
          .attr("width", columnWidth)
