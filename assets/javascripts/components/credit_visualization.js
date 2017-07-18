@@ -81,6 +81,9 @@ ko.components.register('credit-visualization', {
    /**
     * A credit visualization widget designed to plug into CWRC.
     *
+    * If you are unfamiliar with Islandora, take a quick read though the primer:
+    * https://wiki.duraspace.org/display/ISLANDORA/Getting+Started+with+Islandora
+    *
     * Uses dom-to-node to produce images. https://github.com/tsayen/dom-to-image
     *
     * @params params
@@ -179,7 +182,7 @@ ko.components.register('credit-visualization', {
       };
 
       self.allModifications = ko.pureComputed(function () {
-         var data, countChanges, documents;
+         var data, countChangesFunc, documents;
 
          if (!self.totalModel())
             return [];
@@ -197,21 +200,21 @@ ko.components.register('credit-visualization', {
             }).modifications;
          }
 
-         countChanges = CWRC.CreditVisualization.StackedColumnGraph.countChanges;
+         countChangesFunc = CWRC.CreditVisualization.StackedColumnGraph.countChanges;
 
          data = self.sanitize(data);
 
          self.applyWeights(data, self.tagWeights || {});
 
          data = data.sort(function (a, b) {
-            return countChanges(b) - countChanges(a)
+            return countChangesFunc(b) - countChangesFunc(a)
          });
 
          return data;
       });
 
       self.filteredModifications = ko.pureComputed(function () {
-         var filter, dataset, matchesUser, matchesDocument;
+         var filter, matchesUser, matchesDocument;
 
          filter = self.filter;
 
@@ -222,7 +225,7 @@ ko.components.register('credit-visualization', {
          };
 
          matchesDocument = function (datum) {
-            // todo: this is curretnly actually accomplished in totalModifications because we don't
+            // todo: this is curretnly actually accomplished in allModifications because we don't
             // todo: have document data available here
             return true;
 
@@ -319,10 +322,9 @@ ko.components.register('credit-visualization', {
       });
 
       self.sanitize = function (data) {
-         var self = this, changeset, removable, mergedTagMap, cleanData, category, sourceValue;
+         var self = this, cleanData, category, sourceValue;
 
          cleanData = [];
-         mergedTagMap = self.mergeTags;
 
          // the endpoint returns each workflow change as a separate entry, so we're merging it here.
          data.forEach(function (modification, i) {
@@ -348,9 +350,17 @@ ko.components.register('credit-visualization', {
             existingRecord.workflow_changes[category].addValue(sourceValue);
          });
 
+         self.mergeAliases(cleanData);
+
+         return cleanData;
+      };
+
+      self.mergeAliases = function (cleanData) {
+         var mergedTagMap = self.mergeTags;
+
          // also merge together categories that have aliases
          cleanData.forEach(function (modification) {
-            changeset = modification.workflow_changes;
+            var changeset = modification.workflow_changes;
 
             for (var mergedTag in mergedTagMap) {
                var primaryTag = mergedTagMap[mergedTag];
@@ -359,8 +369,6 @@ ko.components.register('credit-visualization', {
                delete changeset[mergedTag];
             }
          });
-
-         return cleanData;
       };
 
       self.applyWeights = function (data, weights) {
@@ -535,6 +543,8 @@ ko.components.register('credit-visualization', {
          }
 
          ajax('get', '/services/credit_viz' + forwardingURI.search(), false, function (credViz) {
+            //var WORKFLOW_DSID = 'WORKFLOW';
+
             /**
              * TODO: When/if the credit_viz service is capable of returning a result with both the project name
              * TODO: and the project's id, these next two ajax calls will become redundant, and can be collapsed
@@ -549,42 +559,45 @@ ko.components.register('credit-visualization', {
                // object.value is the value of the isMemberOfCollection relationship
                parentId = parentRelationship.object.value;
 
-               ajax('get', '/islandora/rest/v1/object/' + parentId, null, function (objectDetails) {
-                  var filterUpdateListener;
+               //ajax('get', '/islandora/rest/v1/object/' + parentId + '/datastream/WORKFLOW', null, function (workflowData) {
+               var filterUpdateListener;
 
-                  self.totalModel(credViz);
+               self.totalModel(credViz);
 
-                  // TODO: remove - later versions of the credviz api should already contain the id
-                  self.totalModel().id = parentId;
+               // TODO: remove - later versions of the credviz api should already contain the id
+               self.totalModel().id = parentId;
 
-                  self.grapher =
-                     new CWRC.CreditVisualization.StackedColumnGraph(
-                        self.htmlId(),
-                        self.tagWeights,
-                        self.labels);
+               self.grapher =
+                  new CWRC.CreditVisualization.StackedColumnGraph(
+                     self.htmlId(),
+                     self.tagWeights,
+                     self.labels);
 
-                  filterUpdateListener = function (newVal) {
-                     self.grapher.updateBars(self.filteredModifications(), self.totalNumChanges());
+               //console.log(credViz)
+               //console.log(workflowData)
 
-                     if (!historyUpdating) {
-                        self.history.save();
-                     }
-                  };
+               filterUpdateListener = function (newVal) {
+                  self.grapher.updateBars(self.filteredModifications(), self.totalNumChanges());
 
-                  for (var key in self.filter) {
-                     self.filter[key].subscribe(filterUpdateListener);
+                  if (!historyUpdating) {
+                     self.history.save();
                   }
+               };
 
-                  window.addEventListener('popstate', self.history.load);
+               for (var key in self.filter) {
+                  self.filter[key].subscribe(filterUpdateListener);
+               }
+
+               window.addEventListener('popstate', self.history.load);
 
 // TODO: this is a hack to force it to draw the initial. It shouldn't be necessary. Something is wrong in the D3 section
-                  // trigger a redraw to use now-loaded data
-                  historyUpdating = true;
-                  var users = self.filter.users();
-                  self.filter.users([]);
-                  self.filter.users(users);
-                  historyUpdating = false;
-               });
+               // trigger a redraw to use now-loaded data
+               historyUpdating = true;
+               var users = self.filter.users();
+               self.filter.users([]);
+               self.filter.users(users);
+               historyUpdating = false;
+               //});
             });
          });
       };
@@ -656,8 +669,16 @@ CWRC.toTitleCase = function (string) {
    CWRC.CreditVisualization.WorkflowChangeTally = function () {
       var self = this;
 
+      //self.dataset = ko.observable();
+
       CWRC.CreditVisualization.WorkflowChangeTally.CATEGORIES
          .forEach(function (key) {
+            //self[key] = ko.pureComputed(function () {
+            //   self.dataset();
+            //
+            //   return new CWRC.CreditVisualization.WorkflowChange(rawValue);
+            //});
+            //
             self[key] = new CWRC.CreditVisualization.WorkflowChange()
          });
    };
@@ -691,10 +712,10 @@ CWRC.toTitleCase = function (string) {
 })();
 
 (function WorkflowChange() {
-   CWRC.CreditVisualization.WorkflowChange = function () {
+   CWRC.CreditVisualization.WorkflowChange = function (rawValue) {
       var self = this;
 
-      self.rawValue = ko.observable(0);
+      self.rawValue = ko.observable(rawValue || 0);
       self.weight = ko.observable(1);
 
       self.weightedValue = ko.pureComputed(function () {

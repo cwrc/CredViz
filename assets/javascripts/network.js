@@ -11,7 +11,12 @@
             window.ajaxCount--;
 
             if (request.status < 400) {
-               var response = JSON.parse(request.response || '{}');
+               var response;
+
+               if (request.responseXML)
+                  response = request.responseXML;
+               else
+                  response = JSON.parse(request.response || '{}');
 
                if (response.error || response.errors) {
                   if (errorBlock) {
@@ -24,7 +29,7 @@
                }
             } else {
                // throw 4/5xx no matter what, so that the testing framework sees it.
-               throw "ERROR: " + request.status + " (" + method.toTitleCase() + " " + uri + ")\n\"" + request.response + "\" ";
+               throw "ERROR: " + request.status + " (" + method + " " + uri + ")\n\"" + request.response + "\" ";
             }
          }
       };
