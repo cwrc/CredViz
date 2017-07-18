@@ -47,11 +47,15 @@
                               },
                               "stamp": {
                                  "type": "string"
+                              },
+                              "timestamp": {
+                                 "type": "string"
                               }
                            },
                            "required": [
                               "category",
-                              "stamp"
+                              "stamp",
+                              "timestamp"
                            ]
                         },
                         "diff_changes": {

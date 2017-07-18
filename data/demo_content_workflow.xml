@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://cwrc.ca/schemas/workflow.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<cwrc>
+  <workflow date="2016-10-17" userID="karynh">
+    <activity category="published" status="c"></activity>
+  </workflow>
+  <workflow date="2016-12-20" userID="sbrown" time="12:16:49" timestamp="2016-12-20T19:16:49.519880+00:00"
+            workflowID="cwrc_6c4752dd-76e3-4ee8-838a-6e98575480fd_wk_1">
+    <activity category="content_contribution" stamp="cwrc:ckd" status="c"/>
+  </workflow>
+</cwrc>
