@@ -81,8 +81,8 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
 
       workTagStacker = d3.stack()
          .keys(Object.keys(self.workTypes))
-         .value(function (datum, key) {
-            return (datum.workflow_changes[key].weightedValue() || 0) / allChangesCount
+         .value(function (datum, category) {
+            return datum.categoryValue(category) / allChangesCount
          });
 
       workTagStack = workTagStacker(filteredData);
@@ -229,7 +229,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
             return "total-label total-label-user-" + datum.user.id;
          })
          .text(function (d) {
-            return formatPercent((CWRC.CreditVisualization.StackedColumnGraph.countChanges(d) || 0) / (allChangesCount || 1));
+            return formatPercent(d.totalValue() / (allChangesCount || 1));
          })
          .attr('x', function (d) {
             return self.usersScale(JSON.stringify(d.user)) + columnWidth / 2;
@@ -481,16 +481,6 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
          rectSelection.attr('width', 0);
          rectSelection.attr('height', 0);
       }
-   };
-
-   CWRC.CreditVisualization.StackedColumnGraph.countChanges = function (datum) {
-      var total = 0;
-
-      for (var type in datum.workflow_changes) {
-         total += datum.workflow_changes[type].weightedValue();
-      }
-
-      return total;
    };
 
    CWRC.CreditVisualization.StackedColumnGraph.prototype.wrap = function (text, width) {
