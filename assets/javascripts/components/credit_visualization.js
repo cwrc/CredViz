@@ -105,7 +105,7 @@ ko.components.register('credit-visualization', {
       self.tagWeights = params.tagWeights;
       self.mergeTags = params.mergeTags || {};
       self.ignoreTags = params.ignoreTags || [];
-      self.labels = CWRC.CreditVisualization.WorkflowChangeTally.CATEGORIES.reduce(function (object, category) {
+      self.labels = CWRC.CreditVisualization.WorkflowChangeSet.CATEGORIES.reduce(function (object, category) {
          var removedTags = Object.keys(self.mergeTags).concat(self.ignoreTags);
 
          if (removedTags.indexOf(category) < 0)
@@ -182,7 +182,7 @@ ko.components.register('credit-visualization', {
       };
 
       self.allModifications = ko.pureComputed(function () {
-         var data, countChangesFunc, documents;
+         var data, documents;
 
          if (!self.totalModel())
             return [];
@@ -200,14 +200,10 @@ ko.components.register('credit-visualization', {
             }).modifications;
          }
 
-         countChangesFunc = CWRC.CreditVisualization.StackedColumnGraph.countChanges;
-
          data = self.sanitize(data);
 
-         self.applyWeights(data, self.tagWeights || {});
-
          data = data.sort(function (a, b) {
-            return countChangesFunc(b) - countChangesFunc(a)
+            return b.totalValue() - a.totalValue()
          });
 
          return data;
@@ -241,7 +237,7 @@ ko.components.register('credit-visualization', {
 
       self.totalNumChanges = ko.pureComputed(function () {
          return self.allModifications().reduce(function (aggregate, datum) {
-            return aggregate + CWRC.CreditVisualization.StackedColumnGraph.countChanges(datum);
+            return aggregate + datum.totalValue();
          }, 0);
       });
 
@@ -322,53 +318,38 @@ ko.components.register('credit-visualization', {
       });
 
       self.sanitize = function (data) {
-         var self = this, cleanData, category, sourceValue;
+         var self = this, cleanData, sourceValue;
 
          cleanData = [];
 
          // the endpoint returns each workflow change as a separate entry, so we're merging it here.
-         data.forEach(function (modification, i) {
-            var existingRecord = cleanData.find(function (other) {
-               return other.user.id == modification.user.id;
+         data.forEach(function (modification) {
+            var category, existingRecord, user;
+
+            user = modification.user;
+
+            existingRecord = cleanData.find(function (other) {
+               return other.user.id == user.id;
             });
 
             if (!existingRecord) {
-               existingRecord = {
-                  user: modification.user,
-                  workflow_changes: new CWRC.CreditVisualization.WorkflowChangeTally()
-               };
+               existingRecord = new CWRC.CreditVisualization.WorkflowChangeSet(user, self.mergeTags, self.tagWeights);
                cleanData.push(existingRecord)
             }
 
             category = modification.workflow_changes.category;
 
-            if (CWRC.CreditVisualization.WorkflowChangeTally.isScalar(category))
+            if (CWRC.CreditVisualization.WorkflowChangeSet.isScalar(category))
                sourceValue = parseInt(modification.diff_changes);
             else
                sourceValue = 1;
 
-            existingRecord.workflow_changes[category].addValue(sourceValue);
+            existingRecord.addValue(category, sourceValue, modification.workflow_changes.timestamp);
          });
 
-         self.mergeAliases(cleanData);
+         console.log(cleanData)
 
          return cleanData;
-      };
-
-      self.mergeAliases = function (cleanData) {
-         var mergedTagMap = self.mergeTags;
-
-         // also merge together categories that have aliases
-         cleanData.forEach(function (modification) {
-            var changeset = modification.workflow_changes;
-
-            for (var mergedTag in mergedTagMap) {
-               var primaryTag = mergedTagMap[mergedTag];
-
-               changeset[primaryTag].addValue(changeset[mergedTag].rawValue() || 0);
-               delete changeset[mergedTag];
-            }
-         });
       };
 
       self.applyWeights = function (data, weights) {
@@ -665,29 +646,60 @@ CWRC.toTitleCase = function (string) {
    }).join(' ')
 };
 
-(function WorkflowChangeTally() {
-   CWRC.CreditVisualization.WorkflowChangeTally = function () {
+(function WorkflowChangeSet() {
+   CWRC.CreditVisualization.WorkflowChangeSet = function (user, mergedTagMap, tagWeightMap) {
       var self = this;
 
-      //self.dataset = ko.observable();
+      self.user = user;
+      self.mergedTagMap = mergedTagMap;
+      self.tagWeightMap = tagWeightMap;
+      self.categoryValueMap = {};
 
-      CWRC.CreditVisualization.WorkflowChangeTally.CATEGORIES
-         .forEach(function (key) {
-            //self[key] = ko.pureComputed(function () {
-            //   self.dataset();
-            //
-            //   return new CWRC.CreditVisualization.WorkflowChange(rawValue);
-            //});
-            //
-            self[key] = new CWRC.CreditVisualization.WorkflowChange()
+      CWRC.CreditVisualization.WorkflowChangeSet.CATEGORIES.forEach(function (category) {
+         var isMergedProperty = mergedTagMap.hasOwnProperty(category);
+
+         if (!isMergedProperty)
+            self.categoryValueMap[category] = [];
+      });
+   };
+
+   CWRC.CreditVisualization.WorkflowChangeSet.prototype.addValue = function (category, newVal, timestamp) {
+      var self = this, weight;
+
+      category = self.mergedTagMap[category] || category;
+
+      weight = self.tagWeightMap[category];
+
+      self.categoryValueMap[category].push(new CWRC.CreditVisualization.WorkflowChange(newVal, weight, timestamp));
+   };
+
+   CWRC.CreditVisualization.WorkflowChangeSet.prototype.categoryValue = function (category) {
+      var self = this;
+
+      category = self.mergedTagMap[category] || category;
+
+      return self.categoryValueMap[category].reduce(function (aggregate, change) {
+         return aggregate + change.weightedValue();
+      }, 0);
+   };
+
+   CWRC.CreditVisualization.WorkflowChangeSet.prototype.totalValue = function () {
+      var self = this;
+
+      return Object.keys(self.categoryValueMap).reduce(function (aggregate, category) {
+         self.categoryValueMap[category].forEach(function (change) {
+            aggregate += change.weightedValue();
          });
+
+         return aggregate;
+      }, 0);
    };
 
-   CWRC.CreditVisualization.WorkflowChangeTally.isScalar = function (category) {
-      return CWRC.CreditVisualization.WorkflowChangeTally.SCALAR_CATEGORIES.indexOf(category) >= 0;
+   CWRC.CreditVisualization.WorkflowChangeSet.isScalar = function (category) {
+      return CWRC.CreditVisualization.WorkflowChangeSet.SCALAR_CATEGORIES.indexOf(category) >= 0;
    };
 
-   CWRC.CreditVisualization.WorkflowChangeTally.CATEGORIES_TO_STAMPS = {
+   CWRC.CreditVisualization.WorkflowChangeSet.CATEGORIES_TO_STAMPS = {
       created: 'cre',
       deposited: 'dep',
       metadata_contribution: 'evr',
@@ -704,26 +716,23 @@ CWRC.toTitleCase = function (string) {
       deleted: 'del'
    };
 
-   CWRC.CreditVisualization.WorkflowChangeTally.CATEGORIES =
-      Object.keys(CWRC.CreditVisualization.WorkflowChangeTally.CATEGORIES_TO_STAMPS);
+   CWRC.CreditVisualization.WorkflowChangeSet.CATEGORIES =
+      Object.keys(CWRC.CreditVisualization.WorkflowChangeSet.CATEGORIES_TO_STAMPS);
 
    // these are the categories whose values are based on actual filesize diffs
-   CWRC.CreditVisualization.WorkflowChangeTally.SCALAR_CATEGORIES = ['created', 'deposited', 'content_contribution'];
+   CWRC.CreditVisualization.WorkflowChangeSet.SCALAR_CATEGORIES = ['created', 'deposited', 'content_contribution'];
 })();
 
 (function WorkflowChange() {
-   CWRC.CreditVisualization.WorkflowChange = function (rawValue) {
+   CWRC.CreditVisualization.WorkflowChange = function (value, weight, timestamp) {
       var self = this;
 
-      self.rawValue = ko.observable(rawValue || 0);
-      self.weight = ko.observable(1);
+      self.rawValue = ko.observable(value || 0);
+      self.weight = ko.observable(weight == null ? 1 : weight);
+      self.timestamp = timestamp;
 
       self.weightedValue = ko.pureComputed(function () {
          return self.rawValue() * self.weight();
       });
-   };
-
-   CWRC.CreditVisualization.WorkflowChange.prototype.addValue = function (newVal) {
-      this.rawValue(this.rawValue() + newVal)
    };
 })();
