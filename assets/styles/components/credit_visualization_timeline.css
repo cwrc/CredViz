@@ -31,7 +31,8 @@ credit-visualization-timeline .change-record {
 credit-visualization-timeline .change-record .time {
    display: inline-block;
 
-   min-width: 6em;
+   min-width: 5em;
+   padding-right: 1em;
 }
 
 credit-visualization-timeline .change-record .name {

@@ -1,7 +1,7 @@
 ko.components.register('credit-visualization-timeline', {
    template: ' <div class="timeline-list" data-bind="foreach: sortedData">\
                   <div class="change-record">\
-                     <span class="time" data-bind="text: $data.timestamp"></span>\
+                     <span class="time" data-bind="text: $parent.cleanTime($data.timestamp)"></span>\
                      <a href="#" class="name" data-bind="attr: {href: $parent.userLink($data.user)}">\
                         <span data-bind="text: $data.user.name"></span>\
                      </a>\
@@ -53,28 +53,13 @@ ko.components.register('credit-visualization-timeline', {
          return self.labels[workType];
       };
 
-      //self.getContributionForType = function (user, workType) {
-      //   var datum, percentage;
-      //
-      //   datum = self.data().find(function (d) {
-      //      return d.user.id == user.id;
-      //   });
-      //
-      //   var nDecimals = 1;
-      //   var decimalShifter = Math.pow(10, nDecimals);
-      //   var value = datum.categoryValue(workType);
-      //
-      //   percentage = Math.round(
-      //      (value / self.totalNumChanges()) * 100 * decimalShifter
-      //   );
-      //
-      //   return (percentage / decimalShifter) || '\u2013';
-      //};
-      //
-      //self.isBlankContribution = function (user, workType) {
-      //   return !parseInt(self.getContributionForType(user, workType));
-      //};
-      //
+      self.cleanTime = function (timestamp) {
+         var date = new Date(timestamp);
+
+         return date.toISOString().split('T')[0];
+      };
+
+
       //self.workTypeColors = self.workTypes.reduce(function (agg, workType) {
       //   agg[workType] = ko.observable();
       //
