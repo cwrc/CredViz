@@ -42,6 +42,10 @@ credit-visualization .view-tabs .selected {
    color: white;
 }
 
+credit-visualization .tab {
+   min-height: 32em;
+}
+
 credit-visualization .popup {
    position: fixed;
 

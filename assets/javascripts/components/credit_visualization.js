@@ -9,18 +9,17 @@ ko.components.register('credit-visualization', {
                                             css: {selected: $parent.isView($data)}, \
                                             text: $data"></a>\
                   </div>\
-                  <div data-bind="visible: isView(\'Bar Graph\'), attr: {id: htmlId()}">\
+                  <div class="tab" data-bind="visible: isView(\'Bar Graph\'), attr: {id: htmlId()}">\
                      <svg data-bind="attr: {width: width, height: height}"></svg>\
                   </div>\
-                  <div data-bind="visible: isView(\'Timeline\')">\
-                     <!-- timeline here -->\
+                  <div class="tab" data-bind="visible: isView(\'Timeline\')">\
+                     <credit-visualization-timeline params="data: filteredModifications, \
+                                                            labels: labels"></credit-visualization-timeline>\
                   </div>\
-                  <div data-bind="visible: isView(\'Table\')">\
+                  <div class="tab" data-bind="visible: isView(\'Table\')">\
                      <credit-visualization-table data-bind="style: {width: width + \'px\', height: height + \'px\'}" \
                                                  params="filteredModifications: filteredModifications, \
                                                          totalNumChanges: totalNumChanges, \
-                                                         ignoreTags: ignoreTags,\
-                                                         mergeTags: mergeTags, \
                                                          labels: labels"></credit-visualization-table>\
                   </div>\
                   <header class="graph-title">\
@@ -172,8 +171,7 @@ ko.components.register('credit-visualization', {
          self.labelEditorVisible(false);
       };
 
-      //self.views = ['Bar Graph', 'Timeline', 'Table'];
-      self.views = ['Bar Graph', 'Table'];
+      self.views = ['Bar Graph', 'Table', 'Timeline'];
       self.view = ko.observable(uriParams.view || 'Bar Graph');
 
       self.view.subscribe(function (newView) {
@@ -704,7 +702,7 @@ CWRC.toTitleCase = function (string) {
 
       weight = self.tagWeightMap[category];
 
-      self.categoryValueMap[category].push(new CWRC.CreditVisualization.WorkflowChange(newVal, weight, timestamp));
+      self.categoryValueMap[category].push(new CWRC.CreditVisualization.WorkflowChange(newVal, weight, timestamp, self.user, category));
    };
 
    CWRC.CreditVisualization.WorkflowChangeSet.prototype.categoryValue = function (category) {
@@ -784,12 +782,14 @@ CWRC.toTitleCase = function (string) {
 })();
 
 (function WorkflowChange() {
-   CWRC.CreditVisualization.WorkflowChange = function (value, weight, timestamp) {
+   CWRC.CreditVisualization.WorkflowChange = function (value, weight, timestamp, user, category) {
       var self = this;
 
       self.rawValue = ko.observable(value || 0);
       self.weight = ko.observable(weight == null ? 1 : weight);
       self.timestamp = timestamp;
+      self.user = user;
+      self.category = category;
 
       self.weightedValue = ko.pureComputed(function () {
          return self.rawValue() * self.weight();
