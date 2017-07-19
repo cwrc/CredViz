@@ -35,10 +35,7 @@ ko.components.register('credit-visualization-table', {
          });
       });
 
-      self.workTypes = Object.keys(self.labels).filter(function (workType) {
-         return params.ignoreTags.indexOf(workType) < 0 &&
-            Object.keys(params.mergeTags).indexOf(workType) < 0;
-      });
+      self.workTypes = Object.keys(self.labels)
 
       self.cleanLabel = function (workType) {
          return self.labels[workType];
