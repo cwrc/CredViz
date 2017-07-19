@@ -610,14 +610,9 @@ ko.components.register('credit-visualization', {
 
                window.addEventListener('popstate', self.history.load);
 
-// TODO: this is a hack to force it to draw the initial. It shouldn't be necessary. Something is wrong in the D3 section
-               // trigger a redraw to use now-loaded data
                historyUpdating = true;
-               var users = self.filter.users();
-               self.filter.users([]);
-               self.filter.users(users);
+               filterUpdateListener();
                historyUpdating = false;
-               //});
             });
          });
       };

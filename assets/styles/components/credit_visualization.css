@@ -140,6 +140,10 @@ credit-visualization .filters label {
    display: block;
 }
 
+credit-visualization .actions {
+   margin-top: 1em;
+}
+
 credit-visualization footer {
    position: absolute;
 
