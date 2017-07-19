@@ -21,7 +21,7 @@ credit-visualization-timeline .timeline-list {
 }
 
 credit-visualization-timeline .change-record {
-   margin: 0.5em auto;
+   margin: 0 auto;
 
    padding: 0.5em;
 
@@ -39,4 +39,14 @@ credit-visualization-timeline .change-record .name {
    display: inline-block;
 
    min-width: 10em;
+}
+
+credit-visualization-timeline .change-record a {
+   color: black;
+
+   text-decoration: none;
+}
+
+credit-visualization-timeline .change-record a:hover {
+   text-decoration: underline;
 }
