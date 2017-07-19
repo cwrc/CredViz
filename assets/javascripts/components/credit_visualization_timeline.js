@@ -1,6 +1,6 @@
 ko.components.register('credit-visualization-timeline', {
    template: ' <div class="timeline-list" data-bind="foreach: sortedData">\
-                  <div class="change-record">\
+                  <div class="change-record" data-bind="style: {background: $parent.categoryColors[$data.category]}">\
                      <span class="time" data-bind="text: $parent.cleanTime($data.timestamp)"></span>\
                      <a href="#" class="name" data-bind="attr: {href: $parent.userLink($data.user)}">\
                         <span data-bind="text: $data.user.name"></span>\
@@ -59,29 +59,28 @@ ko.components.register('credit-visualization-timeline', {
          return date.toISOString().split('T')[0];
       };
 
+      self.categoryColors = Object.keys(self.labels).reduce(function (agg, workType) {
+         agg[workType] = ko.observable();
 
-      //self.workTypeColors = self.workTypes.reduce(function (agg, workType) {
-      //   agg[workType] = ko.observable();
-      //
-      //   return agg;
-      //}, {});
-      //
+         return agg;
+      }, {});
+
       //// This is done on a polling loop because the D3 graph doesn't have a conveniently accessible event here
-      //self.fetchWorkColors = function () {
-      //   if (document.querySelector('svg g')) {
-      //      for (var workType in self.workTypeColors) {
-      //         var graphLegendItem, snakeWorkType;
-      //
-      //         snakeWorkType = workType.toLowerCase().replace(' ', '_');
-      //
-      //         graphLegendItem = document.querySelector('.legend-' + snakeWorkType + ' rect');
-      //
-      //         self.workTypeColors[workType](graphLegendItem ? graphLegendItem.getAttribute('fill') : '');
-      //      }
-      //   } else {
-      //      window.setTimeout(self.fetchWorkColors, 500);
-      //   }
-      //};
-      //self.fetchWorkColors();
+      self.fetchWorkColors = function () {
+         if (document.querySelector('svg g')) {
+            for (var category in self.categoryColors) {
+               var graphLegendItem, snakeCategory;
+
+               snakeCategory = category.toLowerCase().replace(' ', '_');
+
+               graphLegendItem = document.querySelector('.legend-' + snakeCategory + ' rect');
+
+               self.categoryColors[category](graphLegendItem ? graphLegendItem.getAttribute('fill') : '');
+            }
+         } else {
+            window.setTimeout(self.fetchWorkColors, 500);
+         }
+      };
+      self.fetchWorkColors();
    }
 });
