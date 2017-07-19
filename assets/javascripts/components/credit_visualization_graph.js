@@ -118,7 +118,9 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
       //   return d;
       //});
 
-      seriesVM.enter()
+      seriesVM.exit().remove();
+
+      seriesVM = seriesVM.enter()
          .append("g")
          .merge(seriesVM)
          .attr("class", function (datum) {
@@ -128,7 +130,6 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
             return self.colorScale(d.key);
          });
 
-      seriesVM.exit().remove();
 
       // === The actual graphic rects ===
       segmentHoverHandler = function (d, rowNumber, group) {
@@ -160,7 +161,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
 
       rectBlocksVM
          .enter()// for new data items...
-         .insert("rect", ':first-child')// add a rect & add it at the front to ensure that labels draw on top
+         .insert("rect")// add a rect
          .merge(rectBlocksVM) // and now update properties on both the new rects and existing ones
          .filter(hasSize)// removing the empties cleans up the graph DOM for other conditionals
          .attr("x", function (d) {
@@ -170,8 +171,6 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
             return self.contributionScale(dataRow[1]);
          })
          .attr("height", function (dataRow) {
-            console.log(dataRow, self.contributionScale(dataRow[0]) - self.contributionScale(dataRow[1]))
-
             return self.contributionScale(dataRow[0]) - self.contributionScale(dataRow[1]);
          })
          .attr("width", columnWidth)
