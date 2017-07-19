@@ -49,6 +49,10 @@ ko.components.register('credit-visualization', {
                         </label>\
                         <!-- /ko -->\
                      </div>\
+                     <date_filter params="minTime: minTime, \
+                                          maxTime: maxTime, \
+                                          rangeMinObservable: filter.timeStart, \
+                                          rangeMaxObservable: filter.timeEnd"></date_filter>\
                   </div>\
                   <div class="actions">\
                      <button data-bind="click: toggleEmbed">Link</button>\
@@ -126,7 +130,9 @@ ko.components.register('credit-visualization', {
       self.filter = {
          collectionId: ko.observable(uriParams.collectionId),
          users: ko.observableArray(userList instanceof Array ? userList : [userList]),
-         pid: ko.observableArray(pidList instanceof Array ? pidList : [pidList])
+         pid: ko.observableArray(pidList instanceof Array ? pidList : [pidList]),
+         timeStart: ko.observable(new Date(2016, 0, 1)),
+         timeEnd: ko.observable(new Date(2016, 05, 1))
       };
 
       self.errorText = ko.observable();
@@ -210,7 +216,7 @@ ko.components.register('credit-visualization', {
       });
 
       self.filteredModifications = ko.pureComputed(function () {
-         var filter, matchesUser, matchesDocument;
+         var filter, matchesUser, matchesDocument, result;
 
          filter = self.filter;
 
@@ -230,11 +236,13 @@ ko.components.register('credit-visualization', {
             //filter.pid().indexOf(datum.document.id) >= 0
          };
 
-         console.log('filtering:', self.allModifications())
-
-         return (self.allModifications() || []).filter(function (datum) {
-            return matchesUser(datum) && matchesDocument(datum);
+         result = (self.allModifications() || []).filter(function (workflowChangeSet) {
+            return matchesUser(workflowChangeSet) && matchesDocument(workflowChangeSet);
+         }).map(function (workflowChanges) {
+            return workflowChanges.filter(self.filter);
          });
+
+         return result;
       });
 
       self.totalNumChanges = ko.pureComputed(function () {
@@ -260,6 +268,49 @@ ko.components.register('credit-visualization', {
 
          return users;
       });
+      self.minTime = ko.pureComputed(function () {
+         var earliestDate, userMods;
+
+         userMods = self.allModifications();
+
+         if (userMods.length == 0)
+            return new Date(0).getTime();
+
+         earliestDate = userMods.reduce(function (lowest, mod) {
+            mod.allValues().forEach(function (change) {
+               var stamp = new Date(change.timestamp).getTime();
+
+               if (stamp < lowest)
+                  lowest = stamp;
+            });
+
+            return lowest;
+         }, Infinity);
+
+         return earliestDate;
+      });
+      self.maxTime = ko.pureComputed(function () {
+         var latestDate, userMods;
+
+         userMods = self.allModifications();
+
+         if (userMods.length == 0)
+            return new Date().getTime();
+
+         latestDate = userMods.reduce(function (highest, mod) {
+            mod.allValues().forEach(function (change) {
+               var stamp = new Date(change.timestamp).getTime();
+
+               if (stamp > highest)
+                  highest = stamp;
+            });
+
+            return highest;
+         }, -Infinity);
+
+         return latestDate;
+      });
+
       self.fullSource = ko.observable();
 
       self.documents = ko.pureComputed(function () {
@@ -639,12 +690,12 @@ CWRC.toTitleCase = function (string) {
       var self = this;
 
       self.user = user;
-      self.mergedTagMap = mergedTagMap;
-      self.tagWeightMap = tagWeightMap;
+      self.mergedTagMap = mergedTagMap || {};
+      self.tagWeightMap = tagWeightMap || {};
       self.categoryValueMap = {};
 
       CWRC.CreditVisualization.WorkflowChangeSet.CATEGORIES.forEach(function (category) {
-         var isMergedProperty = mergedTagMap.hasOwnProperty(category);
+         var isMergedProperty = self.mergedTagMap.hasOwnProperty(category);
 
          if (!isMergedProperty)
             self.categoryValueMap[category] = [];
@@ -681,6 +732,32 @@ CWRC.toTitleCase = function (string) {
 
          return aggregate;
       }, 0);
+   };
+
+   CWRC.CreditVisualization.WorkflowChangeSet.prototype.allValues = function () {
+      var self = this;
+
+      return Object.keys(self.categoryValueMap).reduce(function (aggregate, category) {
+         self.categoryValueMap[category].forEach(function (change) {
+            aggregate.push(change);
+         });
+
+         return aggregate;
+      }, []);
+   };
+
+   CWRC.CreditVisualization.WorkflowChangeSet.prototype.filter = function (filters) {
+      var self = this, dup;
+
+      dup = new CWRC.CreditVisualization.WorkflowChangeSet(self.user);
+
+      Object.keys(self.categoryValueMap).forEach(function (category) {
+         dup.categoryValueMap[category] = self.categoryValueMap[category].filter(function (workflowChange) {
+            return workflowChange.inTimeRange(filters.timeStart(), filters.timeEnd());
+         })
+      });
+
+      return dup;
    };
 
    CWRC.CreditVisualization.WorkflowChangeSet.isScalar = function (category) {
@@ -723,4 +800,16 @@ CWRC.toTitleCase = function (string) {
          return self.rawValue() * self.weight();
       });
    };
+
+   CWRC.CreditVisualization.WorkflowChange.prototype.inTimeRange = function (start, end) {
+      var self = this, afterStart, beforeEnd, stamp;
+
+      stamp = new Date(self.timestamp);
+
+      afterStart = start != null ? new Date(start) <= stamp : true;
+
+      beforeEnd = end != null ? stamp <= new Date(end) : true;
+
+      return afterStart && beforeEnd;
+   }
 })();

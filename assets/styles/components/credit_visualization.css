@@ -114,6 +114,22 @@ credit-visualization .filters {
    text-align: left;
 }
 
+credit-visualization .filters .users,
+credit-visualization .filters date_filter {
+   display: inline-block;
+
+   vertical-align: top;
+
+   margin-right: 3em;
+}
+
+credit-visualization .filters date_filter .noUi-value {
+   padding-top: 0.25em;
+
+   font-size: 0.75em;
+   white-space: nowrap;
+}
+
 credit-visualization .documents header,
 credit-visualization .filters header {
    margin-bottom: 0.5em;
