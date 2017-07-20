@@ -42,7 +42,7 @@ credit-visualization-timeline .change-record .name {
 }
 
 credit-visualization-timeline .change-record a {
-   color: black;
+   color: inherit;
 
    text-decoration: none;
 }

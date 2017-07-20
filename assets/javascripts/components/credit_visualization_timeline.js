@@ -22,11 +22,7 @@ ko.components.register('credit-visualization-timeline', {
       self.sortedData = ko.pureComputed(function () {
          var data;
 
-         data = self.sourceData().reduce(function (agg, workset) {
-            return agg.concat(workset.allValues());
-         }, []);
-
-         data = data.sort(function (changeA, changeB) {
+         data = self.sourceData().sort(function (changeA, changeB) {
             return new Date(changeA.timestamp).getTime() - new Date(changeB.timestamp).getTime() ||
                changeA.user.name.localeCompare(changeB.user.name)
          });
