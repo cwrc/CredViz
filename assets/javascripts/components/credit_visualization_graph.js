@@ -77,15 +77,34 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
       var self = this;
 
       var seriesVM, workTagStacker, workTagStack, formatPercent, maxValue, segmentHoverHandler,
-         rectBlocksVM, labelsVM, hasSize, columnWidth, columnWidthThreshold, drawableCanvasWidth;
+         rectBlocksVM, labelsVM, hasSize, columnWidth, columnWidthThreshold, drawableCanvasWidth, userContributionMap, users;
+
+      userContributionMap = filteredData.reduce(function (map, change) {
+         var userId = change.user.id;
+
+         map[userId] = map[userId] || {};
+
+         map[userId][change.category] = (map[userId][change.category] || 0) + change.weightedValue();
+
+         return map;
+      }, {});
+      users = filteredData.reduce(function (aggregate, change) {
+         if (!aggregate.find(function (user) {
+               return user.id == change.user.id;
+            })) {
+            aggregate.push(change.user)
+         }
+
+         return aggregate;
+      }, []);
 
       workTagStacker = d3.stack()
          .keys(Object.keys(self.workTypes))
-         .value(function (datum, category) {
-            return datum.categoryValue(category) / allChangesCount
+         .value(function (user, category) {
+            return (userContributionMap[user.id][category] || 0) / allChangesCount;
          });
 
-      workTagStack = workTagStacker(filteredData);
+      workTagStack = workTagStacker(users);
 
       maxValue = d3.max(workTagStack.reduce(function (a, b) {
          return a.concat(b.reduce(function (c, d) {
@@ -100,9 +119,9 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
       drawableCanvasWidth = self.bounds.getInnerWidth() - self.bounds.legendWidth;
       columnWidthThreshold = 4;
 
-      self.usersScale.rangeRound([0, filteredData.length >= columnWidthThreshold ? drawableCanvasWidth : drawableCanvasWidth / columnWidthThreshold]);
-      self.usersScale.domain(filteredData.map(function (d) {
-         return JSON.stringify(d.user);
+      self.usersScale.rangeRound([0, users.length >= columnWidthThreshold ? drawableCanvasWidth : drawableCanvasWidth / columnWidthThreshold]);
+      self.usersScale.domain(users.map(function (user) {
+         return JSON.stringify(user);
       }));
       self.contributionScale.domain([0, maxValue]).nice();
       self.colorScale.domain(Object.keys(self.workTypes));
@@ -165,7 +184,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
          .merge(rectBlocksVM) // and now update properties on both the new rects and existing ones
          .filter(hasSize)// removing the empties cleans up the graph DOM for other conditionals
          .attr("x", function (d) {
-            return self.usersScale(JSON.stringify(d.data.user));
+            return self.usersScale(JSON.stringify(d.data));
          })
          .attr("y", function (dataRow) {
             return self.contributionScale(dataRow[1]);
@@ -202,7 +221,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
          })
          .classed('filled', true)
          .attr("x", function (d) {
-            return self.usersScale(JSON.stringify(d.data.user)) + columnWidth / 2;
+            return self.usersScale(JSON.stringify(d.data)) + columnWidth / 2;
          })
          .attr("y", function (dataRow) {
             var baseline = self.contributionScale(dataRow[0]);
@@ -214,28 +233,37 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
       labelsVM.exit().remove();
 
       // === Column totals ===
-      var totalLabelGroups =
+
+      var totalLabelGroups, totalsMap;
+
+      totalsMap = filteredData.reduce(function (totalsMap, change) {
+         totalsMap[change.user.id] = (totalsMap[change.user.id] || 0) + change.weightedValue();
+
+         return totalsMap;
+      }, {});
+
+      totalLabelGroups =
          self.contentGroup
             .selectAll('.total-label')
-            .data(filteredData, function (d) {
+            .data(users, function (d) {
                //   need this to compare by item, not by list index
-               return d.user.id;
+               return d;
             });
 
       totalLabelGroups
          .enter()
          .insert('text', '#' + self.containerId + ' g.legend')
          .merge(totalLabelGroups)
-         .attr("class", function (datum) {
-            return "total-label total-label-user-" + datum.user.id;
+         .attr("class", function (user) {
+            return "total-label total-label-user-" + user.id;
          })
-         .text(function (d) {
-            return formatPercent(d.totalValue() / (allChangesCount || 1));
+         .text(function (user) {
+            return formatPercent(totalsMap[user.id] / (allChangesCount || 1));
          })
-         .attr('x', function (d) {
-            return self.usersScale(JSON.stringify(d.user)) + columnWidth / 2;
+         .attr('x', function (user) {
+            return self.usersScale(JSON.stringify(user)) + columnWidth / 2;
          })
-         .attr('y', function (datum, index) {
+         .attr('y', function (user, index) {
             var finalStackRow, userSegment, segmentTop;
 
             // each stack row is all segments within a category, so last one is top
@@ -337,10 +365,10 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
 
       tickGroup.selectAll('.tick')
          .append('a')
-         .attr('xlink:href', function (datum) {
+         .attr('xlink:href', function (userJson) {
             var user, uri;
 
-            user = JSON.parse(datum);
+            user = JSON.parse(userJson);
 
             // ideally, it would actually include their true URI (eg. what happens if there are 2x John Smiths)
             // but this isn't guaranteed at this time, so the best we can do is an educated guess

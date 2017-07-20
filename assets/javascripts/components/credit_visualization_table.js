@@ -25,14 +25,18 @@ ko.components.register('credit-visualization-table', {
       if (!params.labels)
          throw "Must provide 'labels' parameter to credit-visualization-table";
 
-      self.data = params.filteredModifications;
+      self.data = params.data;
       self.totalNumChanges = params.totalNumChanges;
       self.labels = params.labels;
 
       self.users = ko.pureComputed(function () {
-         return self.data().map(function (d) {
-            return d.user;
-         });
+         return self.data().reduce(function (agg, change) {
+            if (!agg.find(function (user) {
+                  return user.id == change.user.id;
+               }))
+               agg.push(change.user);
+            return agg;
+         }, []);
       });
 
       self.workTypes = Object.keys(self.labels)
@@ -41,19 +45,24 @@ ko.components.register('credit-visualization-table', {
          return self.labels[workType];
       };
 
-      self.getContributionForType = function (user, workType) {
-         var datum, percentage;
+      self.getContributionForType = function (user, category) {
+         var changes, percentage, nDecimals, decimalShifter, total;
 
-         datum = self.data().find(function (d) {
-            return d.user.id == user.id;
+         changes = self.data().filter(function (change) {
+            return change.user.id == user.id
+               && change.category == category;
          });
 
-         var nDecimals = 1;
-         var decimalShifter = Math.pow(10, nDecimals);
-         var value = datum.categoryValue(workType);
+         console.log(changes)
+
+         nDecimals = 1;
+         decimalShifter = Math.pow(10, nDecimals);
+         total = changes.reduce(function (agg, change) {
+            return agg + change.weightedValue();
+         }, 0);
 
          percentage = Math.round(
-            (value / self.totalNumChanges()) * 100 * decimalShifter
+            (total / self.totalNumChanges()) * 100 * decimalShifter
          );
 
          return (percentage / decimalShifter) || '\u2013';

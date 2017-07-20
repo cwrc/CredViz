@@ -13,12 +13,12 @@ ko.components.register('credit-visualization', {
                      <svg data-bind="attr: {width: width, height: height}"></svg>\
                   </div>\
                   <div class="tab" data-bind="visible: isView(\'Timeline\')">\
-                     <credit-visualization-timeline params="data: filteredModifications, \
+                     <credit-visualization-timeline params="data: filteredChanges, \
                                                             labels: labels"></credit-visualization-timeline>\
                   </div>\
                   <div class="tab" data-bind="visible: isView(\'Table\')">\
                      <credit-visualization-table data-bind="style: {width: width + \'px\', height: height + \'px\'}" \
-                                                 params="filteredModifications: filteredModifications, \
+                                                 params="data: filteredChanges, \
                                                          totalNumChanges: totalNumChanges, \
                                                          labels: labels"></credit-visualization-table>\
                   </div>\
@@ -185,26 +185,13 @@ ko.components.register('credit-visualization', {
          return self.view() == viewName;
       };
 
-      self.allModifications = ko.pureComputed(function () {
-         var data, documents;
+      self.allChangeSets = ko.pureComputed(function () {
+         var data;
 
          if (!self.fullSource())
             return [];
 
-         documents = self.fullSource().documents;
-
-         if (self.isProjectView()) {
-            data = documents.reduce(function (aggregate, document) {
-               return aggregate.concat(document.modifications);
-            }, []);
-         } else {
-            data = documents.find(function (doc) {
-               // TODO: this really would be nicer to include in filteredModifications instead
-               return doc.id == self.filter.pid()
-            }).modifications;
-         }
-
-         data = self.sanitize(data);
+         data = self.normalize(self.fullSource().documents);
 
          data = data.sort(function (a, b) {
             return b.totalValue() - a.totalValue()
@@ -213,63 +200,66 @@ ko.components.register('credit-visualization', {
          return data;
       });
 
-      self.filteredModifications = ko.pureComputed(function () {
+      self.filteredChanges = ko.pureComputed(function () {
          var filter, matchesUser, matchesDocument, result;
 
          filter = self.filter;
 
-         matchesUser = function (datum) {
+         matchesUser = function (change) {
             return !filter.users() ||
                filter.users().length == 0 ||
-               filter.users().indexOf(datum.user.id) >= 0
+               filter.users().indexOf(change.user.id) >= 0
          };
 
-         matchesDocument = function (datum) {
-            // todo: this is curretnly actually accomplished in allModifications because we don't
-            // todo: have document data available here
-            return true;
-
-            //return !filter.pid() ||
-            //   filter.pid().length == 0 ||
-            //filter.pid().indexOf(datum.document.id) >= 0
+         matchesDocument = function (change) {
+            return !filter.pid() ||
+               filter.pid().length == 0 ||
+               filter.pid().indexOf(change.document.id) >= 0
          };
 
-         result = (self.allModifications() || []).filter(function (workflowChangeSet) {
-            return matchesUser(workflowChangeSet) && matchesDocument(workflowChangeSet);
-         }).map(function (workflowChanges) {
-            return workflowChanges.filter(self.filter);
+         matchesTime = function (change) {
+            return change.inTimeRange(filter.timeStart(), filter.timeEnd())
+         };
+
+         var allChanges = self.allChangeSets().reduce(function (agg, changeSet) {
+            return agg.concat(changeSet.workChanges())
+         }, []);
+
+         result = allChanges.filter(function (change) {
+            return matchesUser(change) && matchesDocument(change) && matchesTime(change);
          });
 
          return result;
       });
 
       self.totalNumChanges = ko.pureComputed(function () {
-         return self.allModifications().reduce(function (aggregate, datum) {
-            return aggregate + datum.totalValue();
+         return self.allChangeSets().reduce(function (aggregate, changeSet) {
+            return aggregate + changeSet.totalValue();
          }, 0);
       });
 
       self.users = ko.pureComputed(function () {
          var users;
 
-         users = self.allModifications().map(function (datum) {
-            return datum.user;
-         }).reduce(function (aggregate, user) {
-            if (!aggregate.find(function (u) {
-                  return u.name == user.name;
-               })) {
-               aggregate.push(user);
-            }
-
-            return aggregate;
-         }, []);
+         users = self.allChangeSets()
+            .reduce(function (agg, changeSet) {
+               return agg.concat(changeSet.workChanges());
+            }, [])
+            .map(function (change) {
+               return change.user;
+            })
+            .filter(function (user, index, arr) {
+               return arr.findIndex(function (u) {
+                     return u.id == user.id
+                  }) === index;
+            });
 
          return users;
       });
       self.minTime = ko.pureComputed(function () {
          var earliestDate, userMods;
 
-         userMods = self.allModifications();
+         userMods = self.allChangeSets();
 
          if (userMods.length == 0)
             return new Date(0).getTime();
@@ -290,7 +280,7 @@ ko.components.register('credit-visualization', {
       self.maxTime = ko.pureComputed(function () {
          var latestDate, userMods;
 
-         userMods = self.allModifications();
+         userMods = self.allChangeSets();
 
          if (userMods.length == 0)
             return new Date().getTime();
@@ -368,36 +358,45 @@ ko.components.register('credit-visualization', {
          return (self.titleText().toLowerCase() + ' contributions ' + timeString).replace(/\s/g, '_');
       });
 
-      self.sanitize = function (data) {
-         var self = this, cleanData, sourceValue;
+      self.normalize = function (documents) {
+         var self = this, cleanData, sourceValue, data;
 
          cleanData = [];
 
-         // the endpoint returns each workflow change as a separate entry, so we're merging it here.
-         data.forEach(function (modification) {
-            var category, existingRecord, user;
+         documents.forEach(function (document) {
+            data = Array.prototype.concat.apply([], document.modifications);
 
-            user = modification.user;
+            // the endpoint returns each workflow change as a separate entry, so we're merging it here.
+            data.forEach(function (modification) {
+               var category, existingRecord, user;
 
-            existingRecord = cleanData.find(function (other) {
-               return other.user.id == user.id;
+               user = modification.user;
+
+               existingRecord = cleanData.find(function (other) {
+                  return other.document.id == document.id;
+               });
+
+               if (!existingRecord) {
+                  existingRecord = new CWRC.CreditVisualization.WorkflowChangeSet(
+                     document,
+                     self.mergeTags,
+                     self.tagWeights);
+                  cleanData.push(existingRecord)
+               }
+
+               category = modification.workflow_changes.category;
+
+               if (CWRC.CreditVisualization.WorkflowChangeSet.isScalar(category))
+                  sourceValue = parseInt(modification.diff_changes);
+               else
+                  sourceValue = 1;
+
+               existingRecord.addChange(user, category, sourceValue, modification.workflow_changes.timestamp);
             });
-
-            if (!existingRecord) {
-               existingRecord = new CWRC.CreditVisualization.WorkflowChangeSet(user, self.mergeTags, self.tagWeights);
-               cleanData.push(existingRecord)
-            }
-
-            category = modification.workflow_changes.category;
-
-            if (CWRC.CreditVisualization.WorkflowChangeSet.isScalar(category))
-               sourceValue = parseInt(modification.diff_changes);
-            else
-               sourceValue = 1;
-
-            existingRecord.addValue(category, sourceValue, modification.workflow_changes.timestamp);
          });
 
+
+         console.log(cleanData)
          return cleanData;
       };
 
@@ -595,7 +594,7 @@ ko.components.register('credit-visualization', {
                //console.log(workflowData)
 
                filterUpdateListener = function (newVal) {
-                  self.grapher.updateBars(self.filteredModifications(), self.totalNumChanges());
+                  self.grapher.updateBars(self.filteredChanges(), self.totalNumChanges());
 
                   if (!historyUpdating) {
                      self.history.save();
@@ -679,78 +678,39 @@ CWRC.toTitleCase = function (string) {
 };
 
 (function WorkflowChangeSet() {
-   CWRC.CreditVisualization.WorkflowChangeSet = function (user, mergedTagMap, tagWeightMap) {
+   CWRC.CreditVisualization.WorkflowChangeSet = function (document, mergedTagMap, tagWeightMap) {
       var self = this;
 
-      self.user = user;
+      self.document = document;
       self.mergedTagMap = mergedTagMap || {};
       self.tagWeightMap = tagWeightMap || {};
-      self.categoryValueMap = {};
-
-      CWRC.CreditVisualization.WorkflowChangeSet.CATEGORIES.forEach(function (category) {
-         var isMergedProperty = self.mergedTagMap.hasOwnProperty(category);
-
-         if (!isMergedProperty)
-            self.categoryValueMap[category] = [];
-      });
+      self.workChanges = ko.observableArray([]);
    };
 
-   CWRC.CreditVisualization.WorkflowChangeSet.prototype.addValue = function (category, newVal, timestamp) {
-      var self = this, weight;
+   CWRC.CreditVisualization.WorkflowChangeSet.prototype.addChange = function (user, category, newVal, timestamp) {
+      var self = this, weight, change;
 
       category = self.mergedTagMap[category] || category;
 
       weight = self.tagWeightMap[category];
 
-      self.categoryValueMap[category].push(new CWRC.CreditVisualization.WorkflowChange(newVal, weight, timestamp, self.user, category));
-   };
+      change = new CWRC.CreditVisualization.WorkflowChange(newVal, weight, timestamp, user, category, self.document);
 
-   CWRC.CreditVisualization.WorkflowChangeSet.prototype.categoryValue = function (category) {
-      var self = this;
-
-      category = self.mergedTagMap[category] || category;
-
-      return self.categoryValueMap[category].reduce(function (aggregate, change) {
-         return aggregate + change.weightedValue();
-      }, 0);
+      self.workChanges.push(change);
    };
 
    CWRC.CreditVisualization.WorkflowChangeSet.prototype.totalValue = function () {
       var self = this;
 
-      return Object.keys(self.categoryValueMap).reduce(function (aggregate, category) {
-         self.categoryValueMap[category].forEach(function (change) {
-            aggregate += change.weightedValue();
-         });
-
-         return aggregate;
+      return self.workChanges().reduce(function (aggregate, change) {
+         return aggregate + change.weightedValue();
       }, 0);
    };
 
    CWRC.CreditVisualization.WorkflowChangeSet.prototype.allValues = function () {
       var self = this;
 
-      return Object.keys(self.categoryValueMap).reduce(function (aggregate, category) {
-         self.categoryValueMap[category].forEach(function (change) {
-            aggregate.push(change);
-         });
-
-         return aggregate;
-      }, []);
-   };
-
-   CWRC.CreditVisualization.WorkflowChangeSet.prototype.filter = function (filters) {
-      var self = this, dup;
-
-      dup = new CWRC.CreditVisualization.WorkflowChangeSet(self.user);
-
-      Object.keys(self.categoryValueMap).forEach(function (category) {
-         dup.categoryValueMap[category] = self.categoryValueMap[category].filter(function (workflowChange) {
-            return workflowChange.inTimeRange(filters.timeStart(), filters.timeEnd());
-         })
-      });
-
-      return dup;
+      return self.workChanges();
    };
 
    CWRC.CreditVisualization.WorkflowChangeSet.isScalar = function (category) {
@@ -782,13 +742,14 @@ CWRC.toTitleCase = function (string) {
 })();
 
 (function WorkflowChange() {
-   CWRC.CreditVisualization.WorkflowChange = function (value, weight, timestamp, user, category) {
+   CWRC.CreditVisualization.WorkflowChange = function (value, weight, timestamp, user, category, document) {
       var self = this;
 
       self.rawValue = ko.observable(value || 0);
       self.weight = ko.observable(weight == null ? 1 : weight);
       self.timestamp = timestamp;
       self.user = user;
+      self.document = document;
       self.category = category;
 
       self.weightedValue = ko.pureComputed(function () {
