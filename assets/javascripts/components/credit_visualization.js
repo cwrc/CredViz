@@ -201,7 +201,7 @@ ko.components.register('credit-visualization', {
       });
 
       self.filteredChanges = ko.pureComputed(function () {
-         var filter, matchesUser, matchesDocument, result;
+         var filter, matchesUser, matchesDocument, matchesTime, result;
 
          filter = self.filter;
 
@@ -234,7 +234,10 @@ ko.components.register('credit-visualization', {
 
       self.totalNumChanges = ko.pureComputed(function () {
          return self.allChangeSets().reduce(function (aggregate, changeSet) {
-            return aggregate + changeSet.totalValue();
+            if (self.isProjectView() || self.filter.pid().indexOf(changeSet.document.id) >= 0)
+               return aggregate + changeSet.totalValue();
+            else
+               return aggregate;
          }, 0);
       });
 
@@ -312,7 +315,7 @@ ko.components.register('credit-visualization', {
       });
 
       self.isProjectView = ko.pureComputed(function () {
-         return !self.filter.pid() || self.filter.pid().length != 1;
+         return self.filter.pid().length == 0 || self.filter.pid().length == self.documents().length;
       });
 
       self.titleText = ko.pureComputed(function () {
