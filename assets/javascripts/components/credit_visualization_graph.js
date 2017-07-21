@@ -98,6 +98,18 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
          return aggregate;
       }, []);
 
+      users.sort(function (userA, userB) {
+         var userContribution, userBContrib;
+
+         userContribution = function (user) {
+            return Object.keys(userContributionMap[user.id]).reduce(function (agg, category) {
+               return agg + userContributionMap[user.id][category];
+            }, 0);
+         };
+
+         return (userContribution(userB) - userContribution(userA)) || userA.name.localeCompare(userB.name);
+      });
+
       workTagStacker = d3.stack()
          .keys(Object.keys(self.workTypes))
          .value(function (user, category) {
