@@ -398,8 +398,6 @@ ko.components.register('credit-visualization', {
             });
          });
 
-
-         console.log(cleanData)
          return cleanData;
       };
 
@@ -592,9 +590,6 @@ ko.components.register('credit-visualization', {
                      self.htmlId(),
                      self.tagWeights,
                      self.labels);
-
-               //console.log(credViz)
-               //console.log(workflowData)
 
                filterUpdateListener = function (newVal) {
                   self.grapher.updateBars(self.filteredChanges(), self.totalNumChanges());

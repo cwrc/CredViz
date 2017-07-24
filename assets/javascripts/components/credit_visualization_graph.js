@@ -144,10 +144,6 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
       seriesVM = self.contentGroup
          .selectAll('g.series')
          .data(workTagStack);
-      //.data(workTagStack, function (d) {
-      //   // need this to compare by item, not by list index
-      //   return d;
-      //});
 
       seriesVM.exit().remove();
 
@@ -155,7 +151,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
          .append("g")
          .merge(seriesVM)
          .attr("class", function (datum) {
-            return "series tag-" + datum.key;
+            return "series category-" + datum.key;
          })
          .attr("fill", function (d) {
             return self.colorScale(d.key);
@@ -176,7 +172,8 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
          self.svg.select('.legend-' + keyName)
             .classed('highlight', isMouseEnter);
 
-         self.svg.selectAll('.tag-' + keyName + ' text')
+         // and also the segment's label
+         self.svg.selectAll('.category-' + keyName + ' text')
             .filter(function (d, labelRowNumber, f) {
                return rowNumber == labelRowNumber;
             })
@@ -213,9 +210,26 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
 
       // === Column segment labels ===
 
+      var seriesLabelsVM;
       formatPercent = d3.format(".1%");
 
-      labelsVM = seriesVM
+      seriesLabelsVM = self.contentGroup
+         .selectAll('g.series-labels')
+         .data(workTagStack);
+
+      seriesLabelsVM.exit().remove();
+
+      seriesLabelsVM = seriesLabelsVM.enter()
+         .append("g")
+         .merge(seriesVM)
+         .attr("class", function (datum) {
+            return "series-labels category-" + datum.key;
+         })
+         .attr("fill", function (d) {
+            return self.colorScale(d.key);
+         });
+
+      labelsVM = seriesLabelsVM
          .selectAll('text')
          .data(function (d) {
             return d;
@@ -427,7 +441,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
          d3.select(d3.event.target.parentNode)
             .classed("highlight", isEnter);
 
-         segments = self.svg.selectAll('.tag-' + columnName)
+         segments = self.svg.selectAll('.category-' + columnName)
             .selectAll('rect.filled, text.filled');
 
          if (segments.size() > 0) {
