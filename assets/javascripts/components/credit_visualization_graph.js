@@ -77,29 +77,37 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
       var self = this;
 
       var seriesVM, workTagStacker, workTagStack, formatPercent, maxValue, segmentHoverHandler,
-         rectBlocksVM, labelsVM, hasSize, columnWidth, columnWidthThreshold, drawableCanvasWidth, userContributionMap, users;
+         rectBlocksVM, labelsVM, columnWidth, columnWidthThreshold, drawableCanvasWidth, userContributionMap, users;
+
+      filteredData = filteredData.filter(function (change) {
+         return change.weightedValue() / allChangesCount >= self.minimumPercent;
+      });
 
       userContributionMap = filteredData.reduce(function (map, change) {
-         var userId = change.user.id;
+         var userId;
+
+         userId = change.user.id;
 
          map[userId] = map[userId] || {};
 
-         map[userId][change.category] = (map[userId][change.category] || 0) + change.weightedValue();
+         map[userId][change.category] = (map[userId][change.category] || 0) + (change.weightedValue() / allChangesCount);
 
          return map;
       }, {});
-      users = filteredData.reduce(function (aggregate, change) {
-         if (!aggregate.find(function (user) {
-               return user.id == change.user.id;
-            })) {
-            aggregate.push(change.user)
+      users = filteredData.reduce(function (users, change) {
+         var alreadyFound = users.find(function (user) {
+            return user.id == change.user.id;
+         });
+
+         if (!alreadyFound) {
+            users.push(change.user)
          }
 
-         return aggregate;
+         return users;
       }, []);
 
       users.sort(function (userA, userB) {
-         var userContribution, userBContrib;
+         var userContribution;
 
          userContribution = function (user) {
             return Object.keys(userContributionMap[user.id]).reduce(function (agg, category) {
@@ -113,7 +121,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
       workTagStacker = d3.stack()
          .keys(Object.keys(self.workTypes))
          .value(function (user, category) {
-            return (userContributionMap[user.id][category] || 0) / allChangesCount;
+            return userContributionMap[user.id][category] || 0;
          });
 
       workTagStack = workTagStacker(users);
@@ -123,10 +131,6 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
             return c.concat(d);
          }, []));
       }, []));
-
-      hasSize = function (positionsRow) {
-         return Math.abs(positionsRow[0] - positionsRow[1]) > self.minimumPercent;
-      };
 
       drawableCanvasWidth = self.bounds.getInnerWidth() - self.bounds.legendWidth;
       columnWidthThreshold = 4;
@@ -145,8 +149,6 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
          .selectAll('g.series')
          .data(workTagStack);
 
-      seriesVM.exit().remove();
-
       seriesVM = seriesVM.enter()
          .append("g")
          .merge(seriesVM)
@@ -157,6 +159,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
             return self.colorScale(d.key);
          });
 
+      seriesVM.exit().remove();
 
       // === The actual graphic rects ===
       segmentHoverHandler = function (d, rowNumber, group) {
@@ -191,7 +194,6 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
          .enter()// for new data items...
          .insert("rect")// add a rect
          .merge(rectBlocksVM) // and now update properties on both the new rects and existing ones
-         .filter(hasSize)// removing the empties cleans up the graph DOM for other conditionals
          .attr("x", function (d) {
             return self.usersScale(JSON.stringify(d.data));
          })
@@ -202,7 +204,14 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
             return self.contributionScale(dataRow[0]) - self.contributionScale(dataRow[1]);
          })
          .attr("width", columnWidth)
-         .classed('filled', true)
+         .attr('class', function (dataRow) {
+            var contribution = self.contributionScale(dataRow[0]) - self.contributionScale(dataRow[1]);
+
+            if (contribution)
+               return 'filled user-' + dataRow.data.id;
+            else
+               return 'hidden'
+         })
          .on("mouseover", segmentHoverHandler)
          .on("mouseout", segmentHoverHandler);
 
@@ -217,17 +226,17 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
          .selectAll('g.series-labels')
          .data(workTagStack);
 
-      seriesLabelsVM.exit().remove();
-
       seriesLabelsVM = seriesLabelsVM.enter()
          .append("g")
-         .merge(seriesVM)
+         .merge(seriesLabelsVM)
          .attr("class", function (datum) {
             return "series-labels category-" + datum.key;
          })
          .attr("fill", function (d) {
             return self.colorScale(d.key);
          });
+
+      seriesLabelsVM.exit().remove();
 
       labelsVM = seriesLabelsVM
          .selectAll('text')
@@ -239,13 +248,14 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
          .enter()
          .append('text')
          .merge(labelsVM)
-         .filter(hasSize)// removing the empties cleans up the graph DOM for other conditionals
          .text(function (d) {
             var value = d[1] - d[0];
 
             return value > 0 ? formatPercent(value) : '';
          })
-         .classed('filled', true)
+         .classed('filled', function (d) {
+            return d[1] - d[0];
+         })
          .attr("x", function (d) {
             return self.usersScale(JSON.stringify(d.data)) + columnWidth / 2;
          })
@@ -418,7 +428,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
       columnWidth = self.usersScale.bandwidth(); // columnWidth is a better name than bandwidth
 
       tickGroup.selectAll(".tick text")
-         .call(self.wrap, columnWidth);
+         .call(self.lineWrap, columnWidth);
    };
 
    CWRC.CreditVisualization.StackedColumnGraph.prototype.constructLegend = function (tagWeights) {
@@ -538,7 +548,7 @@ CWRC.CreditVisualization = CWRC.CreditVisualization || {};
       }
    };
 
-   CWRC.CreditVisualization.StackedColumnGraph.prototype.wrap = function (text, width) {
+   CWRC.CreditVisualization.StackedColumnGraph.prototype.lineWrap = function (text, width) {
       text.each(function () {
          var text, words, word, line, lineNumber, lineHeight, y, dy, tspan;
 

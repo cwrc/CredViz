@@ -12,6 +12,10 @@ credit-visualization svg g.series rect.highlight {
    stroke-width: 1px;
 }
 
+credit-visualization svg g.series rect.hidden {
+   display: none;
+}
+
 credit-visualization svg g.series-labels text {
    display: none;
 
