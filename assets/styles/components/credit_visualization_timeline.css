@@ -8,37 +8,57 @@ credit-visualization-timeline {
    padding: 0.125em 0;
 }
 
-credit-visualization-timeline .timeline-list {
-   max-height: 32em;
+credit-visualization-timeline header {
+   border-bottom: 1px solid grey;
+
+   font-size: 1.5em;
+}
+
+credit-visualization-timeline .scrollpane {
+   max-height: 31em;
 
    border: inset 1px;
    border-radius: 0.25em;
    box-shadow: 0 0 0.4em rgba(0, 0, 0, 0.50) inset;
 
+   padding: 2em;
+
    overflow-y: auto;
+}
+
+credit-visualization-timeline .timeline-list {
+   border-collapse: collapse;
+
+   margin: 0 auto;
 
    text-align: left;
 }
 
-credit-visualization-timeline .change-record {
-   margin: 0 auto;
+credit-visualization-timeline .change-record td {
 
    padding: 0.5em;
 
-   max-width: 30em;
+   max-width: 40em;
 }
 
-credit-visualization-timeline .change-record .time {
-   display: inline-block;
+/*credit-visualization-timeline .change-record .time {*/
+/*display: inline-block;*/
 
-   min-width: 5em;
-   padding-right: 1em;
-}
+/*min-width: 5em;*/
+/*padding-right: 1em;*/
+/*}*/
 
-credit-visualization-timeline .change-record .name {
-   display: inline-block;
+/*credit-visualization-timeline .change-record .name,*/
+/*credit-visualization-timeline .change-record .category,*/
+/*credit-visualization-timeline .change-record .document {*/
 
-   min-width: 10em;
+/*display: inline-block;*/
+
+/*min-width: 12em;*/
+/*}*/
+
+credit-visualization-timeline .change-record .document {
+   min-width: 15em;
 }
 
 credit-visualization-timeline .change-record a {

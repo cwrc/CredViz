@@ -1,12 +1,19 @@
 ko.components.register('credit-visualization-timeline', {
-   template: ' <div class="timeline-list" data-bind="foreach: sortedData">\
-                  <div class="change-record" data-bind="style: {background: $parent.categoryColors[$data.category]}">\
-                     <span class="time" data-bind="text: $parent.cleanTime($data.timestamp)"></span>\
-                     <a href="#" class="name" data-bind="attr: {href: $parent.userLink($data.user)}">\
-                        <span data-bind="text: $data.user.name"></span>\
-                     </a>\
-                     <span class="category" data-bind="text: $parent.cleanLabel($data.category)"></span>\
-                  </div>\
+   template: ' <div class="scrollpane">\
+                  <table class="timeline-list" >\
+                     <tbody data-bind="foreach: sortedData">\
+                        <tr class="change-record" data-bind="style: {background: $parent.categoryColors[$data.category]}">\
+                           <td class="time" data-bind="text: $parent.cleanTime($data.timestamp)"></td>\
+                           <td class="name">\
+                              <a href="#" data-bind="attr: {href: $parent.userLink($data.user)}">\
+                                 <span data-bind="text: $data.user.name"></span>\
+                              </a>\
+                           </td>\
+                           <td class="category" data-bind="text: $parent.cleanLabel($data.category)"></td>\
+                           <td class="document" data-bind="text: $data.document.name"></td>\
+                        </tr>\
+                     </tbody>\
+                  </table>\
                </div>',
 
    viewModel: function (params) {
