@@ -34,8 +34,6 @@ ko.components.register('credit-visualization-timeline', {
                changeA.user.name.localeCompare(changeB.user.name)
          });
 
-         console.log(data)
-
          return data;
       });
       self.totalNumChanges = params.totalNumChanges;

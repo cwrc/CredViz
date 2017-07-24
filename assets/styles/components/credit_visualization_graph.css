@@ -12,7 +12,7 @@ credit-visualization svg g.series rect.highlight {
    stroke-width: 1px;
 }
 
-credit-visualization svg g.series text {
+credit-visualization svg g.series-labels text {
    display: none;
 
    text-anchor: middle;
@@ -27,17 +27,17 @@ credit-visualization svg g.series text {
    pointer-events: none;
 }
 
-credit-visualization svg g.series text.highlight {
+credit-visualization svg g.series-labels text.highlight {
    display: inherit;
 }
 
-credit-visualization svg text.total-label {
+credit-visualization svg .total-label {
    display: none;
 
    text-anchor: middle
 }
 
-credit-visualization svg text.total-label.highlight {
+credit-visualization svg .total-label.highlight {
    display: inherit;
 
    font-size: 1.25em;

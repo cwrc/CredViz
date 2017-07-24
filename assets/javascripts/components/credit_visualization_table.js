@@ -53,8 +53,6 @@ ko.components.register('credit-visualization-table', {
                && change.category == category;
          });
 
-         console.log(changes)
-
          nDecimals = 1;
          decimalShifter = Math.pow(10, nDecimals);
          total = changes.reduce(function (agg, change) {
