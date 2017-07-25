@@ -118,11 +118,13 @@ ko.components.register('credit-visualization', {
       }, {});
 
       // STATE
-      var uriParams, pidList, userList, historyUpdating;
+      var uriParams, pidList, userList, timeStart, timeEnd, historyUpdating;
 
       uriParams = (new URI()).search(true);
       pidList = uriParams['pid[]'] || [];
       userList = params.user || uriParams['users[]'] || [];
+      timeStart = new Date(parseInt(params.timeStart || uriParams['timeStart'] || 0));
+      timeEnd = new Date(parseInt(params.timeEnd || uriParams['timeEnd'] || 0));
 
       historyUpdating = false;
 
@@ -130,8 +132,8 @@ ko.components.register('credit-visualization', {
          collectionId: ko.observable(uriParams.collectionId),
          users: ko.observableArray(userList instanceof Array ? userList : [userList]),
          pid: ko.observableArray(pidList instanceof Array ? pidList : [pidList]),
-         timeStart: ko.observable(new Date(2016, 0, 1)),
-         timeEnd: ko.observable(new Date(2016, 05, 1))
+         timeStart: ko.observable(timeStart.getTime()),
+         timeEnd: ko.observable(timeEnd.getTime())
       };
 
       self.errorText = ko.observable();

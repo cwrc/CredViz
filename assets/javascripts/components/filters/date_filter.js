@@ -20,11 +20,8 @@ ko.components.register('date_filter', {
       self.maxTime = params.maxTime;
 
       // TODO: add extender to auto convert to int? would remove the parseInt calls
-      self.rangeMin = params.rangeMinObservable || ko.observable();
-      self.rangeMax = params.rangeMaxObservable || ko.observable();
-
-      self.rangeMin(self.minTime());
-      self.rangeMax(self.maxTime());
+      self.rangeMin = params.rangeMinObservable || ko.observable(self.minTime());
+      self.rangeMax = params.rangeMaxObservable || ko.observable(self.maxTime());
 
       /**
        * This is separated from rangeMin/Max because we don't want to filter until after the slider is
@@ -93,10 +90,19 @@ ko.components.register('date_filter', {
          return domElement;
       };
 
-      // Tried with subscribe, but it ends up out of order. Making a computed fixes the order problem.
-      self.sliderElement = ko.computed(function () {
-         return self.constructSlider();
-      });
+      self.sliderElement = self.constructSlider();
+
+      self.updateSlider = function () {
+         self.sliderElement.noUiSlider.updateOptions({
+            range: {
+               min: self.minTime(),
+               max: self.maxTime()
+            }
+         }, false);
+      };
+
+      self.minTime.subscribe(self.updateSlider);
+      self.maxTime.subscribe(self.updateSlider);
 
       //self['filter'] = function (item) {
       //   if (item.timestamp) {
