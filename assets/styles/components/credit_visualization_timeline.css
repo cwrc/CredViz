@@ -15,7 +15,7 @@ credit-visualization-timeline header {
 }
 
 credit-visualization-timeline .scrollpane {
-   max-height: 31em;
+   max-height: 27em;
 
    border: inset 1px;
    border-radius: 0.25em;
@@ -35,30 +35,7 @@ credit-visualization-timeline .timeline-list {
 }
 
 credit-visualization-timeline .change-record td {
-
-   padding: 0.5em;
-
-   max-width: 40em;
-}
-
-/*credit-visualization-timeline .change-record .time {*/
-/*display: inline-block;*/
-
-/*min-width: 5em;*/
-/*padding-right: 1em;*/
-/*}*/
-
-/*credit-visualization-timeline .change-record .name,*/
-/*credit-visualization-timeline .change-record .category,*/
-/*credit-visualization-timeline .change-record .document {*/
-
-/*display: inline-block;*/
-
-/*min-width: 12em;*/
-/*}*/
-
-credit-visualization-timeline .change-record .document {
-   min-width: 15em;
+   padding: 0.5em 0.75em;
 }
 
 credit-visualization-timeline .change-record a {
@@ -69,4 +46,33 @@ credit-visualization-timeline .change-record a {
 
 credit-visualization-timeline .change-record a:hover {
    text-decoration: underline;
+}
+
+credit-visualization-timeline .diffpane {
+   height: 30em;
+
+   overflow-y: auto;
+
+   text-align: left;
+}
+
+credit-visualization-timeline .diffpane .added {
+   background: green;
+}
+
+credit-visualization-timeline .diffpane .removed {
+   background: red;
+}
+
+credit-visualization-timeline .diffpane .blank {
+   display: block;
+   min-height: 1em;
+}
+
+credit-visualization-timeline .diffpane .diff-content {
+   font-size: 0;
+}
+
+credit-visualization-timeline .diffpane .diff-content span {
+   font-size: 14px;
 }
