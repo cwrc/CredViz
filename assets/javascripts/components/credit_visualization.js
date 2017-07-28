@@ -124,7 +124,7 @@ ko.components.register('credit-visualization', {
       pidList = uriParams['pid[]'] || [];
       userList = params.user || uriParams['users[]'] || [];
       timeStart = new Date(parseInt(params.timeStart || uriParams['timeStart'] || 0));
-      timeEnd = new Date(parseInt(params.timeEnd || uriParams['timeEnd'] || 0));
+      timeEnd = new Date(params.timeEnd || parseInt(uriParams['timeEnd']) || new Date());
 
       historyUpdating = false;
 
@@ -648,6 +648,9 @@ ko.components.register('credit-visualization', {
          load: function (event) {
             var historicalState = history.state;
             historyUpdating = true;
+
+            if (!historicalState)
+               return;
 
             for (var key in self.filter) {
                self.filter[key](historicalState.filter[key]);
