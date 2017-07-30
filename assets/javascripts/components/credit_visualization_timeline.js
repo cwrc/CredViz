@@ -20,6 +20,7 @@ ko.components.register('credit-visualization-timeline', {
                   </table>\
                </div>\
                <div class="diffpane popup" data-bind="visible: diffVisible">\
+                  <header data-bind="text: diffTitle"></header>\
                   <div class="diff-content" data-bind="foreach: {data: diffData, as: \'diff\'}">\
                      <!-- ko foreach: $parent.splitLines(diff) -->\
                         <span data-bind="text: $data, \
@@ -29,6 +30,9 @@ ko.components.register('credit-visualization-timeline', {
                                            blank: $data == \'\'\
                                          }"></span> \
                      <!-- /ko -->\
+                  </div>\
+                  <div class="controls">\
+                     <input type="button" value="Close" data-bind="click: clickOverlay"/>\
                   </div>\
                </div>\
                <div class="overlay" data-bind="visible: diffVisible, click: clickOverlay"></div>',
@@ -56,6 +60,7 @@ ko.components.register('credit-visualization-timeline', {
       self.labels = params.labels;
 
       self.diffVisible = ko.observable(false);
+      self.diffTitle = ko.observable();
       self.diffData = ko.observableArray();
 
       self.userLink = function (user) {
@@ -90,14 +95,14 @@ ko.components.register('credit-visualization-timeline', {
       self.viewDiff = function (change) {
          var targetDate, previousDate, targetUri, previousUri;
 
-         self.diffVisible(true);
-
          targetDate = new Date("2017-07-27T23:48:03.384Z");
          previousDate = new Date();
 
+         self.diffVisible(true);
+         self.diffTitle('Changes to ' + change.document.name + ' on ' + self.cleanTime(targetDate));
+
          targetUri = '/islandora/rest/v1/object/' + change.document.id + '/datastream/CWRC?version=' + targetDate.toISOString()
          previousUri = '/islandora/rest/v1/object/' + change.document.id + '/datastream/CWRC?version=' + previousDate.toISOString()
-
 
          ajax('get', targetUri, false, function (contentA) {
             ajax('get', previousUri, false, function (contentB) {
