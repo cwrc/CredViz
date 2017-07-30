@@ -49,19 +49,31 @@ credit-visualization-timeline .change-record a:hover {
 }
 
 credit-visualization-timeline .diffpane {
-   height: 30em;
+   position: absolute;
 
-   overflow-y: auto;
+   height: 30em;
 
    text-align: left;
 }
 
+credit-visualization-timeline .diffpane header {
+   margin-bottom: 1em;
+
+   padding: 0.5em;
+
+   background: #cdcdcd;
+}
+
 credit-visualization-timeline .diffpane .added {
-   background: green;
+   background: rgba(0, 128, 0, 0.24);
+   color: green;
 }
 
 credit-visualization-timeline .diffpane .removed {
-   background: red;
+   background: rgba(255, 0, 0, 0.27);
+
+   text-decoration: line-through;
+   color: rgba(255, 0, 0, 0.77);
 }
 
 credit-visualization-timeline .diffpane .blank {
@@ -70,9 +82,22 @@ credit-visualization-timeline .diffpane .blank {
 }
 
 credit-visualization-timeline .diffpane .diff-content {
+   height: 75%;
+
+   box-shadow: 0 0 8px rgba(0, 0, 0, 0.34) inset;
+   padding: 12px;
+
+   overflow-y: auto;
+
    font-size: 0;
 }
 
 credit-visualization-timeline .diffpane .diff-content span {
    font-size: 14px;
+}
+
+credit-visualization-timeline .diffpane .controls {
+   padding: 0.25em 0;
+
+   text-align: right;
 }
