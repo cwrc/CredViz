@@ -13,7 +13,7 @@ ko.components.register('credit-visualization-timeline', {
                            <td class="document" data-bind="text: $data.document.name"></td>\
                            <td class="diff">\
                               <a href="#" data-bind="visible: $parent.hasDiff($data), \
-                                                     click: function(){ $parent.viewDiff($data) }">Compare</a>\
+                                                     click: function(){ $parent.viewDiff($data, $index()) }">Compare</a>\
                            </td>\
                         </tr>\
                      </tbody>\
@@ -92,11 +92,13 @@ ko.components.register('credit-visualization-timeline', {
          return diff.value.split("\n")
       };
 
-      self.viewDiff = function (change) {
-         var targetDate, previousDate, targetUri, previousUri;
+      self.viewDiff = function (change, index) {
+         var targetDate, previousDate, targetUri, previousUri, previousChange;
 
-         targetDate = new Date("2017-07-27T23:48:03.384Z");
-         previousDate = new Date();
+         previousChange = self.sortedData()[index - 1];
+
+         targetDate = new Date(change.timestamp); // eg "2017-07-27T23:48:03.384Z"
+         previousDate = new Date(previousChange ? previousChange.timestamp : 0);
 
          self.diffVisible(true);
          self.diffTitle('Changes to ' + change.document.name + ' on ' + self.cleanTime(targetDate));
@@ -104,8 +106,8 @@ ko.components.register('credit-visualization-timeline', {
          targetUri = '/islandora/rest/v1/object/' + change.document.id + '/datastream/CWRC?version=' + targetDate.toISOString()
          previousUri = '/islandora/rest/v1/object/' + change.document.id + '/datastream/CWRC?version=' + previousDate.toISOString()
 
-         ajax('get', targetUri, false, function (contentA) {
-            ajax('get', previousUri, false, function (contentB) {
+         ajax('get', targetUri, false, function (targetContent) {
+            ajax('get', previousUri, false, function (prevContent) {
                var entryA, entryB, compact;
 
                compact = function (str) {
@@ -120,8 +122,8 @@ ko.components.register('credit-visualization-timeline', {
                      .trim();
                };
 
-               entryA = contentA.getElementsByTagName('ENTRY')[0];
-               entryB = contentB.getElementsByTagName('ENTRY')[0];
+               entryA = targetContent.getElementsByTagName('ENTRY')[0];
+               entryB = prevContent.getElementsByTagName('ENTRY')[0];
 
                self.diffData(JsDiff.diffChars(compact(entryA.textContent), compact(entryB.textContent)));
             });
