@@ -11,9 +11,8 @@ ko.components.register('credit-visualization-timeline', {
                            </td>\
                            <td class="category" data-bind="text: $parent.cleanLabel($data.category)"></td>\
                            <td class="document" data-bind="text: $data.document.name"></td>\
-                           <td class="diff">\
-                              <a href="#" data-bind="visible: $parent.hasDiff($data), \
-                                                     click: function(){ $parent.viewDiff($data, $index()) }">Compare</a>\
+                           <td class="diff" data-bind="css: {\'diff-button\': $parent.hasDiff($data)}">\
+                              <a href="#" data-bind="click: function(){ $parent.viewDiff($data, $index()) }">Compare</a>\
                            </td>\
                         </tr>\
                      </tbody>\
@@ -21,7 +20,7 @@ ko.components.register('credit-visualization-timeline', {
                </div>\
                <div class="diffpane popup" data-bind="visible: diffVisible">\
                   <header data-bind="text: diffTitle"></header>\
-                  <div class="diff-content" data-bind="foreach: {data: diffData, as: \'diff\'}">\
+                  <div class="diff-content" data-bind="visible: diffData().length, foreach: {data: diffData, as: \'diff\'}">\
                      <!-- ko foreach: $parent.splitLines(diff) -->\
                         <span data-bind="text: $data, \
                                          css: { \
@@ -30,6 +29,9 @@ ko.components.register('credit-visualization-timeline', {
                                            blank: $data == \'\'\
                                          }"></span> \
                      <!-- /ko -->\
+                  </div>\
+                  <div class="diff-empty" data-bind="visible: !diffData().length">\
+                     - Data not available -\
                   </div>\
                   <div class="controls">\
                      <input type="button" value="Close" data-bind="click: clickOverlay"/>\
@@ -102,6 +104,7 @@ ko.components.register('credit-visualization-timeline', {
 
          self.diffVisible(true);
          self.diffTitle('Changes to ' + change.document.name + ' on ' + self.cleanTime(targetDate));
+         self.diffData([]);
 
          targetUri = '/islandora/rest/v1/object/' + change.document.id + '/datastream/CWRC?version=' + targetDate.toISOString()
          previousUri = '/islandora/rest/v1/object/' + change.document.id + '/datastream/CWRC?version=' + previousDate.toISOString()
