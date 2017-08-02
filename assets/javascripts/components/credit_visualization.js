@@ -23,9 +23,12 @@ ko.components.register('credit-visualization', {
                                                          labels: labels"></credit-visualization-table>\
                   </div>\
                   <header class="graph-title">\
-                     <span>Contributions to</span>\
-                     <a href="#" data-bind="attr: {href: titleTarget}, text: titleText"></a>,\
-                     <span>by Type</span>\
+                     <!-- ko if: !isPrinting() -->\
+                        <span>Contributions to</span>\
+                        <a href="#" data-bind="attr: {href: titleTarget}, text: titleSubject"></a>,\
+                        <span>by Type</span>\
+                     <!-- /ko -->\
+                     <span data-bind="visible: isPrinting, text: exportTitle"></span>\
                   </header>\
                   <div class="documents">\
                      <header>Documents</header>\
@@ -68,11 +71,11 @@ ko.components.register('credit-visualization', {
                            <header>Annotations (optional)</header>\
                            <label>\
                               <span>Title</span>\
-                              <input type="text" data-bind="text: exportTitle" />\
+                              <input type="text" data-bind="value: exportTitle" />\
                            </label>\
                            <label class="notes">\
                               <span>Notes</span>\
-                              <textarea data-bind="text: notes"></textarea>\
+                              <textarea data-bind="value: notes"></textarea>\
                            </label>\
                         </div>\
                         <p>Save as...</p>\
@@ -89,7 +92,9 @@ ko.components.register('credit-visualization', {
                      </div>\
                      <div class="overlay" data-bind="visible: overlayVisible, click: clickOverlay"></div>\
                   </div>\
-                  <footer data-bind="text: creationTime">\
+                  <footer data-bind="visible: isPrinting">\
+                     <div class="notes" data-bind="text: notes"></div>\
+                     <div class="time" data-bind="text: creationTime"></div>\
                   </footer>\
                </div>',
 
@@ -334,7 +339,7 @@ ko.components.register('credit-visualization', {
          return self.filter.pid().length == 0 || self.filter.pid().length == self.documents().length;
       });
 
-      self.titleText = ko.pureComputed(function () {
+      self.titleSubject = ko.pureComputed(function () {
          var title = '';
 
          if (self.fullSource()) {
@@ -374,7 +379,7 @@ ko.components.register('credit-visualization', {
          timeString = generationTime.toISOString().replace(':', '-');
          timeString = timeString.split('T')[0];
 
-         return (self.titleText().toLowerCase() + ' contributions ' + timeString).replace(/\s/g, '_');
+         return (self.titleSubject().toLowerCase() + ' contributions ' + timeString).replace(/\s/g, '_');
       });
 
       self.normalize = function (documents) {
@@ -445,6 +450,8 @@ ko.components.register('credit-visualization', {
          domNode.style.display = 'inline-block';
 
          self.creationTime('Generated on ' + new Date());
+         self.exportTitle(self.exportTitle() || 'Contributions to ' + self.titleSubject() + ', by Type');
+         self.isPrinting(true);
 
          downloadImage = function (dataUrl) {
             var link = document.createElement('a');
@@ -456,7 +463,7 @@ ko.components.register('credit-visualization', {
 
             link.click();
 
-            self.creationTime('');
+            self.isPrinting(false);
          };
 
          if (type == 'png')
@@ -484,6 +491,8 @@ ko.components.register('credit-visualization', {
          domNode.style.display = 'inline-block';
 
          self.creationTime('Generated on ' + new Date());
+         self.exportTitle(self.exportTitle() || 'Contributions to ' + self.titleSubject() + ', by Type');
+         self.isPrinting(true);
 
          domtoimage
             .toPng(domNode, {
@@ -523,9 +532,6 @@ ko.components.register('credit-visualization', {
 
                   linkTarget = (new URI()).toString();
 
-                  linkX = pdfWidth / 2 - pdf.getTextWidth(linkTarget) / 2;
-                  linkY = imageY + pdfImageHeight + scaledLineHeight;
-
                   linkTarget = pdf.splitTextToSize(linkTarget, pdfWidth - margin * 2);
 
                   /*
@@ -544,13 +550,16 @@ ko.components.register('credit-visualization', {
 
                   textHeight = linkTarget.length * scaledLineHeight + linkPadding * 2;
 
+                  linkX = pdfWidth / 2 - textWidth / 2;
+                  linkY = imageY + pdfImageHeight + scaledLineHeight;
+
                   pdf.text(linkTarget, linkX, linkY);
                   pdf.link(linkX, linkY - scaledLineHeight, textWidth, textHeight, {url: linkTarget});
                   //pdf.rect(linkX, linkY - scaledLineHeight, textWidth, textHeight); // useful for debug
 
                   pdf.save(self.filename() + '.pdf');
 
-                  self.creationTime('');
+                  self.isPrinting(false);
                }
             });
       };
