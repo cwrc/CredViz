@@ -7,6 +7,8 @@ credit-visualization {
 
 credit-visualization header.graph-title {
    margin: 0.5em 0 1em 0;
+
+   font-weight: bold;
 }
 
 credit-visualization * {
@@ -223,4 +225,10 @@ credit-visualization footer {
 
    background: white;
    font-size: 10pt;
+}
+
+credit-visualization footer .notes {
+   padding: 1em;
+
+   font-style: italic;
 }
