@@ -63,6 +63,18 @@ ko.components.register('credit-visualization', {
                         <button data-bind="click: toggleEmbed">Close</button>\
                      </div>\
                      <div class="download-popup popup" data-bind="visible: downloadVisible">\
+                        <header>Download</header>\
+                        <div class="labelling">\
+                           <header>Annotations (optional)</header>\
+                           <label>\
+                              <span>Title</span>\
+                              <input type="text" data-bind="text: exportTitle" />\
+                           </label>\
+                           <label class="notes">\
+                              <span>Notes</span>\
+                              <textarea data-bind="text: notes"></textarea>\
+                           </label>\
+                        </div>\
                         <p>Save as...</p>\
                         <div class="options">\
                            <button data-bind="click: function() { saveScreenshot(\'png\') }">PNG</button>\
@@ -116,6 +128,8 @@ ko.components.register('credit-visualization', {
 
          return object;
       }, {});
+      self.notes = ko.observable();
+      self.exportTitle = ko.observable();
 
       // STATE
       var uriParams, pidList, userList, timeStart, timeEnd, historyUpdating;
