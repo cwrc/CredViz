@@ -27,6 +27,8 @@ body > header .description {
    color: white;
 
    margin-left: 15em;
+
+   white-space: nowrap;
 }
 
 body > header .description img {
