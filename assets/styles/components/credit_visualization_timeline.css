@@ -1,0 +1,138 @@
+credit-visualization-timeline {
+   display: block;
+
+   width: 1024px;
+
+   margin: 0 auto;
+
+   padding: 0.125em 0;
+}
+
+credit-visualization-timeline header {
+   border-bottom: 1px solid grey;
+
+   font-size: 1.5em;
+}
+
+credit-visualization-timeline .scrollpane {
+   max-height: 27em;
+
+   border: inset 1px;
+   border-radius: 0.25em;
+   box-shadow: 0 0 0.4em rgba(0, 0, 0, 0.50) inset;
+
+   padding: 2em;
+
+   overflow-y: auto;
+}
+
+credit-visualization-timeline .timeline-list {
+   border-collapse: collapse;
+
+   margin: 0 auto;
+
+   text-align: left;
+}
+
+credit-visualization-timeline .change-record td {
+   padding: 0.5em 0.75em;
+}
+
+credit-visualization-timeline .change-record a {
+   color: inherit;
+
+   text-decoration: none;
+}
+
+credit-visualization-timeline .change-record a:hover {
+   text-decoration: underline;
+}
+
+credit-visualization-timeline .change-record td.diff-button {
+   padding: 0 0.25em 0 0;
+}
+
+credit-visualization-timeline .change-record td.diff a {
+   display: none;
+}
+
+credit-visualization-timeline .change-record td.diff-button a {
+   display: inline;
+
+   border-radius: 0.5em;
+
+   background: #336699;
+
+   padding: 0.25em 0.5em;
+
+   color: white;
+}
+
+credit-visualization-timeline .change-record td.diff-button a:hover {
+   box-shadow: 0.1em 0.1em 0.25em rgba(0, 0, 0, 0.5);
+
+   text-decoration: none;
+}
+
+credit-visualization-timeline .diffpane {
+   position: absolute;
+
+   height: 30em;
+
+   text-align: left;
+}
+
+credit-visualization-timeline .diffpane header {
+   margin-bottom: 1em;
+
+   padding: 0.5em;
+
+   background: #cdcdcd;
+}
+
+credit-visualization-timeline .diffpane .added {
+   background: rgba(0, 128, 0, 0.24);
+   color: green;
+}
+
+credit-visualization-timeline .diffpane .removed {
+   background: rgba(255, 0, 0, 0.27);
+
+   text-decoration: line-through;
+   color: rgba(255, 0, 0, 0.77);
+}
+
+credit-visualization-timeline .diffpane .blank {
+   display: block;
+   min-height: 1em;
+}
+
+credit-visualization-timeline .diffpane .diff-content,
+credit-visualization-timeline .diffpane .diff-empty {
+   height: 75%;
+
+   box-shadow: 0 0 8px rgba(0, 0, 0, 0.34) inset;
+   padding: 12px;
+
+   overflow-y: auto;
+
+   font-size: 0;
+}
+
+credit-visualization-timeline .diffpane .diff-empty {
+   text-align: center;
+
+   font-size: 1em;
+
+   color: grey;
+}
+
+credit-visualization-timeline .diffpane .diff-content span {
+   font-size: 14px;
+}
+
+credit-visualization-timeline .diffpane .controls {
+   padding: 0.25em 0;
+
+   text-align: right;
+}

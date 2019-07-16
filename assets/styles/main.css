@@ -1,0 +1,103 @@
+body {
+   margin: 0;
+
+   padding-bottom: 10em;
+
+   min-height: 100%;
+
+   font-family: "Lato", "Arial", sans-serif;
+   color: #222;
+
+   text-align: center;
+}
+
+body > header {
+   margin-bottom: 5em;
+
+   text-align: left;
+
+   background: black;
+   color: black;
+}
+
+body > header .description {
+   display: inline-block;
+
+   vertical-align: top;
+   color: white;
+
+   margin-left: 15em;
+
+   white-space: nowrap;
+}
+
+body > header .description img {
+   margin-right: 1em;
+}
+
+body > header .description p {
+   display: inline-block;
+}
+
+body > header .description a {
+   color: white;
+}
+
+body > header .description a:hover {
+   color: mistyrose;
+}
+
+.logo {
+   /*display: inline-block;*/
+   position: absolute;
+
+   margin: 0;
+   box-shadow: 0.1em 0.1em 0.5em rgba(0, 0, 0, 0.5);
+
+   padding: 0.5em 1.5em;
+
+   text-align: center;
+
+   background: white;
+}
+
+.logo a {
+   text-decoration: none;
+   color: black;
+}
+
+.logo .name {
+   display: block;
+
+   font-size: 2em;
+   font-weight: bold;
+   font-family: 'Courier New', monospace;
+}
+
+.logo:hover {
+   box-shadow: 0.3em 0.3em 0.75em rgba(0, 0, 0, 0.25);
+}
+
+@font-face {
+   font-family: 'Special Elite';
+   font-style: normal;
+   font-weight: 400;
+   src: local('Special Elite'), local('SpecialElite-Regular'), url(https://fonts.gstatic.com/s/specialelite/v6/9-wW4zu3WNoD5Fjka35JmzxObtw73-qQgbr7Be51v5c.woff2) format('woff2');
+   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215, U+E0FF, U+EFFD, U+F000;
+}
+
+.logo span {
+   font-style: italic;
+   font-family: "Special Elite", "Courier New", Courier, monospace;
+}
+
+main section > header {
+   margin: 1em auto;
+   max-width: 66%;
+   border-bottom: 1px dotted black;
+   padding: 0.5em;
+
+   font-family: "Lato", "Arial", sans-serif;
+
+   font-size: 1.5em;
+}

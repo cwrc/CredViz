@@ -1,0 +1,55 @@
+credit-visualization-table {
+   display: block;
+
+   margin: 0 auto;
+
+   padding: 0.125em 0;
+
+   /*overflow-y: auto;*/
+}
+
+credit-visualization-table table {
+   width: 100%;
+   height: 100%;
+
+   border-collapse: collapse;
+}
+
+credit-visualization-table table th {
+   font-weight: normal;
+}
+
+/*credit-visualization-table table thead th:first-of-type {*/
+/*width: 5em;*/
+/*}*/
+
+credit-visualization-table table tbody th {
+   width: 10em;
+
+   text-align: right;
+}
+
+credit-visualization-table table tbody tr:nth-of-type(odd) {
+   background: lightgrey;
+}
+
+credit-visualization-table table th,
+credit-visualization-table table td {
+   padding: 0.5em;
+}
+
+credit-visualization-table table thead th {
+   padding-top: 0;
+}
+
+credit-visualization-table table td.contribution:after {
+   content: '%';
+}
+
+credit-visualization-table table td.nil {
+   opacity: 0.3;
+}
+
+credit-visualization-table table td.nil:after {
+   display: none;
+}

@@ -1,0 +1,86 @@
+{
+   "$schema": "http://json-schema.org/draft-04/schema#",
+   "type": "object",
+   "properties": {
+      "id": {
+         "type": "string"
+      },
+      "label": {
+         "type": "string"
+      },
+      "documents": {
+         "type": "array",
+         "items": {
+            "type": "object",
+            "properties": {
+               "id": {
+                  "type": "string"
+               },
+               "name": {
+                  "type": "string"
+               },
+               "modifications": {
+                  "type": "array",
+                  "items": {
+                     "type": "object",
+                     "properties": {
+                        "user": {
+                           "type": "object",
+                           "properties": {
+                              "id": {
+                                 "type": "string"
+                              },
+                              "name": {
+                                 "type": "string"
+                              }
+                           },
+                           "required": [
+                              "id",
+                              "name"
+                           ]
+                        },
+                        "workflow_changes": {
+                           "type": "object",
+                           "properties": {
+                              "category": {
+                                 "type": "string"
+                              },
+                              "stamp": {
+                                 "type": "string"
+                              },
+                              "timestamp": {
+                                 "type": "string"
+                              }
+                           },
+                           "required": [
+                              "category",
+                              "stamp",
+                              "timestamp"
+                           ]
+                        },
+                        "diff_changes": {
+                           "type": "array"
+                        }
+                     },
+                     "required": [
+                        "user",
+                        "workflow_changes",
+                        "diff_changes"
+                     ]
+                  }
+               }
+            },
+            "required": [
+               "id",
+               "name",
+               "modifications"
+            ]
+         }
+      }
+   },
+   "required": [
+      "id",
+      "label",
+      "documents"
+   ]
+}

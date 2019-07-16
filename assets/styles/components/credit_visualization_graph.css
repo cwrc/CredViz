@@ -1,0 +1,88 @@
+
+credit-visualization svg .bar {
+   fill: steelblue;
+}
+
+credit-visualization svg .axis path {
+   display: none;
+}
+
+credit-visualization svg g.series rect.highlight {
+   stroke: black;
+   stroke-width: 1px;
+}
+
+credit-visualization svg g.series rect.hidden {
+   display: none;
+}
+
+credit-visualization svg g.series-labels text {
+   display: none;
+
+   text-anchor: middle;
+   alignment-baseline: middle;
+
+   fill: black;
+   font-size: 1.25em;
+   font-weight: bold;
+   stroke: white;
+   stroke-width: 0.03em;
+
+   pointer-events: none;
+}
+
+credit-visualization svg g.series-labels text.highlight {
+   display: inherit;
+}
+
+credit-visualization svg .total-label {
+   display: none;
+
+   text-anchor: middle
+}
+
+credit-visualization svg .total-label.highlight {
+   display: inherit;
+
+   font-size: 1.25em;
+}
+
+credit-visualization svg a text:hover {
+   text-decoration: underline;
+}
+
+credit-visualization svg .legend .highlight text {
+   font-size: 110%;
+
+   cursor: default;
+   -webkit-user-select: none;
+   -moz-user-select: none;
+   user-select: none;
+}
+
+credit-visualization svg .legend .highlight rect {
+   stroke: black;
+   stroke-width: 2px;
+}
+
+credit-visualization svg .notice-label text {
+   fill: white;
+
+   text-anchor: middle;
+}
+
+credit-visualization svg .notice-label rect {
+   padding: 1em;
+
+   fill: rgba(51, 51, 51, 0.61);
+
+   transition: none;
+}
+
+credit-visualization svg .title a {
+   font-style: italic;
+}
+
+credit-visualization svg .title a:hover {
+   text-decoration: underline;
+}
